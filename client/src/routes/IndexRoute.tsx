@@ -44,7 +44,7 @@ function IndexRoute() {
     >
       <div className="flex-center" style={{ textAlign: "center" }}>
         <h1>Two Rooms and a Boom</h1>
-        <Image src="/assets/tds-box.png" size="small" />
+        <Image src="/assets/2r1b-dual.jpeg" size="small" />
 
         {isLoading ? (
           <>
@@ -58,8 +58,9 @@ function IndexRoute() {
           </>
         ) : (
           <p style={{ margin: "5%" }}>
-            A quick-play party game that combines cooperative social deduction
-            with bluffing, luck and chance.
+            Find your teammates, establish
+            trust, and exchange hostages before time runs out and the bomb
+            explodes!
           </p>
         )}
       </div>
@@ -73,7 +74,12 @@ function IndexRoute() {
         >
           LEARN
         </Button>
-        <Button disabled={isLoading} fluid color="green" onClick={handleJoinGame}>
+        <Button
+          disabled={isLoading}
+          fluid
+          color="green"
+          onClick={handleJoinGame}
+        >
           JOIN
         </Button>
         <Button disabled={isLoading} fluid primary onClick={handleNewGame}>

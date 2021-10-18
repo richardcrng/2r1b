@@ -11,7 +11,7 @@ function App() {
       <main
         className='background'
         style={{
-          backgroundImage: "url('/assets/tds-main.jpeg')",
+          backgroundImage: "url('/assets/2r1b-background.png')",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
