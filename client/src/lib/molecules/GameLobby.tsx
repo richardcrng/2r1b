@@ -5,8 +5,8 @@ import { Button } from "semantic-ui-react";
 import styled from 'styled-components';
 // import { gameLobbyReadiness } from "../../selectors/game";
 import { GameBase, Player } from "../../types/game.types";
-import PlayerList from "../../lib/atoms/PlayerList";
-import PlayerAvatar from "../../lib/atoms/PlayerAvatar";
+import PlayerList from "../atoms/PlayerList";
+import PlayerAvatar from "../atoms/PlayerAvatar";
 import { GameLobbyReadiness } from "../../selectors/game";
 
 interface Props {
