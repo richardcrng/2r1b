@@ -18,8 +18,8 @@ export enum RedRoleName {
   CLOWN = "Clown",
   ENGINEER = "Engineer",
   MARTYR = "Martyr",
-  TEAM = "Red Team",
   TINKERER = "Tinkerer",
+  TEAM = "Red Team",
 }
 
 export enum GreyRoleName {
@@ -28,134 +28,156 @@ export enum GreyRoleName {
 }
 
 export type RoleName = BlueRoleName | RedRoleName | GreyRoleName
+export type BlueRoleKey = `${keyof typeof BlueRoleName}_BLUE`;
+export type RedRoleKey = `${keyof typeof RedRoleName}_RED`;
+export type GreyRoleKey = `${keyof typeof GreyRoleName}_GREY`;
+export type RoleKey = BlueRoleKey | RedRoleKey | GreyRoleKey
 
 export interface PlayerRoleBase {
+  key: RoleKey;
   team: TeamName;
   roleName: RoleName;
 }
 
 export interface BlueRole extends PlayerRoleBase {
+  key: BlueRoleKey;
   team: TeamName.BLUE;
   roleName: BlueRoleName;
 }
 
 export interface RedRole extends PlayerRoleBase {
+  key: RedRoleKey;
   team: TeamName.RED;
   roleName: RedRoleName;
 }
 
 export interface GreyRole extends PlayerRoleBase {
+  key: GreyRoleKey;
   team: TeamName.GREY;
   roleName: GreyRoleName;
 }
 
 export type PlayerRole = BlueRole | GreyRole | RedRole
+export type Restricted<TRole extends PlayerRole> = TRole & { restrictions: RoleRestrictions }
 
-export const BLUE_ROLES_DICT = Object.fromEntries(
-  (Object.keys(BlueRoleName) as (keyof typeof BlueRoleName)[]).map(
-    (roleName) => [
-      `${roleName}_${TeamName.BLUE}`,
-      { team: TeamName.BLUE, roleName: BlueRoleName[roleName] },
-    ]
-  )
-) as Record<`${keyof typeof BlueRoleName}_${TeamName.BLUE}`, BlueRole>;
+export interface RoleRestrictions {
+  max: number;
+  min: number;
+}
 
-export const GREY_ROLES_DICT = Object.fromEntries(
-  (Object.keys(GreyRoleName) as (keyof typeof GreyRoleName)[]).map((roleName) => [
-    `${roleName}_${TeamName.GREY}`,
-    { team: TeamName.GREY, roleName: GreyRoleName[roleName] },
-  ])
-) as Record<`${keyof typeof GreyRoleName}_${TeamName.GREY}`, GreyRole>;
+class RoleDefinition<TRole extends PlayerRole> {
+  readonly key: TRole['key'];
+  readonly team: TRole['team'];
+  readonly roleName: TRole['roleName'];
+  readonly restrictions: RoleRestrictions;
 
-export const RED_ROLES_DICT = Object.fromEntries(
-  (Object.keys(RedRoleName) as (keyof typeof RedRoleName)[]).map((roleName) => [
-    `${roleName}_${TeamName.RED}`,
-    { team: TeamName.RED, roleName: RedRoleName[roleName] },
-  ])
-) as Record<`${keyof typeof RedRoleName}_${TeamName.RED}`, RedRole>;
+  constructor(
+    { key, team, roleName }: TRole,
+    { max = 1, min = 0 } = {}
+  ) {
+    this.key = key
+    this.team = team;
+    this.roleName = roleName;
+    this.restrictions = { max, min }
+  }
 
-export const ALL_ROLES = { ...BLUE_ROLES_DICT, ...GREY_ROLES_DICT, ...RED_ROLES_DICT }
+  toString(): `${RoleName} (${TeamName})` {
+    return `${this.roleName} (${this.team})`;
+  }
+}
 
-export type RoleKey = keyof typeof ALL_ROLES;
+export const BLUE_ROLES: Record<BlueRoleKey, Restricted<BlueRole>> = {
 
-// export default class PlayerRole implements PlayerRoleBase {
-//   readonly team: TeamName;
-//   readonly roleName: RoleName;
+  CLOWN_BLUE: new RoleDefinition({
+    key: 'CLOWN_BLUE',
+    team: TeamName.BLUE,
+    roleName: BlueRoleName.CLOWN
+  }),
 
-//   static readonly BLUE_TEAM = new PlayerRole({
-//     team: TeamName.BLUE,
-//     roleName: RoleName.BLUE_TEAM,
-//   });
+  DOCTOR_BLUE: new RoleDefinition({
+    key: 'DOCTOR_BLUE',
+    team: TeamName.BLUE,
+    roleName: BlueRoleName.DOCTOR
+  }),
 
-//   static readonly BOMBER = new PlayerRole({
-//     team: TeamName.RED,
-//     roleName: RoleName.BOMBER,
-//   });
+  NURSE_BLUE: new RoleDefinition({
+    key: 'NURSE_BLUE',
+    team: TeamName.BLUE,
+    roleName: BlueRoleName.NURSE
+  }),
 
-//   static readonly CLOWN_BLUE = new PlayerRole({
-//     team: TeamName.BLUE,
-//     roleName: RoleName.CLOWN,
-//   });
+  PRESIDENT_BLUE: new RoleDefinition({
+    key: 'PRESIDENT_BLUE',
+    team: TeamName.BLUE,
+    roleName: BlueRoleName.PRESIDENT
+  }, { min: 1 }),
 
-//   static readonly CLOWN_RED = new PlayerRole({
-//     team: TeamName.RED,
-//     roleName: RoleName.CLOWN,
-//   });
+  PRESIDENTS_DAUGHTER_BLUE: new RoleDefinition({
+    key: 'PRESIDENTS_DAUGHTER_BLUE',
+    team: TeamName.BLUE,
+    roleName: BlueRoleName.PRESIDENTS_DAUGHTER
+  }),
 
-//   static readonly DOCTOR = new PlayerRole({
-//     team: TeamName.BLUE,
-//     roleName: RoleName.DOCTOR,
-//   });
+  TEAM_BLUE: new RoleDefinition({
+    key: 'TEAM_BLUE',
+    team: TeamName.BLUE,
+    roleName: BlueRoleName.TEAM
+  }, { max: Infinity })
 
-//   static readonly ENGINEER = new PlayerRole({
-//     team: TeamName.RED,
-//     roleName: RoleName.ENGINEER,
-//   });
+};
 
-//   static readonly GAMBLER = new PlayerRole({
-//     team: TeamName.GREY,
-//     roleName: RoleName.GAMBLER,
-//   });
+export const RED_ROLES: Record<RedRoleKey, Restricted<RedRole>> = {
+  CLOWN_RED: new RoleDefinition({
+    key: "CLOWN_RED",
+    team: TeamName.RED,
+    roleName: RedRoleName.CLOWN,
+  }),
 
-//   static readonly NURSE = new PlayerRole({
-//     team: TeamName.BLUE,
-//     roleName: RoleName.NURSE,
-//   });
+  BOMBER_RED: new RoleDefinition({
+    key: 'BOMBER_RED',
+    team: TeamName.RED,
+    roleName: RedRoleName.BOMBER
+  }, { min: 1 }),
 
-//   static readonly PRESIDENT = new PlayerRole({
-//     team: TeamName.BLUE,
-//     roleName: RoleName.PRESIDENT,
-//   });
+  ENGINEER_RED: new RoleDefinition({
+    key: 'ENGINEER_RED',
+    team: TeamName.RED,
+    roleName: RedRoleName.ENGINEER
+  }),
 
-//   static readonly PRESIDENTS_DAUGHTER = new PlayerRole({
-//     team: TeamName.BLUE,
-//     roleName: RoleName.PRESIDENTS_DAUGHTER,
-//   });
+  MARTYR_RED: new RoleDefinition({
+    key: 'MARTYR_RED',
+    team: TeamName.RED,
+    roleName: RedRoleName.MARTYR
+  }),
 
-//   static readonly PRIVATE_EYE = new PlayerRole({
-//     team: TeamName.GREY,
-//     roleName: RoleName.PRIVATE_EYE,
-//   });
+  TEAM_RED: new RoleDefinition({
+    key: 'TEAM_RED',
+    team: TeamName.RED,
+    roleName: RedRoleName.MARTYR
+  }, { max: Infinity }),
 
-//   static readonly RED_TEAM = new PlayerRole({
-//     team: TeamName.RED,
-//     roleName: RoleName.RED_TEAM,
-//   });
+  TINKERER_RED: new RoleDefinition({
+    key: 'TINKERER_RED',
+    team: TeamName.RED,
+    roleName: RedRoleName.TINKERER
+  })
+};
 
-//   static readonly TINKERER = new PlayerRole({
-//     team: TeamName.RED,
-//     roleName: RoleName.TINKERER,
-//   });
+export const GREY_ROLES: Record<GreyRoleKey, Restricted<GreyRole>> = {
+  
+  GAMBLER_GREY: new RoleDefinition({
+    key: 'GAMBLER_GREY',
+    team: TeamName.GREY,
+    roleName: GreyRoleName.GAMBLER
+  }),
 
-//   // private to disallow creating other instances of this type
-//   private constructor(
-//     { team, roleName }: PlayerRoleBase
-//   ) {
-//     this.team = team;
-//     this.roleName = roleName;
-//   }
+  PRIVATE_EYE_GREY: new RoleDefinition({
+    key: 'PRIVATE_EYE_GREY',
+    team: TeamName.GREY,
+    roleName: GreyRoleName.PRIVATE_EYE
+  })
 
-//   toString(): `${RoleName} (${TeamName})` {
-//     return `${this.roleName} (${this.team})`;
-//   }
-// }
+};
+
+export const ALL_ROLES = { ...BLUE_ROLES, ...RED_ROLES, ...GREY_ROLES }
