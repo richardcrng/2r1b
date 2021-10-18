@@ -1,3 +1,5 @@
+import { PlayerRole, RoleKey, RoleName } from "./role.types";
+
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
@@ -8,11 +10,6 @@ export enum CardType {
   GOLD = 'gold',
   FIRE = 'fire',
   EMPTY = 'empty'
-}
-
-export enum Role {
-  ADVENTURER = 'ADVENTURER',
-  GUARDIAN = 'GUARDIAN'
 }
 
 export interface Card {
@@ -38,7 +35,7 @@ export interface Player {
   gameId?: string;
   name?: string;
   isHost?: boolean;
-  role?: Role;
+  role?: PlayerRole;
   colors?: string[]
 }
 
@@ -51,13 +48,85 @@ export interface Turn {
   flip: CardType;
 }
 
-export interface Round {
-  number: 1 | 2 | 3 | 4;
-  cardsDealt: {
-    /** Card ids dealt to each player */
-    [playerId: string]: number[];
+export enum LeaderRecordMethod {
+  APPOINTMENT = "appointment",
+  ABDICATION = "abdication",
+  USURPATION = "usurpation"
+}
+
+export interface LeaderRecordBase {
+  method: LeaderRecordMethod;
+  leaderId: string;
+}
+
+export interface LeaderAbdication {
+  method: LeaderRecordMethod.ABDICATION;
+  abdicaterId: string;
+}
+
+export interface LeaderAppointment {
+  method: LeaderRecordMethod.APPOINTMENT;
+  appointerId: string;
+}
+
+export interface LeaderUsurpation extends LeaderRecordBase {
+  method: LeaderRecordMethod.USURPATION;
+  votes: {
+    [playerId: string]: number;
   }
-  turns: Turn[];
+}
+
+export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderUsurpation;
+
+export enum PlayerActionType {
+  CARD_SHARE = 'card-share',
+  COLOR_SHARE = 'color-share',
+  PRIVATE_REVEAL = 'private-reveal',
+  PUBLIC_REVEAL = 'public-reveal',
+}
+
+export interface PlayerActionBase {
+  type: PlayerActionType;
+  room: RoomName;
+}
+
+export interface PlayerActionPublicReveal {
+  type: PlayerActionType.PUBLIC_REVEAL;
+  revealerId: string;
+}
+
+export interface PlayerActionShareBase extends PlayerActionBase {
+  type: PlayerActionType.CARD_SHARE | PlayerActionType.COLOR_SHARE;
+  proposerId: string;
+  accepterId: string;
+}
+
+export interface PlayerActionColorShare extends PlayerActionShareBase {
+  type: PlayerActionType.COLOR_SHARE;
+}
+
+export interface PlayerActionCardShare extends PlayerActionShareBase {
+  type: PlayerActionType.CARD_SHARE;
+}
+
+export type PlayerAction = PlayerActionColorShare | PlayerActionColorShare
+
+export interface RoomRound {
+  leadersRecord: LeaderRecord[];
+  hostages: string[];
+}
+
+export enum RoomName {
+  A = "a",
+  B = "b"
+}
+
+export interface Round {
+  number: 1 | 2 | 3 | 4 | 5;
+  timerSeconds: number;
+  rooms: Record<RoomName, RoomRound>;
+  actions: PlayerAction[];
+  playerAllocation: Record<string, RoomName>;
 }
 
 export type Game = GameBase | GameInLobby | GameOngoing | GameComplete;
@@ -67,11 +136,9 @@ export interface GameBase {
   players: {
     [playerSocketId: string]: Player;
   };
-  deck: Deck;
   rounds: Round[];
+  roles: Record<RoleKey, number>;
   status: GameStatus;
-  /** If the first keyholder needs to be controlled, e.g. from a previous game */
-  firstKeyholderId?: string;
 }
 
 export interface GameInLobby extends GameBase {
