@@ -3,10 +3,11 @@
 import { useCopyToClipboard } from "react-use";
 import { Button } from "semantic-ui-react";
 import styled from 'styled-components';
-import { gameLobbyReadiness } from "../../selectors/game";
+// import { gameLobbyReadiness } from "../../selectors/game";
 import { GameBase, Player } from "../../types/game.types";
-import PlayerList from "../atoms/PlayerList";
-import PlayerAvatar from "../atoms/PlayerAvatar";
+import PlayerList from "../../lib/atoms/PlayerList";
+import PlayerAvatar from "../../lib/atoms/PlayerAvatar";
+import { GameLobbyReadiness } from "../../selectors/game";
 
 interface Props {
   game: GameBase;
@@ -40,7 +41,8 @@ const PlayerListItemContents = styled.div`
 `
 
 function GameLobby({ game, handleStartGame, players, player }: Props) {
-  const readiness = gameLobbyReadiness(game);
+  // const readiness = gameLobbyReadiness(game);
+  const readiness: GameLobbyReadiness = { isReady: false }
   // eslint-disable-next-line
   const [_, copyToClipboard] = useCopyToClipboard();
 
@@ -86,7 +88,7 @@ function GameLobby({ game, handleStartGame, players, player }: Props) {
       <ActionArea>
         {!readiness.isReady && (
           <p>
-            The game cannot yet be started: {readiness.reason.toLowerCase()}
+            The game cannot yet be started{readiness.reason && ": " + readiness.reason.toLowerCase()}.
           </p>
         )}
         {player.isHost ? (
