@@ -1,4 +1,4 @@
-import { PlayerRole, RoleKey, RoleName } from "./role.types";
+import { PlayerRole, RoleKey } from "./role.types";
 
 export enum GameStatus {
   LOBBY = "LOBBY",
@@ -137,7 +137,10 @@ export interface GameBase {
     [playerSocketId: string]: Player;
   };
   rounds: Round[];
-  roles: Record<RoleKey, number>;
+  roles: {
+    inPlay: Record<RoleKey, number>;
+    allocated: Partial<Record<RoleKey, number>>;
+  };
   status: GameStatus;
 }
 
