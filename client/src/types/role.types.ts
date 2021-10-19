@@ -58,11 +58,20 @@ export interface GreyRole extends PlayerRoleBase {
 }
 
 export type PlayerRole = BlueRole | GreyRole | RedRole
-export type Restricted<TRole extends PlayerRole> = TRole & { restrictions: RoleRestrictions }
+
+export type FullyDefined<TRole extends PlayerRole> = TRole & {
+  restrictions: RoleRestrictions;
+}
 
 export interface RoleRestrictions {
   max: number;
   min: number;
+  requires: Partial<Record<RoleKey, number>>;
+  recommended: Partial<Record<RoleKey, number>>;
+}
+
+export interface RoleDescription {
+  winCondition: string;
 }
 
 class RoleDefinition<TRole extends PlayerRole> {
@@ -73,12 +82,12 @@ class RoleDefinition<TRole extends PlayerRole> {
 
   constructor(
     { key, team, roleName }: TRole,
-    { max = 1, min = 0 } = {}
+    { max = 1, min = 0, requires = {}, recommended = {} }: Partial<RoleRestrictions> = {}
   ) {
     this.key = key
     this.team = team;
     this.roleName = roleName;
-    this.restrictions = { max, min }
+    this.restrictions = { max, min, requires, recommended }
   }
 
   toString(): `${RoleName} (${TeamName})` {
@@ -86,7 +95,7 @@ class RoleDefinition<TRole extends PlayerRole> {
   }
 }
 
-export const BLUE_ROLES: Record<BlueRoleKey, Restricted<BlueRole>> = {
+export const BLUE_ROLES: Record<BlueRoleKey, FullyDefined<BlueRole>> = {
 
   CLOWN_BLUE: new RoleDefinition({
     key: 'CLOWN_BLUE',
@@ -98,35 +107,35 @@ export const BLUE_ROLES: Record<BlueRoleKey, Restricted<BlueRole>> = {
     key: 'DOCTOR_BLUE',
     team: TeamName.BLUE,
     roleName: BlueRoleName.DOCTOR
-  }),
+  }, { recommended: { ENGINEER_RED: 1 } }),
 
   NURSE_BLUE: new RoleDefinition({
     key: 'NURSE_BLUE',
     team: TeamName.BLUE,
     roleName: BlueRoleName.NURSE
-  }),
+  }, { recommended: { TINKERER_RED: 1 } }),
 
   PRESIDENT_BLUE: new RoleDefinition({
     key: 'PRESIDENT_BLUE',
     team: TeamName.BLUE,
     roleName: BlueRoleName.PRESIDENT
-  }, { min: 1 }),
+  }, { min: 1, requires: { BOMBER_RED: 1 } }),
 
   PRESIDENTS_DAUGHTER_BLUE: new RoleDefinition({
     key: 'PRESIDENTS_DAUGHTER_BLUE',
     team: TeamName.BLUE,
     roleName: BlueRoleName.PRESIDENTS_DAUGHTER
-  }),
+  }, { recommended: { MARTYR_RED: 1 } }),
 
   TEAM_BLUE: new RoleDefinition({
     key: 'TEAM_BLUE',
     team: TeamName.BLUE,
     roleName: BlueRoleName.TEAM
-  }, { max: Infinity })
+  }, { max: Infinity, recommended: { TEAM_RED: 1 } })
 
 };
 
-export const RED_ROLES: Record<RedRoleKey, Restricted<RedRole>> = {
+export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
   CLOWN_RED: new RoleDefinition({
     key: "CLOWN_RED",
     team: TeamName.RED,
@@ -137,34 +146,34 @@ export const RED_ROLES: Record<RedRoleKey, Restricted<RedRole>> = {
     key: 'BOMBER_RED',
     team: TeamName.RED,
     roleName: RedRoleName.BOMBER
-  }, { min: 1 }),
+  }, { min: 1, requires: { PRESIDENT_BLUE: 1 } }),
 
   ENGINEER_RED: new RoleDefinition({
     key: 'ENGINEER_RED',
     team: TeamName.RED,
     roleName: RedRoleName.ENGINEER
-  }),
+  }, { recommended: { DOCTOR_BLUE: 1 } }),
 
   MARTYR_RED: new RoleDefinition({
     key: 'MARTYR_RED',
     team: TeamName.RED,
     roleName: RedRoleName.MARTYR
-  }),
+  }, { recommended: { PRESIDENTS_DAUGHTER_BLUE: 1 } }),
 
   TEAM_RED: new RoleDefinition({
     key: 'TEAM_RED',
     team: TeamName.RED,
     roleName: RedRoleName.MARTYR
-  }, { max: Infinity }),
+  }, { max: Infinity, recommended: { TEAM_BLUE: 1 } }),
 
   TINKERER_RED: new RoleDefinition({
     key: 'TINKERER_RED',
     team: TeamName.RED,
     roleName: RedRoleName.TINKERER
-  })
+  }, { recommended: { NURSE_BLUE: 1 } })
 };
 
-export const GREY_ROLES: Record<GreyRoleKey, Restricted<GreyRole>> = {
+export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
   
   GAMBLER_GREY: new RoleDefinition({
     key: 'GAMBLER_GREY',
