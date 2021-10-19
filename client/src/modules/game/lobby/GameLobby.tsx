@@ -35,7 +35,7 @@ function GameLobby({ game, handleStartGame, players, player }: Props): JSX.Eleme
       );
     
       case LobbyView.SETUP_EDIT:
-        return <GameLobbySetupEdit />
+        return <GameLobbySetupEdit game={game} />
       
       case LobbyView.SETUP_VIEW:
         return <GameLobbySetupView />

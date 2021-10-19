@@ -276,3 +276,7 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
 };
 
 export const ALL_ROLES = { ...BLUE_ROLES, ...RED_ROLES, ...GREY_ROLES }
+
+export const ALPHABETISED_ROLE_VALUES = Object.freeze(
+  Object.values(ALL_ROLES).sort((a, b) => (a.roleName < b.roleName ? -1 : 1))
+);
