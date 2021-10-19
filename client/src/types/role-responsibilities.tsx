@@ -66,17 +66,14 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
 
   [BlueRoleName.DOCTOR]: (
     <>
-      {responsibility("Treatment")} The President will die unless you
-      {CARD_SHARE} with them before the game ends.
+      {responsibility("Treatment")} The President will die unless you {CARD_SHARE} with them before the game ends.
     </>
   ),
 
   [BlueRoleName.NURSE]: (
     <ul>
       <li>
-        {responsibility("Backup Doctor")} Your latent responsibility activates
-        if the {DOCTOR} role is Buried or receives the '{DEAD}' condition before
-        Treating the {PRESIDENT}.
+        {responsibility("Backup Doctor")} If the {DOCTOR} role is Buried, or receives the '{DEAD}' condition before it has Treated the {PRESIDENT}, you assume all of its duties and your latent responsibility activates.
       </li>
       <li>
         {responsibility("Treatment (latent)")} The President will die unless you
@@ -98,25 +95,28 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </ul>
   ),
 
-  [BlueRoleName.VICE_PRESIDENT]: (
-    <ul>
-      <li>
-        {responsibility("Backup President")} You are the backup character for
-        the {PRESIDENT}: if that role is buried, you must carry out all
-        responsibilities associated with it.
-      </li>
-      <li>
-        {responsibility("Secondary")} You are the secondary character for the{" "}
-        {BLUE_TEAM}.
-      </li>
-    </ul>
-  ),
-
   [BlueRoleName.TEAM]: (
     <>
       Use your powers of deduction, persuasion and organisation to keep the{" "}
       {PRESIDENT} alive!
     </>
+  ),
+
+  [BlueRoleName.VICE_PRESIDENT]: (
+    <ul>
+      <li>
+        {responsibility("Backup President")} If the {PRESIDENT} role is Buried,
+        you assume all of its duties and your latent responsibility activates.
+      </li>
+      <li>
+        {responsibility("Secondary")} You are the secondary character for the{" "}
+        {BLUE_TEAM}.
+      </li>
+      <li>
+        {responsibility("Survival (latent)")} Your team cannot win if you gain
+        the '{DEAD}' condition.
+      </li>
+    </ul>
   ),
 
   [RedRoleName.BOMBER]: (
@@ -142,9 +142,8 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [RedRoleName.MARTYR]: (
     <ul>
       <li>
-        {responsibility("Backup Bomber")} Your latent responsibility activates
-        if the {BOMBER} role is Buried or receives the '{DEAD}' condition before
-        its explosives detonate.
+        {responsibility("Backup Bomber")} If the {BOMBER} role is Buried, or receives the '{DEAD}' condition before
+        its explosives detonate, you assume all of its duties and your latent responsibility activates.
       </li>
       <li>
         {responsibility("Secondary")} You are the secondary character for the{" "}
@@ -159,16 +158,16 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
 
   [RedRoleName.TEAM]: (
     <>
-      Use your powers of deduction, persuasion and organisation to support the {BOMBER}'s mission!
+      Use your powers of deduction, persuasion and organisation to support the{" "}
+      {BOMBER}'s mission!
     </>
   ),
 
   [RedRoleName.TINKERER]: (
     <ul>
       <li>
-        {responsibility("Backup Engineer")} Your latent responsibility activates
-        if the {ENGINEER} role is Buried or receives the '{DEAD}' condition
-        before wiring the {BOMBER}'s explosives.
+        {responsibility("Backup Engineer")} If the {ENGINEER} role is Buried, or receives the '{DEAD}' condition
+        before it has wired the {BOMBER}'s explosives, you assume all of its duties and your latent responsibility activates.
       </li>
       <li>
         {responsibility("Wiring (latent)")} The {BOMBER}'s explosives will be
@@ -179,15 +178,17 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
 
   [GreyRoleName.GAMBLER]: (
     <>
-      {responsibility("Wager")} At the end of the last round, before all players reveal their cards, you
-      must publicly predict the winning team ({RED_TEAM}, {BLUE_TEAM}, or neither).
+      {responsibility("Wager")} At the end of the last round, before all players
+      reveal their cards, you must publicly predict the winning team ({RED_TEAM}
+      , {BLUE_TEAM}, or neither).
     </>
   ),
 
   [GreyRoleName.PRIVATE_EYE]: (
     <>
-      {responsibility("Identification")} At the end of the last round, before all players reveal their character
-      cards, you must publicly predict the identity of the buried card.
+      {responsibility("Identification")} At the end of the last round, before
+      all players reveal their character cards, you must publicly predict the
+      identity of the buried card.
     </>
   ),
 };
