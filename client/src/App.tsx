@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import useMobileVH from "./hooks/useMobileVH";
 import GameRoute from "./routes/GameRoute";
 import IndexRoute from "./routes/IndexRoute";
+import ReferenceRoute from "./routes/ReferenceRoute";
 
 function App() {
   useMobileVH()
@@ -23,6 +24,7 @@ function App() {
         <div className='active-area'>
           <Switch>
             <Route exact path="/game/:gameId" component={GameRoute} />
+            <Route path="/reference" component={ReferenceRoute} />
             <Route path="/" component={IndexRoute} />
           </Switch>
         </div>
