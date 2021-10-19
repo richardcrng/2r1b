@@ -6,7 +6,7 @@ function GameLobbySetupEdit() {
   return (
     <>
       <p>Edit setup here!</p>
-      <RoleCard role={ALL_ROLES.MARTYR_RED} />
+      <RoleCard role={ALL_ROLES.PRIVATE_EYE_GREY} />
     </>
   );
 }

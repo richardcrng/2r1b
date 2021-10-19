@@ -249,7 +249,7 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
 
   TEAM_RED: RoleDefinition.Red({
     key: 'TEAM_RED',
-    roleName: RedRoleName.MARTYR
+    roleName: RedRoleName.TEAM
   }, { roleMax: Infinity, recommended: { TEAM_BLUE: 1 } }),
 
   TINKERER_RED: RoleDefinition.Red({

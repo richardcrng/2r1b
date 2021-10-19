@@ -52,8 +52,8 @@ const RED_TEAM = red("Red Team")
 
 export const WIN_CONDITIONS = {
   BLUE: <>You if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).</>,
-  [GreyRoleName.GAMBLER]: <>You win if, at the end of the final round, you can correctly predict which main team will win ({BLUE_TEAM}, {RED_TEAM} or neither).</>,
-  [GreyRoleName.PRIVATE_EYE]: <>You win if, at the end of the final round, you can correctly predict the identity of the Buried card.</>,
+  [GreyRoleName.GAMBLER]: <>You win if you make a correct {action("Wager")}.</>,
+  [GreyRoleName.PRIVATE_EYE]: <>You win if you make a correct {action("Identification")}.</>,
   RED: <>You win if the {PRESIDENT} is killed (gains the '{DEAD}' condition).</>
 };
 
@@ -112,7 +112,12 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </ul>
   ),
 
-  [BlueRoleName.TEAM]: <>Protect the {PRESIDENT}!</>,
+  [BlueRoleName.TEAM]: (
+    <>
+      Use your powers of deduction, persuasion and organisation to keep the{" "}
+      {PRESIDENT} alive!
+    </>
+  ),
 
   [RedRoleName.BOMBER]: (
     <ul>
@@ -152,7 +157,11 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </ul>
   ),
 
-  [RedRoleName.TEAM]: <>Support the {BOMBER}!</>,
+  [RedRoleName.TEAM]: (
+    <>
+      Use your powers of deduction, persuasion and organisation to support the {BOMBER}'s mission!
+    </>
+  ),
 
   [RedRoleName.TINKERER]: (
     <ul>
@@ -162,24 +171,23 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
         before wiring the {BOMBER}'s explosives.
       </li>
       <li>
-        {responsibility("Wiring (latent)")} The {BOMBER}'s explosives will be ineffectual unless you {CARD_SHARE} with
-        them before the game ends.
+        {responsibility("Wiring (latent)")} The {BOMBER}'s explosives will be
+        ineffectual unless you {CARD_SHARE} with them before the game ends.
       </li>
     </ul>
   ),
 
   [GreyRoleName.GAMBLER]: (
     <>
-      At the end of the last round, before all players reveal their cards, you
-      must publicly announce which team ({RED_TEAM}, {BLUE_TEAM}, or neither)
-      you think won the game.
+      {responsibility("Wager")} At the end of the last round, before all players reveal their cards, you
+      must publicly predict the winning team ({RED_TEAM}, {BLUE_TEAM}, or neither).
     </>
   ),
 
   [GreyRoleName.PRIVATE_EYE]: (
     <>
-      At the end of the last round, before all players reveal their character
-      cards, you must publicly announce the identity of the buried card.
+      {responsibility("Identification")} At the end of the last round, before all players reveal their character
+      cards, you must publicly predict the identity of the buried card.
     </>
   ),
 };
