@@ -1,21 +1,16 @@
-import { last } from 'lodash';
-import { getKeyholder } from '../../../client/src/selectors/game';
+import { last, mapValues } from 'lodash';
 import { CreateGameEvent } from "../../../client/src/types/event.types";
 import {
-  Card,
   Game,
-  GameBase,
   GameStatus,
-  Round,
-  Turn,
 } from "../../../client/src/types/game.types";
+import { ALL_ROLES } from '../../../client/src/types/role.types';
 import { games, getGameById } from "../db";
 import { generateRandomGameId, getColors } from "../utils";
-import { assignRoles, dealCardsToPlayers, generateDeck, getCardIdsToDeal, stackFlippedCards } from "./utils";
 
-export const createGame = (data: CreateGameEvent): GameBase => {
+export const createGame = (data: CreateGameEvent): Game => {
   const gameId = generateRandomGameId();
-  const game: GameBase = {
+  const game: Game = {
     id: gameId,
     players: {
       [data.socketId]: {
@@ -26,72 +21,23 @@ export const createGame = (data: CreateGameEvent): GameBase => {
         colors: getColors(5)
       },
     },
-    status: GameStatus.LOBBY,
-    deck: {
-      cards: {},
+    roles: {
+      inPlay: mapValues(ALL_ROLES, role => role.restrictions.roleMin),
+      allocated: {}
     },
+    status: GameStatus.LOBBY,
     rounds: []
   };
   games[gameId] = game;
   return game;
 };
 
-export const dealCards = (game: GameBase): void => {
-  const nextRoundNumber = game.rounds.length + 1 as Round['number'];
-  // stack all flipped cards
-  game.deck = stackFlippedCards(game.deck);
-  const nextRound: Round = {
-    number: nextRoundNumber,
-    turns: [],
-    cardsDealt: dealCardsToPlayers(getCardIdsToDeal(game.deck), Object.keys(game.players))
-  }
-  game.rounds.push(nextRound);
-}
-
-/**
- * @returns the number of turns
- */
-export const flipCard = (game: Game, { card, cardIdx, keyholderId, playerId }: { card: Card, cardIdx: number, keyholderId: string, playerId: string }): number => {
-  const currentRound = last(game.rounds)!;
-  const turnCreated: Turn = {
-    keyholderId,
-    selected: {
-      playerId,
-      cardIdx
-    },
-    flip: card.type
-  }
-  currentRound.turns.push(turnCreated);
-  const cardToFlip = game.deck.cards[card.id];
-  cardToFlip.isFlipped = true;
-  return currentRound.turns.length
-}
-
-export const resetGame = (gameId: string): GameBase => {
-  const game = getGameById(gameId);
-  if (game) {
-    const lastRound = last(game.rounds);
-    const lastTurn = last(lastRound?.turns);
-    const lastKeyholder = lastTurn?.selected.playerId;
-    game.firstKeyholderId = lastKeyholder;
-    game.status = GameStatus.LOBBY;
-    game.deck.cards = {};
-    game.rounds = [];
-    return game
-  } else {
-    throw new Error("Couldn't find game")
-  }
-}
-
 export const startGame = (
   gameId: string,
-): GameBase => {
+): Game => {
   const game = getGameById(gameId);
   if (game) {
     game.status = GameStatus.ONGOING;
-    assignRoles(game.players);
-    game.deck = generateDeck(Object.keys(game.players).length)
-    dealCards(game);
     return game;
   } else {
     throw new Error("Couldn't find game");
