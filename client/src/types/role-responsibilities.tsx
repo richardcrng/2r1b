@@ -9,6 +9,10 @@ const StyledCondition = styled.span`
   font-weight: bold;
 `
 
+const StyledAction = styled.span`
+  font-weight: bold;
+`
+
 const StyledRole = styled.span`
   font-style: italic;
   font-weight: bold;
@@ -31,6 +35,7 @@ export const TEAM_ICONS: Record<TeamColor, IconType> = {
   [TeamColor.GREY]: GreyIcon
 }
 
+const action = (actionName: string) => <StyledAction>{actionName}</StyledAction>
 const blue = (roleName: string) => <StyledBlueRole>{roleName}</StyledBlueRole>
 const condition = (conditionName: string) => <StyledCondition>{conditionName}</StyledCondition>
 const red = (roleName: string) => <StyledRedRole>{roleName}</StyledRedRole>
@@ -38,6 +43,7 @@ const responsibility = (responsibilityName: string) => <strong>{responsibilityNa
 
 const BLUE_TEAM = blue("Blue Team")
 const BOMBER = red("Bomber")
+const CARD_SHARE = action("card share")
 const DEAD = condition("dead")
 const DOCTOR = blue(BlueRoleName.DOCTOR)
 const ENGINEER = red(RedRoleName.ENGINEER)
@@ -45,7 +51,7 @@ const PRESIDENT = blue(BlueRoleName.PRESIDENT)
 const RED_TEAM = red("Red Team")
 
 export const WIN_CONDITIONS = {
-  BLUE: <>{BLUE_TEAM} wins if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).</>,
+  BLUE: <>You if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).</>,
   [GreyRoleName.GAMBLER]: <>You win if, at the end of the final round, you can correctly predict which main team will win ({BLUE_TEAM}, {RED_TEAM} or neither).</>,
   [GreyRoleName.PRIVATE_EYE]: <>You win if, at the end of the final round, you can correctly predict the identity of the Buried card.</>,
   RED: <>You win if the {PRESIDENT} is killed (gains the '{DEAD}' condition).</>
@@ -54,22 +60,29 @@ export const WIN_CONDITIONS = {
 export type WinCondition = keyof typeof WIN_CONDITIONS
 
 export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
-  [BlueRoleName.CLOWN]: <>You must do your best to smile at all times.</>,
+  [BlueRoleName.CLOWN]: (
+    <>{responsibility("Smile")} You must do your best to smile at all times.</>
+  ),
 
   [BlueRoleName.DOCTOR]: (
     <>
-      To keep the {PRESIDENT} alive, you must card share with the {PRESIDENT}{" "}
-      before the game ends. If you do not succeed, you and the rest of your team
-      lose.
+      {responsibility("Treatment")} The President will die unless you
+      {CARD_SHARE} with them before the game ends.
     </>
   ),
 
   [BlueRoleName.NURSE]: (
-    <>
-      You are the backup character for the {DOCTOR}. If the {DOCTOR} card is
-      buried, you must carry out {DOCTOR} responsibilities (i.e. card sharing
-      with the {PRESIDENT}).
-    </>
+    <ul>
+      <li>
+        {responsibility("Backup Doctor")} Your latent responsibility activates if the{" "}
+        {DOCTOR} is Buried or receives the '{DEAD}' condition before the end of
+        the game.
+      </li>
+      <li>
+        {responsibility("Treatment (latent)")} The President will die unless you
+        {CARD_SHARE} with them before the game ends..
+      </li>
+    </ul>
   ),
 
   [BlueRoleName.PRESIDENT]: (
@@ -78,7 +91,10 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
         {responsibility("Primary")} You are the primary character for the{" "}
         {BLUE_TEAM}.
       </li>
-      <li>{responsibility("Survival")} Your team cannot win if you gain the '{DEAD}' condition.</li>
+      <li>
+        {responsibility("Survival")} Your team cannot win if you gain the '
+        {DEAD}' condition.
+      </li>
     </ul>
   ),
 

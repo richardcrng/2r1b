@@ -9,8 +9,8 @@ interface Props {
 const CardContainer = styled.div`
   color: white;
   display: grid;
-  grid-template-columns: 4fr 1fr;
-  grid-template-rows: 5fr 1fr;
+  grid-template-columns: 4fr auto;
+  grid-template-rows: 350px 50px;
   grid-template-areas:
     "description role"
     "team icon"
@@ -19,12 +19,7 @@ const CardContainer = styled.div`
 const Description = styled.div`
   grid-area: description;
   padding: 10px;
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  text-align: center;
+  overflow-y: scroll;
 
   ul {
     text-align: left;
@@ -65,11 +60,6 @@ const TeamIcon = styled.div`
   align-items: center;
 `;
 
-const DescriptionHeader = styled.h3`
-  margin: 0;
-  margin-bottom: 5px;
-`
-
 function RoleCard({ role }: Props): JSX.Element {
 
   const { primary, secondary } = getColors(role.color)
@@ -80,11 +70,12 @@ function RoleCard({ role }: Props): JSX.Element {
     <CardContainer style={{ backgroundColor: primary }}>
       <Description style={{ backgroundColor: secondary }}>
         <section>
-          <DescriptionHeader>Win condition</DescriptionHeader>
+          <h3>Win condition</h3>
           <span>{WIN_CONDITIONS[role.info.winCondition]}</span>
         </section>
+        <hr />
         <section>
-          <DescriptionHeader>Responsibilities</DescriptionHeader>
+          <h3>Responsibilities</h3>
           <span>{ROLE_RESPONSIBILITIES[role.roleName]}</span>
         </section>
       </Description>
