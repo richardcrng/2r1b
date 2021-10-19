@@ -1,4 +1,6 @@
-export enum TeamName {
+import { Optional } from "./util.typs";
+
+export enum TeamColor {
   BLUE = "Blue",
   GREY = "Grey",
   RED = "Red",
@@ -35,33 +37,40 @@ export type RoleKey = BlueRoleKey | RedRoleKey | GreyRoleKey
 
 export interface PlayerRoleBase {
   key: RoleKey;
-  team: TeamName;
+  color: TeamColor;
   roleName: RoleName;
 }
 
 export interface BlueRole extends PlayerRoleBase {
   key: BlueRoleKey;
-  team: TeamName.BLUE;
+  color: TeamColor.BLUE;
   roleName: BlueRoleName;
 }
 
 export interface RedRole extends PlayerRoleBase {
   key: RedRoleKey;
-  team: TeamName.RED;
+  color: TeamColor.RED;
   roleName: RedRoleName;
 }
 
 export interface GreyRole extends PlayerRoleBase {
   key: GreyRoleKey;
-  team: TeamName.GREY;
+  color: TeamColor.GREY;
   roleName: GreyRoleName;
 }
 
 export type PlayerRole = BlueRole | GreyRole | RedRole
 
+export enum WinCondition {
+  BLUE = "You win, with all Blue-aligned players, if the President survives (does not gain the 'dead' condition).",
+  GAMBLER = "You win if, at the end of the final round, you can correctly predict whether the Blue or Red Team are going to win.",
+  PRIVATE_EYE = "You win if, at the end of the final round, you can correctly predict the identity of the Buried card.",
+  RED = "You win, with all Red-aligned players, if the President is killed (gains the 'dead' condition).",
+}
+
 export type FullyDefined<TRole extends PlayerRole> = TRole & {
   restrictions: RoleRestrictions;
-  // info: RoleInfo;
+  info: RoleInfo;
 }
 
 export interface RoleRestrictions {
@@ -72,48 +81,78 @@ export interface RoleRestrictions {
 }
 
 export interface RoleInfo {
-  winCondition: string;
+  winCondition: WinCondition;
 }
 
 class RoleDefinition<TRole extends PlayerRole> {
   readonly key: TRole["key"];
-  readonly team: TRole["team"];
+  readonly color: TRole["color"];
   readonly roleName: TRole["roleName"];
   readonly restrictions: RoleRestrictions;
-  // readonly info: RoleInfo;
+  readonly info: RoleInfo;
 
   static Blue(
-    role: Omit<BlueRole, "team">,
-    restrictions?: Partial<RoleRestrictions>
+    {
+      key,
+      roleName,
+      winCondition = WinCondition.BLUE,
+      ...restInfo
+    }: Omit<BlueRole, "color"> & Optional<RoleInfo, "winCondition">,
+    restrictions: Partial<RoleRestrictions> = {}
   ): RoleDefinition<BlueRole> {
-    return new this({ ...role, team: TeamName.BLUE }, restrictions);
+    return new this(
+      { key, roleName, color: TeamColor.BLUE, winCondition, ...restInfo },
+      restrictions
+    );
+  }
+
+  static Grey(
+    {
+      key,
+      roleName,
+      ...restInfo
+    }: Omit<GreyRole, "color"> & RoleInfo,
+    restrictions: Partial<RoleRestrictions> = {}
+  ): RoleDefinition<GreyRole> {
+    return new this(
+      { key, roleName, color: TeamColor.GREY, ...restInfo },
+      restrictions
+    );
   }
 
   static Red(
-    role: Omit<RedRole, "team">,
-    restrictions?: Partial<RoleRestrictions>
+    {
+      key,
+      roleName,
+      winCondition = WinCondition.RED,
+      ...restInfo
+    }: Omit<RedRole, "color"> & Optional<RoleInfo, "winCondition">,
+    restrictions: Partial<RoleRestrictions> = {}
   ): RoleDefinition<RedRole> {
-    return new this({ ...role, team: TeamName.RED }, restrictions);
+    return new this(
+      { key, roleName, color: TeamColor.RED, winCondition, ...restInfo },
+      restrictions
+    );
   }
 
   constructor(
-    { key, team, roleName }: TRole,
+    { key, color, roleName, ...info }: TRole & RoleInfo,
     {
       max = 1,
       min = 0,
       requires = {},
       recommended = {},
-    }: Partial<RoleRestrictions> = {},
-    { winCondition }: Partial<RoleInfo> = {}
+    }: Partial<RoleRestrictions> = {}
   ) {
     this.key = key;
-    this.team = team;
+    this.color = color;
     this.roleName = roleName;
+    this.info = info;
     this.restrictions = { max, min, requires, recommended };
   }
 
-  toString(): `${RoleName} (${TeamName})` {
-    return `${this.roleName} (${this.team})`;
+  toString(): `${RoleName} (${TeamColor})` {
+    return `${this.roleName} (${this.color})`;
   }
 }
 
@@ -187,14 +226,16 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
   
   GAMBLER_GREY: new RoleDefinition({
     key: 'GAMBLER_GREY',
-    team: TeamName.GREY,
-    roleName: GreyRoleName.GAMBLER
+    color: TeamColor.GREY,
+    roleName: GreyRoleName.GAMBLER,
+    winCondition: WinCondition.GAMBLER
   }),
 
   PRIVATE_EYE_GREY: new RoleDefinition({
     key: 'PRIVATE_EYE_GREY',
-    team: TeamName.GREY,
-    roleName: GreyRoleName.PRIVATE_EYE
+    color: TeamColor.GREY,
+    roleName: GreyRoleName.PRIVATE_EYE,
+    winCondition: WinCondition.PRIVATE_EYE
   })
 
 };
