@@ -12,7 +12,7 @@ export enum BlueRoleName {
   DOCTOR = "Doctor",
   NURSE = "Nurse",
   PRESIDENT = "President",
-  PRESIDENTS_DAUGHTER = "President's Daughter",
+  VICE_PRESIDENT = "Vice-President",
   TEAM = "Blue Team",
 }
 
@@ -212,9 +212,9 @@ export const BLUE_ROLES: Record<BlueRoleKey, FullyDefined<BlueRole>> = {
     ranking: RoleRanking.PRIMARY
   }, { roleMin: 1, requires: { BOMBER_RED: 1 } }),
 
-  PRESIDENTS_DAUGHTER_BLUE: RoleDefinition.Blue({
-    key: 'PRESIDENTS_DAUGHTER_BLUE',
-    roleName: BlueRoleName.PRESIDENTS_DAUGHTER,
+  VICE_PRESIDENT_BLUE: RoleDefinition.Blue({
+    key: 'VICE_PRESIDENT_BLUE',
+    roleName: BlueRoleName.VICE_PRESIDENT,
     ranking: RoleRanking.SECONDARY
   }, { recommended: { MARTYR_RED: 1 } }),
 
@@ -245,7 +245,7 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
   MARTYR_RED: RoleDefinition.Red({
     key: 'MARTYR_RED',
     roleName: RedRoleName.MARTYR
-  }, { recommended: { PRESIDENTS_DAUGHTER_BLUE: 1 } }),
+  }, { recommended: { VICE_PRESIDENT_BLUE: 1 } }),
 
   TEAM_RED: RoleDefinition.Red({
     key: 'TEAM_RED',

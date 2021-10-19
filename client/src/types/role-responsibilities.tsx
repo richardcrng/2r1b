@@ -98,7 +98,7 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </ul>
   ),
 
-  [BlueRoleName.PRESIDENTS_DAUGHTER]: (
+  [BlueRoleName.VICE_PRESIDENT]: (
     <ul>
       <li>
         {responsibility("Backup President")} You are the backup character for
