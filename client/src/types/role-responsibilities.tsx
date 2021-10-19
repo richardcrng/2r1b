@@ -76,7 +76,7 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
       <li>
         {responsibility("Backup Doctor")} Your latent responsibility activates
         if the {DOCTOR} role is Buried or receives the '{DEAD}' condition before
-        the end of the game.
+        Treating the {PRESIDENT}.
       </li>
       <li>
         {responsibility("Treatment (latent)")} The President will die unless you
@@ -155,11 +155,17 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [RedRoleName.TEAM]: <>Support the {BOMBER}!</>,
 
   [RedRoleName.TINKERER]: (
-    <>
-      You are the backup character for the {ENGINEER}. If the {ENGINEER} card is
-      buried, you must carry out {ENGINEER} responsibilities (i.e. card sharing
-      with the {BOMBER}).
-    </>
+    <ul>
+      <li>
+        {responsibility("Backup Engineer")} Your latent responsibility activates
+        if the {ENGINEER} role is Buried or receives the '{DEAD}' condition
+        before wiring the {BOMBER}'s explosives.
+      </li>
+      <li>
+        {responsibility("Wiring (latent)")} The {BOMBER}'s explosives will be ineffectual unless you {CARD_SHARE} with
+        them before the game ends.
+      </li>
+    </ul>
   ),
 
   [GreyRoleName.GAMBLER]: (
