@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { ROLE_RESPONSIBILITIES, WIN_CONDITIONS } from '../../../types/role-responsibilities';
+import { ROLE_RESPONSIBILITIES, TEAM_ICONS, WIN_CONDITIONS } from '../../../types/role-responsibilities';
 import { FullyDefined, PlayerRole, TeamColor } from "../../../types/role.types";
 
 interface Props {
@@ -66,6 +66,8 @@ function RoleCard({ role }: Props): JSX.Element {
 
   const { primary, secondary } = getColors(role.color)
 
+  const Icon = TEAM_ICONS[role.color]
+
   return (
     <CardContainer style={{ backgroundColor: primary }}>
       <Description style={{ backgroundColor: secondary }}>
@@ -88,7 +90,7 @@ function RoleCard({ role }: Props): JSX.Element {
         <div>{role.color.toUpperCase()} TEAM</div>
       </TeamName>
       <TeamIcon>
-        <div>{role.color[0]}</div>
+        <div><Icon size={32} /></div>
       </TeamIcon>
     </CardContainer>
   );

@@ -1,5 +1,9 @@
 import styled from 'styled-components'
-import { BlueRoleName, RedRoleName, GreyRoleName, RoleName } from "./role.types";
+import { IconType } from 'react-icons'
+import { AiFillStar as Star } from 'react-icons/ai'
+import { FaBomb as Bomb } from 'react-icons/fa'
+import { BsPersonBoundingBox as GreyIcon } from 'react-icons/bs'
+import { BlueRoleName, RedRoleName, GreyRoleName, RoleName, TeamColor } from "./role.types";
 
 const StyledCondition = styled.span`
   font-weight: bold;
@@ -19,6 +23,12 @@ const StyledBlueRole = styled(StyledRole)`
 const StyledRedRole = styled(StyledRole)`
   color: red;
 `
+
+export const TEAM_ICONS: Record<TeamColor, IconType> = {
+  [TeamColor.BLUE]: Star,
+  [TeamColor.RED]: Bomb,
+  [TeamColor.GREY]: GreyIcon
+}
 
 const blue = (roleName: string) => <StyledBlueRole>{roleName}</StyledBlueRole>
 const condition = (conditionName: string) => <StyledCondition>{conditionName}</StyledCondition>
