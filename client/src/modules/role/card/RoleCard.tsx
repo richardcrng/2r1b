@@ -25,6 +25,14 @@ const Description = styled.div`
   justify-content: space-around;
   align-items: center;
   text-align: center;
+
+  ul {
+    text-align: left;
+  }
+
+  ul > li {
+    margin-bottom: 5px;
+  }
 `
 
 const RoleReveal = styled.div`
@@ -73,11 +81,11 @@ function RoleCard({ role }: Props): JSX.Element {
       <Description style={{ backgroundColor: secondary }}>
         <section>
           <DescriptionHeader>Win condition</DescriptionHeader>
-          <p>{WIN_CONDITIONS[role.info.winCondition]}</p>
+          <span>{WIN_CONDITIONS[role.info.winCondition]}</span>
         </section>
         <section>
           <DescriptionHeader>Responsibilities</DescriptionHeader>
-          <p>{ROLE_RESPONSIBILITIES[role.roleName]}</p>
+          <span>{ROLE_RESPONSIBILITIES[role.roleName]}</span>
         </section>
       </Description>
       <RoleReveal>

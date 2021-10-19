@@ -13,7 +13,8 @@ const StyledRole = styled.span`
   font-style: italic;
   font-weight: bold;
   background-color: white;
-  padding: 0px 2px;
+  padding: 0px 1.5px;
+  margin: 0px 1px;
 `
 
 const StyledBlueRole = styled(StyledRole)`
@@ -33,6 +34,7 @@ export const TEAM_ICONS: Record<TeamColor, IconType> = {
 const blue = (roleName: string) => <StyledBlueRole>{roleName}</StyledBlueRole>
 const condition = (conditionName: string) => <StyledCondition>{conditionName}</StyledCondition>
 const red = (roleName: string) => <StyledRedRole>{roleName}</StyledRedRole>
+const responsibility = (responsibilityName: string) => <strong>{responsibilityName}:</strong>
 
 const BLUE_TEAM = blue("Blue Team")
 const BOMBER = red("Bomber")
@@ -43,10 +45,10 @@ const PRESIDENT = blue(BlueRoleName.PRESIDENT)
 const RED_TEAM = red("Red Team")
 
 export const WIN_CONDITIONS = {
-  BLUE: <>You win if the {PRESIDENT} survives (does not gain the '{DEAD}' condition).</>,
+  BLUE: <>{BLUE_TEAM} wins if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).</>,
   [GreyRoleName.GAMBLER]: <>You win if, at the end of the final round, you can correctly predict which main team will win ({BLUE_TEAM}, {RED_TEAM} or neither).</>,
   [GreyRoleName.PRIVATE_EYE]: <>You win if, at the end of the final round, you can correctly predict the identity of the Buried card.</>,
-  RED: <>You win, with all players aligned to {RED_TEAM}, if the {PRESIDENT} is killed (gains the '{DEAD}' condition) - e.g. by ending up in the same room as the {BOMBER}.</>
+  RED: <>You win if the {PRESIDENT} is killed (gains the '{DEAD}' condition).</>
 };
 
 export type WinCondition = keyof typeof WIN_CONDITIONS
@@ -71,7 +73,13 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   ),
 
   [BlueRoleName.PRESIDENT]: (
-    <>You are the primary character for the {BLUE_TEAM}.</>
+    <ul>
+      <li>
+        {responsibility("Primary")} You are the primary character for the{" "}
+        {BLUE_TEAM}.
+      </li>
+      <li>{responsibility("Survival")} Your team cannot win if you gain the '{DEAD}' condition.</li>
+    </ul>
   ),
 
   [BlueRoleName.PRESIDENTS_DAUGHTER]: (
@@ -85,10 +93,16 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [BlueRoleName.TEAM]: <>Protect the {PRESIDENT}!</>,
 
   [RedRoleName.BOMBER]: (
-    <>
-      You are the primary character for the {RED_TEAM}. Everyone in the same
-      room as you at the end of the game gains the '{DEAD}' condition.
-    </>
+    <ul>
+      <li>
+        {responsibility("Primary")} You are the Primary character for the{" "}
+        {RED_TEAM}.
+      </li>
+      <li>
+        {responsibility("Detonate")} Everyone in the same room as you at the end
+        of the game gains the '{DEAD}' condition.
+      </li>
+    </ul>
   ),
 
   [RedRoleName.ENGINEER]: (
