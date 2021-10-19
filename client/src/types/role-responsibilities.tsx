@@ -7,6 +7,9 @@ const StyledCondition = styled.span`
 
 const StyledRole = styled.span`
   font-style: italic;
+  font-weight: bold;
+  background-color: white;
+  padding: 0px 2px;
 `
 
 const StyledBlueRole = styled(StyledRole)`
