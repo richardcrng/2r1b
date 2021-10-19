@@ -74,9 +74,9 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [BlueRoleName.NURSE]: (
     <ul>
       <li>
-        {responsibility("Backup Doctor")} Your latent responsibility activates if the{" "}
-        {DOCTOR} is Buried or receives the '{DEAD}' condition before the end of
-        the game.
+        {responsibility("Backup Doctor")} Your latent responsibility activates
+        if the {DOCTOR} is Buried or receives the '{DEAD}' condition before the
+        end of the game.
       </li>
       <li>
         {responsibility("Treatment (latent)")} The President will die unless you
@@ -100,9 +100,9 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
 
   [BlueRoleName.PRESIDENTS_DAUGHTER]: (
     <>
-      You are the backup character for the {PRESIDENT}. If the {PRESIDENT} card
-      is buried you must carry out all responsibilities associated with the{" "}
-      {PRESIDENT}.
+      {responsibility("Backup President")} You are the backup character for the{" "}
+      {PRESIDENT}: if that card is buried, you must carry out all
+      responsibilities associated with it.
     </>
   ),
 

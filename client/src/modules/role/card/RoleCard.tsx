@@ -9,8 +9,9 @@ interface Props {
 const CardContainer = styled.div`
   color: white;
   display: grid;
-  grid-template-columns: 4fr auto;
-  grid-template-rows: 350px 50px;
+  max-width: 300px;
+  grid-template-columns: 1fr 70px;
+  grid-template-rows: 400px 50px;
   grid-template-areas:
     "description role"
     "team icon"
