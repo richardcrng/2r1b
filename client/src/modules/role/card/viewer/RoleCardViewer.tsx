@@ -24,8 +24,15 @@ const roleValueDropdownOptions: {
   ),
 }));
 
-function RoleCardViewer() {
-  const [roleKey, setRoleKey] = useState<RoleKey>('PRESIDENT_BLUE')
+interface Props {
+  onRoleSelect?(roleKey: RoleKey): void;
+  selectedRole?: RoleKey;
+}
+
+function RoleCardViewer({ onRoleSelect, selectedRole: controlledRoleValue }: Props) {
+
+  const [uncontrolledValue, setUncontrolledValue] = useState<RoleKey>();
+  const selectedRole = controlledRoleValue ?? uncontrolledValue;
 
   return (
     <>
@@ -35,12 +42,16 @@ function RoleCardViewer() {
         selection
         fluid
         options={roleValueDropdownOptions}
-        value={roleKey}
-        onChange={(_, { value }) => setRoleKey(value as RoleKey)}
+        value={selectedRole}
+        onChange={(_, { value }) => {
+          const newRole = value as RoleKey
+          onRoleSelect && onRoleSelect(newRole);
+          setUncontrolledValue(newRole);
+        }}
       />
       <br />
-      {roleKey && (
-        <RoleCard role={ALL_ROLES[roleKey]} />
+      {selectedRole && (
+        <RoleCard role={ALL_ROLES[selectedRole]} />
       )}
     </>
   )
