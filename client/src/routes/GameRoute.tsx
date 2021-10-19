@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import PlayerNamer from "../lib/atoms/PlayerNamer";
-import GamePage from "../components/pages/GamePage";
+import GamePage from "../modules/game/GamePage";
 import useGame from "../hooks/useGame";
 import usePlayer from "../hooks/usePlayer";
 import useSocketAliases from "../hooks/useSocketAliases";

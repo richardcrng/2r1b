@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Header, Image, Modal } from "semantic-ui-react";
 import styled from 'styled-components'
-import { Card, CardType, Game, Player } from "../../types/game.types";
+import { Card, CardType, Game, Player } from "../../../types/game.types";
 
 interface Props {
   game: Game;

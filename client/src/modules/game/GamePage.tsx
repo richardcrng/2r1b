@@ -1,6 +1,6 @@
 import { Card, GameBase, GameStatus, Player } from "../../types/game.types";
-import GameLobby from "../../lib/molecules/GameLobby";
-import GameOngoing from "../organisms/GameOngoing";
+import GameLobby from "./lobby/GameLobby";
+import GameOngoing from "./ongoing/GameOngoing";
 
 interface Props {
   game: GameBase;
