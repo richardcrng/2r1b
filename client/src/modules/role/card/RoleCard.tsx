@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { ROLE_RESPONSIBILITIES } from '../../../types/role-responsibilities';
+import { ROLE_RESPONSIBILITIES, WIN_CONDITIONS } from '../../../types/role-responsibilities';
 import { FullyDefined, PlayerRole, TeamColor } from "../../../types/role.types";
 
 interface Props {
@@ -50,7 +50,7 @@ function RoleCard({ role }: Props): JSX.Element {
     <CardContainer style={{ backgroundColor: primary }}>
       <Description style={{ backgroundColor: secondary  }}>
         <h3>Win condition</h3>
-        {role.info.winCondition}
+        {WIN_CONDITIONS[role.info.winCondition]}
         <h3>Responsibilities</h3>
         {ROLE_RESPONSIBILITIES[role.roleName]}
       </Description>

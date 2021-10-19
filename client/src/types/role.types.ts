@@ -1,4 +1,5 @@
 import { Optional } from "./util.typs";
+import { WinCondition } from './role-responsibilities';
 
 export enum TeamColor {
   BLUE = "Blue",
@@ -61,23 +62,30 @@ export interface GreyRole extends PlayerRoleBase {
 
 export type PlayerRole = BlueRole | GreyRole | RedRole
 
-export enum WinCondition {
-  BLUE = "You win, with all Blue-aligned players, if the President survives (does not gain the 'dead' condition).",
-  GAMBLER = "You win if, at the end of the final round, you can correctly predict whether the Blue or Red Team are going to win.",
-  PRIVATE_EYE = "You win if, at the end of the final round, you can correctly predict the identity of the Buried card.",
-  RED = "You win, with all Red-aligned players, if the President is killed (gains the 'dead' condition).",
-}
-
 export type FullyDefined<TRole extends PlayerRole> = TRole & {
-  restrictions: RoleRestrictions;
+  restrictions: Restrictions;
   info: RoleInfo;
 }
 
+export type Restrictions = RoleRestrictions & PlayerRestrictions
+
 export interface RoleRestrictions {
-  max: number;
-  min: number;
+  /** Maximum of this role */
+  roleMax: number;
+  /** Minimum of this role */
+  roleMin: number;
+  /** Other roles required in game */
   requires: Partial<Record<RoleKey, number>>;
+  /** Other roles recommended in game */
   recommended: Partial<Record<RoleKey, number>>;
+  /** Restrictions on player count */
+}
+
+export interface PlayerRestrictions {
+  playerMax: number;
+  playerMin: number;
+  playerMaxRecommended: number;
+  playerMinRecommended: number;
 }
 
 export enum RoleTag {
@@ -98,27 +106,27 @@ export enum RoleRanking {
   SECONDARY = 'secondary'
 }
 
-export interface RoleInfo {
+export interface RoleInfo<TCondition extends WinCondition = WinCondition> {
   ranking?: RoleRanking;
   pauseGameNumber?: number;
-  winCondition: WinCondition;
+  winCondition: TCondition;
 }
 
 class RoleDefinition<TRole extends PlayerRole> {
   readonly key: TRole["key"];
   readonly color: TRole["color"];
   readonly roleName: TRole["roleName"];
-  readonly restrictions: RoleRestrictions;
+  readonly restrictions: Restrictions;
   readonly info: RoleInfo;
 
   static Blue(
     {
       key,
       roleName,
-      winCondition = WinCondition.BLUE,
+      winCondition = "BLUE",
       ...restInfo
     }: Omit<BlueRole, "color"> & Optional<RoleInfo, "winCondition">,
-    restrictions: Partial<RoleRestrictions> = {}
+    restrictions: Partial<Restrictions> = {}
   ): RoleDefinition<BlueRole> {
     return new this(
       { key, roleName, color: TeamColor.BLUE, winCondition, ...restInfo },
@@ -130,12 +138,13 @@ class RoleDefinition<TRole extends PlayerRole> {
     {
       key,
       roleName,
+      winCondition = roleName,
       ...restInfo
-    }: Omit<GreyRole, "color"> & RoleInfo,
-    restrictions: Partial<RoleRestrictions> = {}
+    }: Omit<GreyRole, "color"> & Optional<RoleInfo<GreyRoleName>, "winCondition">,
+    restrictions: Partial<Restrictions> = {}
   ): RoleDefinition<GreyRole> {
     return new this(
-      { key, roleName, color: TeamColor.GREY, ...restInfo },
+      { key, roleName, color: TeamColor.GREY, winCondition, ...restInfo },
       restrictions
     );
   }
@@ -144,10 +153,10 @@ class RoleDefinition<TRole extends PlayerRole> {
     {
       key,
       roleName,
-      winCondition = WinCondition.RED,
+      winCondition = "RED",
       ...restInfo
     }: Omit<RedRole, "color"> & Optional<RoleInfo, "winCondition">,
-    restrictions: Partial<RoleRestrictions> = {}
+    restrictions: Partial<Restrictions> = {}
   ): RoleDefinition<RedRole> {
     return new this(
       { key, roleName, color: TeamColor.RED, winCondition, ...restInfo },
@@ -158,17 +167,21 @@ class RoleDefinition<TRole extends PlayerRole> {
   constructor(
     { key, color, roleName, ...info }: TRole & RoleInfo,
     {
-      max = 1,
-      min = 0,
+      roleMax = 1,
+      roleMin = 0,
       requires = {},
       recommended = {},
-    }: Partial<RoleRestrictions> = {}
+      playerMax = Infinity,
+      playerMaxRecommended = Infinity,
+      playerMin = 0,
+      playerMinRecommended = 0
+    }: Partial<Restrictions> = {}
   ) {
     this.key = key;
     this.color = color;
     this.roleName = roleName;
     this.info = info;
-    this.restrictions = { max, min, requires, recommended };
+    this.restrictions = { roleMax, roleMin, requires, recommended, playerMax, playerMaxRecommended, playerMin, playerMinRecommended };
   }
 
   toString(): `${RoleName} (${TeamColor})` {
@@ -197,7 +210,7 @@ export const BLUE_ROLES: Record<BlueRoleKey, FullyDefined<BlueRole>> = {
     key: 'PRESIDENT_BLUE',
     roleName: BlueRoleName.PRESIDENT,
     ranking: RoleRanking.PRIMARY
-  }, { min: 1, requires: { BOMBER_RED: 1 } }),
+  }, { roleMin: 1, requires: { BOMBER_RED: 1 } }),
 
   PRESIDENTS_DAUGHTER_BLUE: RoleDefinition.Blue({
     key: 'PRESIDENTS_DAUGHTER_BLUE',
@@ -208,7 +221,7 @@ export const BLUE_ROLES: Record<BlueRoleKey, FullyDefined<BlueRole>> = {
   TEAM_BLUE: RoleDefinition.Blue({
     key: 'TEAM_BLUE',
     roleName: BlueRoleName.TEAM
-  }, { max: Infinity, recommended: { TEAM_RED: 1 } })
+  }, { roleMax: Infinity, recommended: { TEAM_RED: 1 } })
 
 };
 
@@ -222,7 +235,7 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
     key: 'BOMBER_RED',
     roleName: RedRoleName.BOMBER,
     ranking: RoleRanking.PRIMARY
-  }, { min: 1, requires: { PRESIDENT_BLUE: 1 } }),
+  }, { roleMin: 1, requires: { PRESIDENT_BLUE: 1 } }),
 
   ENGINEER_RED: RoleDefinition.Red({
     key: 'ENGINEER_RED',
@@ -237,7 +250,7 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
   TEAM_RED: RoleDefinition.Red({
     key: 'TEAM_RED',
     roleName: RedRoleName.MARTYR
-  }, { max: Infinity, recommended: { TEAM_BLUE: 1 } }),
+  }, { roleMax: Infinity, recommended: { TEAM_BLUE: 1 } }),
 
   TINKERER_RED: RoleDefinition.Red({
     key: 'TINKERER_RED',
@@ -248,21 +261,17 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
 
 export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
   
-  GAMBLER_GREY: new RoleDefinition({
+  GAMBLER_GREY: RoleDefinition.Grey({
     key: 'GAMBLER_GREY',
-    color: TeamColor.GREY,
     roleName: GreyRoleName.GAMBLER,
-    winCondition: WinCondition.GAMBLER,
     pauseGameNumber: 10
   }),
 
-  PRIVATE_EYE_GREY: new RoleDefinition({
+  PRIVATE_EYE_GREY: RoleDefinition.Grey({
     key: 'PRIVATE_EYE_GREY',
-    color: TeamColor.GREY,
     roleName: GreyRoleName.PRIVATE_EYE,
-    winCondition: WinCondition.PRIVATE_EYE,
     pauseGameNumber: 5
-  })
+  }, { playerMaxRecommended: 10 })
 
 };
 
