@@ -11,7 +11,7 @@ const CardContainer = styled.div`
   display: grid;
   max-width: 300px;
   grid-template-columns: 1fr 70px;
-  grid-template-rows: 400px 50px;
+  grid-template-rows: 300px 50px;
   grid-template-areas:
     "description role"
     "team icon"
