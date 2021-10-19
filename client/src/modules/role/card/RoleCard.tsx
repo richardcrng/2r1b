@@ -10,7 +10,7 @@ const CardContainer = styled.div`
   color: white;
   display: grid;
   grid-template-columns: 4fr 1fr;
-  grid-template-rows: 3fr 1fr;
+  grid-template-rows: 5fr 1fr;
   grid-template-areas:
     "description role"
     "team icon"
@@ -42,11 +42,19 @@ const RoleName = styled.p`
 const TeamName = styled.div`
   grid-area: team;
   padding: 5px;
+  font-size: 2rem;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const TeamIcon = styled.div`
   grid-area: icon;
   padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const DescriptionHeader = styled.h3`
@@ -76,8 +84,12 @@ function RoleCard({ role }: Props): JSX.Element {
           <RoleName>{role.roleName.toUpperCase()}</RoleName>
         </div>
       </RoleReveal>
-      <TeamName>{role.color} Team</TeamName>
-      <TeamIcon>{role.color[0]}</TeamIcon>
+      <TeamName>
+        <div>{role.color.toUpperCase()} TEAM</div>
+      </TeamName>
+      <TeamIcon>
+        <div>{role.color[0]}</div>
+      </TeamIcon>
     </CardContainer>
   );
 }
