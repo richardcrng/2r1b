@@ -33,7 +33,7 @@ const PRESIDENT = blue(BlueRoleName.PRESIDENT)
 const RED_TEAM = red("Red Team")
 
 export const WIN_CONDITIONS = {
-  BLUE: <>You win, with all players aligned to {BLUE_TEAM}, if the {PRESIDENT} survives (does not gain the '{DEAD}' condition).</>,
+  BLUE: <>You win if the {PRESIDENT} survives (does not gain the '{DEAD}' condition).</>,
   [GreyRoleName.GAMBLER]: <>You win if, at the end of the final round, you can correctly predict which main team will win ({BLUE_TEAM}, {RED_TEAM} or neither).</>,
   [GreyRoleName.PRIVATE_EYE]: <>You win if, at the end of the final round, you can correctly predict the identity of the Buried card.</>,
   RED: <>You win, with all players aligned to {RED_TEAM}, if the {PRESIDENT} is killed (gains the '{DEAD}' condition) - e.g. by ending up in the same room as the {BOMBER}.</>

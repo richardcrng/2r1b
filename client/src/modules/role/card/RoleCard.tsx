@@ -18,12 +18,19 @@ const CardContainer = styled.div`
 
 const Description = styled.div`
   grid-area: description;
-  padding: 5px;
+  padding: 10px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
 `
 
 const RoleReveal = styled.div`
   grid-area: role;
   padding: 5px;
+  padding-top: 30px;
   writing-mode: vertical-rl;
 `;
 
@@ -42,17 +49,26 @@ const TeamIcon = styled.div`
   padding: 5px;
 `;
 
+const DescriptionHeader = styled.h3`
+  margin: 0;
+  margin-bottom: 5px;
+`
+
 function RoleCard({ role }: Props): JSX.Element {
 
   const { primary, secondary } = getColors(role.color)
 
   return (
     <CardContainer style={{ backgroundColor: primary }}>
-      <Description style={{ backgroundColor: secondary  }}>
-        <h3>Win condition</h3>
-        {WIN_CONDITIONS[role.info.winCondition]}
-        <h3>Responsibilities</h3>
-        {ROLE_RESPONSIBILITIES[role.roleName]}
+      <Description style={{ backgroundColor: secondary }}>
+        <section>
+          <DescriptionHeader>Win condition</DescriptionHeader>
+          <p>{WIN_CONDITIONS[role.info.winCondition]}</p>
+        </section>
+        <section>
+          <DescriptionHeader>Responsibilities</DescriptionHeader>
+          <p>{ROLE_RESPONSIBILITIES[role.roleName]}</p>
+        </section>
       </Description>
       <RoleReveal>
         <div>
@@ -60,14 +76,10 @@ function RoleCard({ role }: Props): JSX.Element {
           <RoleName>{role.roleName.toUpperCase()}</RoleName>
         </div>
       </RoleReveal>
-      <TeamName>
-        {role.color} Team
-      </TeamName>
-      <TeamIcon>
-        {role.color[0]}
-      </TeamIcon>
+      <TeamName>{role.color} Team</TeamName>
+      <TeamIcon>{role.color[0]}</TeamIcon>
     </CardContainer>
-  )
+  );
 }
 
 interface Colors {
