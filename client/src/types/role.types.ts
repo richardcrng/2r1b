@@ -100,6 +100,7 @@ export enum RoleRanking {
 
 export interface RoleInfo {
   ranking?: RoleRanking;
+  pauseGameNumber?: number;
   winCondition: WinCondition;
 }
 
@@ -251,14 +252,16 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
     key: 'GAMBLER_GREY',
     color: TeamColor.GREY,
     roleName: GreyRoleName.GAMBLER,
-    winCondition: WinCondition.GAMBLER
+    winCondition: WinCondition.GAMBLER,
+    pauseGameNumber: 10
   }),
 
   PRIVATE_EYE_GREY: new RoleDefinition({
     key: 'PRIVATE_EYE_GREY',
     color: TeamColor.GREY,
     roleName: GreyRoleName.PRIVATE_EYE,
-    winCondition: WinCondition.PRIVATE_EYE
+    winCondition: WinCondition.PRIVATE_EYE,
+    pauseGameNumber: 5
   })
 
 };
