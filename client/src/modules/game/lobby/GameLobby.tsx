@@ -1,5 +1,3 @@
-import { Button } from "semantic-ui-react";
-import styled from 'styled-components';
 // import { gameLobbyReadiness } from "../../selectors/game";
 import { GameBase, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
