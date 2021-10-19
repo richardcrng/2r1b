@@ -80,7 +80,26 @@ export interface RoleRestrictions {
   recommended: Partial<Record<RoleKey, number>>;
 }
 
+export enum RoleTag {
+  ACTING = 'acting',
+  BURY = 'bury',
+  CARD_SHARE_POWER = 'card share power',
+  CARD_SWAP = 'card swap',
+  COLOR_SHARE_POWER = 'color share power',
+  CONDITION = 'condition',
+  CONTAGIOUS = 'contagious',
+  PAUSES_GAME = 'pauses game',
+  PRIVATE_REVEAL_POWER = 'private reveal power',
+  PUBLIC_REVEAL_POWER = 'public reveal power'
+}
+
+export enum RoleRanking {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary'
+}
+
 export interface RoleInfo {
+  ranking?: RoleRanking;
   winCondition: WinCondition;
 }
 
@@ -175,12 +194,14 @@ export const BLUE_ROLES: Record<BlueRoleKey, FullyDefined<BlueRole>> = {
 
   PRESIDENT_BLUE: RoleDefinition.Blue({
     key: 'PRESIDENT_BLUE',
-    roleName: BlueRoleName.PRESIDENT
+    roleName: BlueRoleName.PRESIDENT,
+    ranking: RoleRanking.PRIMARY
   }, { min: 1, requires: { BOMBER_RED: 1 } }),
 
   PRESIDENTS_DAUGHTER_BLUE: RoleDefinition.Blue({
     key: 'PRESIDENTS_DAUGHTER_BLUE',
-    roleName: BlueRoleName.PRESIDENTS_DAUGHTER
+    roleName: BlueRoleName.PRESIDENTS_DAUGHTER,
+    ranking: RoleRanking.SECONDARY
   }, { recommended: { MARTYR_RED: 1 } }),
 
   TEAM_BLUE: RoleDefinition.Blue({
@@ -198,7 +219,8 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
 
   BOMBER_RED: RoleDefinition.Red({
     key: 'BOMBER_RED',
-    roleName: RedRoleName.BOMBER
+    roleName: RedRoleName.BOMBER,
+    ranking: RoleRanking.PRIMARY
   }, { min: 1, requires: { PRESIDENT_BLUE: 1 } }),
 
   ENGINEER_RED: RoleDefinition.Red({
@@ -218,7 +240,8 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
 
   TINKERER_RED: RoleDefinition.Red({
     key: 'TINKERER_RED',
-    roleName: RedRoleName.TINKERER
+    roleName: RedRoleName.TINKERER,
+    ranking: RoleRanking.SECONDARY
   }, { recommended: { NURSE_BLUE: 1 } })
 };
 
