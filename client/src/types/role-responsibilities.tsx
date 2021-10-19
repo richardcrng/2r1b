@@ -75,12 +75,12 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     <ul>
       <li>
         {responsibility("Backup Doctor")} Your latent responsibility activates
-        if the {DOCTOR} is Buried or receives the '{DEAD}' condition before the
-        end of the game.
+        if the {DOCTOR} role is Buried or receives the '{DEAD}' condition before
+        the end of the game.
       </li>
       <li>
         {responsibility("Treatment (latent)")} The President will die unless you
-        {CARD_SHARE} with them before the game ends..
+        {CARD_SHARE} with them before the game ends.
       </li>
     </ul>
   ),
@@ -99,11 +99,17 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   ),
 
   [BlueRoleName.PRESIDENTS_DAUGHTER]: (
-    <>
-      {responsibility("Backup President")} You are the backup character for the{" "}
-      {PRESIDENT}: if that card is buried, you must carry out all
-      responsibilities associated with it.
-    </>
+    <ul>
+      <li>
+        {responsibility("Backup President")} You are the backup character for
+        the {PRESIDENT}: if that role is buried, you must carry out all
+        responsibilities associated with it.
+      </li>
+      <li>
+        {responsibility("Secondary")} You are the secondary character for the{" "}
+        {BLUE_TEAM}.
+      </li>
+    </ul>
   ),
 
   [BlueRoleName.TEAM]: <>Protect the {PRESIDENT}!</>,
@@ -115,26 +121,35 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
         {RED_TEAM}.
       </li>
       <li>
-        {responsibility("Detonate")} Everyone in the same room as you at the end
-        of the game gains the '{DEAD}' condition.
+        {responsibility("Explosives")} Everyone in the same room as you at the
+        end of the game gains the '{DEAD}' condition.
       </li>
     </ul>
   ),
 
   [RedRoleName.ENGINEER]: (
     <>
-      To arm the {BOMBER}'s explosives, you must card share with the {BOMBER}{" "}
-      before the game ends. If you do not succeed, you and the rest of your team
-      lose.
+      {responsibility("Wiring")} The {BOMBER}'s explosives will be ineffectual
+      unless you {CARD_SHARE} with them before the game ends.
     </>
   ),
 
   [RedRoleName.MARTYR]: (
-    <>
-      You are the backup character for the {BOMBER}. If the {BOMBER} card is
-      buried you must carry out all responsibilities associated with the{" "}
-      {BOMBER}.
-    </>
+    <ul>
+      <li>
+        {responsibility("Backup Bomber")} Your latent responsibility activates
+        if the {BOMBER} role is Buried or receives the '{DEAD}' condition before
+        its explosives detonate.
+      </li>
+      <li>
+        {responsibility("Secondary")} You are the secondary character for the{" "}
+        {RED_TEAM}.
+      </li>
+      <li>
+        {responsibility("Explosives (latent)")} Everyone in the same room as you
+        at the end of the game gains the '{DEAD}' condition.
+      </li>
+    </ul>
   ),
 
   [RedRoleName.TEAM]: <>Support the {BOMBER}!</>,
