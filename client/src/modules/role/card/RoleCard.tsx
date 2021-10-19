@@ -101,7 +101,7 @@ interface Colors {
   secondary: string;
 }
 
-const getColors = (teamColor: TeamColor): Colors => {
+export const getColors = (teamColor: TeamColor): Colors => {
   switch (teamColor) {
   
     case TeamColor.BLUE:
