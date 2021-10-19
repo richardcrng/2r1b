@@ -1,12 +1,12 @@
 // import { gameLobbyReadiness } from "../../selectors/game";
-import { GameBase, Player } from "../../../types/game.types";
+import { Game, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
 import { useState } from 'react';
 import GameLobbySetupEdit from "./setup/GameLobbySetupEdit";
 import GameLobbySetupView from "./setup/GameLobbySetupView";
 
 interface Props {
-  game: GameBase;
+  game: Game;
   handleStartGame(): void;
   players: Player[];
   player: Player;
