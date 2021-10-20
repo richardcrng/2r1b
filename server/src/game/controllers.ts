@@ -9,7 +9,7 @@ import { games, getGameById } from "../db";
 import { generateRandomGameId, getColors } from "../utils";
 
 export const incrementRoleInGame = (game: Game, role: RoleKey, increment: number): void => {
-  game.roles.inPlay[role] += 1;
+  game.roles.inPlay[role] += increment;
 }
 
 export const createGame = (data: CreateGameEvent): Game => {

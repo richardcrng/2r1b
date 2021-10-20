@@ -17,9 +17,6 @@ function RoleAdder({ onRoleIncrement, onRoleSelect, rolesCount, selectedRole }: 
     const { roleMax } = getRoleRestrictions(roleToIncrement)
     if (currentCount < roleMax) {
       onRoleIncrement(selectedRole!, 1);
-      if (currentCount + 1 === roleMax) {
-        onRoleSelect(undefined);
-      }
     } else {
       window.alert(`Already at max count for ${roleToIncrement}`);
     }

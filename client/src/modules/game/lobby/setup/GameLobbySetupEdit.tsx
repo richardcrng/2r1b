@@ -3,11 +3,10 @@ import { Button } from "semantic-ui-react";
 import styled from 'styled-components'
 import { selectGameRolesInPlayCount, selectRolesInSetup } from "../../../../selectors/game";
 import { Game } from "../../../../types/game.types";
-import { ALL_ROLES, RoleKey } from "../../../../types/role.types";
-import { getRoleRemovability, getRoleRestrictions } from "../../../../utils/role-utils";
+import { RoleKey } from "../../../../types/role.types";
+import { getRoleRestrictions } from "../../../../utils/role-utils";
 import RoleAdder from "../../../role/adder/RoleAdder";
 import { getColors } from "../../../role/card/RoleCard";
-import RoleDropdown from "../../../role/dropdown/RoleDropdown";
 
 const Container = styled.div`
   display: flex;
@@ -42,7 +41,9 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
         <p>Edit setup here!</p>
         <RoleUl>
           {rolesInSetup.map(([role, count]) => {
-            const { roleMin, roleMax } = getRoleRestrictions(role.key)
+            const { roleMin, roleMax } = getRoleRestrictions(role.key);
+            const handleIncrement = () => onRoleIncrement(role.key, 1);
+            const handleDecrement = () => onRoleIncrement(role.key, -1);
 
             return (
               <RoleLi key={role.key}>
@@ -55,10 +56,10 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
                 {roleMin !== roleMax && (
                   <div>
                     {roleMax > 1 && (
-                      <button disabled={count >= roleMax}>+</button>
+                      <button disabled={count >= roleMax} onClick={handleIncrement}>+</button>
                     )}
                     {roleMin === 0 && (
-                      <button disabled={count <= roleMin}>-</button>
+                      <button disabled={count <= roleMin} onClick={handleDecrement}>-</button>
                     )}
                   </div>
                 )}
