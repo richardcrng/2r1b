@@ -1,6 +1,7 @@
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, GameBase, Player } from "./game.types";
+import { RoleKey } from "./role.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -19,6 +20,7 @@ export enum ClientEvent {
   CREATE_GAME = "create-game",
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
+  INCREMENT_ROLE = 'increment-role',
   JOIN_GAME = "join",
   FLIP_CARD = "flip-card",
   NEXT_ROUND = "next-round",
@@ -62,7 +64,8 @@ export type ClientEventListeners = {
     gameId: string,
     playerId: string,
     aliasIds: string[]
-  ) => void;
+    ) => void;
+  [ClientEvent.INCREMENT_ROLE]: (gameId: string, roleKey: RoleKey, increment: number) => void;
   [ClientEvent.JOIN_GAME]: (gameId: string, player: Player) => void;
   [ClientEvent.NEXT_ROUND]: (gameId: string) => void;
   [ClientEvent.RESET_GAME]: (gameId: string) => void;

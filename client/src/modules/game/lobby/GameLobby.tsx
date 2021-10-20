@@ -4,10 +4,12 @@ import GameLobbyHome from "./home/GameLobbyHome";
 import { useState } from 'react';
 import GameLobbySetupEdit from "./setup/GameLobbySetupEdit";
 import GameLobbySetupView from "./setup/GameLobbySetupView";
+import { RoleKey } from "../../../types/role.types";
 
 interface Props {
   game: Game;
-  handleStartGame(): void;
+  onGameStart(): void;
+  onRoleIncrement(roleKey: RoleKey, increment: number): void;
   players: Player[];
   player: Player;
 }
@@ -18,7 +20,7 @@ enum LobbyView {
   SETUP_VIEW = 'setup-view'
 }
 
-function GameLobby({ game, handleStartGame, players, player }: Props): JSX.Element {
+function GameLobby({ game, onGameStart, onRoleIncrement, players, player }: Props): JSX.Element {
 
   const [view, setView] = useState(LobbyView.HOME)
 
@@ -30,12 +32,12 @@ function GameLobby({ game, handleStartGame, players, player }: Props): JSX.Eleme
     case LobbyView.HOME:
       return (
         <GameLobbyHome
-          {...{ game, handleStartGame, handleViewSetup, players, player }}
+          {...{ game, onGameStart, handleViewSetup, players, player }}
         />
       );
     
       case LobbyView.SETUP_EDIT:
-        return <GameLobbySetupEdit game={game} />
+        return <GameLobbySetupEdit game={game} onRoleIncrement={onRoleIncrement} />
       
       case LobbyView.SETUP_VIEW:
         return <GameLobbySetupView />

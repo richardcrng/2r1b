@@ -12,7 +12,7 @@ import { GameLobbyReadiness } from "../../../../selectors/game";
 interface Props {
   game: GameBase;
   handleViewSetup(): void;
-  handleStartGame(): void;
+  onGameStart(): void;
   players: Player[];
   player: Player;
 }
@@ -41,7 +41,7 @@ const PlayerListItemContents = styled.div`
   padding-bottom: 10px;
 `;
 
-function GameLobbyHome({ game, handleStartGame, handleViewSetup, players, player }: Props) {
+function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: Props) {
   // const readiness = gameLobbyReadiness(game);
   const readiness: GameLobbyReadiness = { isReady: false };
   // eslint-disable-next-line
@@ -100,7 +100,7 @@ function GameLobbyHome({ game, handleStartGame, handleViewSetup, players, player
               primary
               disabled={disableStart}
               onClick={() => {
-                handleStartGame();
+                onGameStart();
               }}
             >
               Start game

@@ -4,9 +4,13 @@ import {
   Game,
   GameStatus,
 } from "../../../client/src/types/game.types";
-import { ALL_ROLES } from '../../../client/src/types/role.types';
+import { ALL_ROLES, RoleKey } from '../../../client/src/types/role.types';
 import { games, getGameById } from "../db";
 import { generateRandomGameId, getColors } from "../utils";
+
+export const incrementRoleInGame = (game: Game, role: RoleKey, increment: number): void => {
+  game.roles.inPlay[role] += 1;
+}
 
 export const createGame = (data: CreateGameEvent): Game => {
   const gameId = generateRandomGameId();

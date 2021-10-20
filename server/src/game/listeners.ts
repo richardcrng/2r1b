@@ -4,11 +4,19 @@ import {
   ServerSocket,
   ServerIO,
 } from "../../../client/src/types/event.types";
-import { createGame, startGame } from "./controllers";
+import { incrementRoleInGame, createGame, startGame } from "./controllers";
 import { getGameById } from "../db";
 import { joinPlayerToGame } from "../player/controllers";
 
 export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
+  socket.on(ClientEvent.INCREMENT_ROLE, (gameId, roleKey, increment) => {
+    const game = getGameById(gameId);
+    if (game) {
+      incrementRoleInGame(game, roleKey, increment);
+      socket.emit(ServerEvent.GAME_UPDATED, game.id, game)
+    }
+  })
+
   socket.on(ClientEvent.CREATE_GAME, (e) => {
     const createdGame = createGame(e);
     socket.emit(ServerEvent.GAME_CREATED, createdGame);
