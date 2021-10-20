@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-import { PlayerRole, RoleKey } from '../../../types/role.types';
-import { getRoleRestrictions } from '../../../utils/role-utils';
+import { PlayerRole, RoleKey, RoleRanking } from '../../../types/role.types';
+import { getRoleRanking, getRoleRestrictions } from '../../../utils/role-utils';
 import { getColors } from '../card/RoleCard';
 
 const RoleUl = styled.ul`
@@ -35,7 +35,10 @@ function RoleSetup({ onRoleIncrement, rolesInSetup }: Props) {
         return (
           <RoleLi key={role.key}>
             <div>
-              <span style={{ color: getColors(role.color).primary }}>
+              <span style={{
+                color: getColors(role.color).primary,
+                fontWeight: getRoleRanking(role.key) === RoleRanking.PRIMARY ? 'bold' : undefined
+              }}>
                 {role.roleName}
               </span>{" "}
               x {count}
