@@ -13,7 +13,7 @@ export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
     const game = getGameById(gameId);
     if (game) {
       incrementRoleInGame(game, roleKey, increment);
-      socket.emit(ServerEvent.GAME_UPDATED, game.id, game)
+      io.emit(ServerEvent.GAME_UPDATED, game.id, game)
     }
   })
 
