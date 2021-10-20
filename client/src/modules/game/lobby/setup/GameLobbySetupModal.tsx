@@ -29,7 +29,7 @@ function GameLobbySetupModal({ game, isEditable, isOpen, onClose, onOpen, onRole
     >
       <Modal.Header>Role setup</Modal.Header>
       <Modal.Content>
-        <RoleSetup {...{ rolesInSetup, onRoleIncrement }} />
+        <RoleSetup {...{ isEditable, rolesInSetup, onRoleIncrement }} />
         {isEditable && (
           <RoleAdder
             {...{ onRoleIncrement, rolesCount, selectedRole }}

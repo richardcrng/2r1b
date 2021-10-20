@@ -14,11 +14,12 @@ const RoleLi = styled.li`
 `;
 
 interface Props {
+  isEditable: boolean;
   onRoleIncrement?(roleKey: RoleKey, increment: number): void;
   rolesInSetup: [PlayerRole, number][];
 }
 
-function RoleSetup({ onRoleIncrement, rolesInSetup }: Props) {
+function RoleSetup({ isEditable, onRoleIncrement, rolesInSetup }: Props) {
   return (
     <RoleUl>
       {rolesInSetup.map(([role, count]) => {
@@ -43,7 +44,7 @@ function RoleSetup({ onRoleIncrement, rolesInSetup }: Props) {
               </span>{" "}
               x {count}
             </div>
-            {roleMin !== roleMax && onRoleIncrement && (
+            {isEditable && roleMin !== roleMax && (
               <div>
                 {roleMax > 1 && (
                   <button disabled={count >= roleMax} onClick={handleIncrement}>

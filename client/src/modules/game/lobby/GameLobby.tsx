@@ -2,10 +2,7 @@
 import { Game, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
 import { useState } from 'react';
-import GameLobbySetupEdit from "./setup/GameLobbySetupEdit";
-import GameLobbySetupView from "./setup/GameLobbySetupView";
 import { RoleKey } from "../../../types/role.types";
-import { Modal } from "semantic-ui-react";
 import GameLobbySetupModal from "./setup/GameLobbySetupModal";
 
 interface Props {
@@ -14,12 +11,6 @@ interface Props {
   onRoleIncrement(roleKey: RoleKey, increment: number): void;
   players: Player[];
   player: Player;
-}
-
-enum LobbyView {
-  HOME = 'home',
-  SETUP_EDIT = 'setup-edit',
-  SETUP_VIEW = 'setup-view'
 }
 
 function GameLobby({ game, onGameStart, onRoleIncrement, players, player }: Props): JSX.Element {
