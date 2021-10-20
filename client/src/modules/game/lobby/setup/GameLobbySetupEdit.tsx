@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { selectGameRolesInPlayCount, selectRolesInSetup } from "../../../../selectors/game";
 import { Game } from "../../../../types/game.types";
 import { ALL_ROLES, RoleKey } from "../../../../types/role.types";
+import { getRoleRemovability, getRoleRestrictions } from "../../../../utils/role-utils";
 import RoleAdder from "../../../role/adder/RoleAdder";
 import { getColors } from "../../../role/card/RoleCard";
 import RoleDropdown from "../../../role/dropdown/RoleDropdown";
@@ -13,6 +14,15 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: space-between;
+`
+const RoleUl = styled.ul`
+  padding-inline-start: 0;
+`
+
+const RoleLi = styled.li`
+  display: flex;
+  justify-content: space-between;
+  min-height: 22px;
 `
 
 interface Props {
@@ -30,16 +40,32 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
     <Container className="active-contents">
       <div>
         <p>Edit setup here!</p>
-        <ul>
-          {rolesInSetup.map(([role, count]) => (
-            <li key={role.key}>
-              <span style={{ color: getColors(role.color).primary }}>
-                {role.roleName}
-              </span>{" "}
-              x {count}
-            </li>
-          ))}
-        </ul>
+        <RoleUl>
+          {rolesInSetup.map(([role, count]) => {
+            const { roleMin, roleMax } = getRoleRestrictions(role.key)
+
+            return (
+              <RoleLi key={role.key}>
+                <div>
+                  <span style={{ color: getColors(role.color).primary }}>
+                    {role.roleName}
+                  </span>{" "}
+                  x {count}
+                </div>
+                {roleMin !== roleMax && (
+                  <div>
+                    {roleMax > 1 && (
+                      <button disabled={count >= roleMax}>+</button>
+                    )}
+                    {roleMin === 0 && (
+                      <button disabled={count <= roleMin}>-</button>
+                    )}
+                  </div>
+                )}
+              </RoleLi>
+            );
+          })}
+        </RoleUl>
       </div>
       <div>
         <RoleAdder

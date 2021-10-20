@@ -1,6 +1,7 @@
 import { Button } from "semantic-ui-react";
 import { ALL_ROLES, RoleKey } from "../../../types/role.types";
 import RoleDropdown from "../dropdown/RoleDropdown";
+import { getRoleRestrictions } from '../../../utils/role-utils';
 
 interface Props {
   onRoleIncrement(roleKey: RoleKey, increment: number): void;
@@ -13,10 +14,10 @@ function RoleAdder({ onRoleIncrement, onRoleSelect, rolesCount, selectedRole }: 
   const handleIncrement = () => {
     const roleToIncrement = selectedRole!;
     const currentCount = rolesCount[roleToIncrement];
-    const maxCount = ALL_ROLES[roleToIncrement].restrictions.roleMax;
-    if (currentCount < maxCount) {
+    const { roleMax } = getRoleRestrictions(roleToIncrement)
+    if (currentCount < roleMax) {
       onRoleIncrement(selectedRole!, 1);
-      if (currentCount + 1 === maxCount) {
+      if (currentCount + 1 === roleMax) {
         onRoleSelect(undefined);
       }
     } else {
