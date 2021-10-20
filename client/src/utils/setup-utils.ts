@@ -38,7 +38,44 @@ const checkRestrictions = (rolesCount: RolesCount, roleKey: RoleKey, { recommend
   // if ()
 }
 
-export const checkRoleCountRestrictions = (rolesCount: RolesCount, roleKey: RoleKey): SetupAlert[] => {
+export const checkOtherRoleCountRestrictions = (
+  rolesCount: RolesCount,
+  roleKey: RoleKey
+): SetupAlert[] => {
+  const alerts: SetupAlert[] = [];
+  const countOfThisRole = rolesCount[roleKey];
+  const { recommended, requires } = getRoleRestrictions(roleKey);
+  const { color, roleName } = getRoleDefinition(roleKey);
+  const recommendedRoleEntries = Object.entries(recommended) as [RoleKey, number][];
+  const requiredRoleEntries = Object.entries(requires) as [RoleKey, number][];
+
+  for (let [otherKey, otherCountPerRole] of recommendedRoleEntries) {
+    const { color: otherColor, roleName: otherRoleName } = getRoleDefinition(otherKey);
+    const expectedCount = countOfThisRole * otherCountPerRole;
+    if (rolesCount[otherKey] !== expectedCount) {
+      alerts.push({
+        severity: SetupAlertSeverity.WARNING,
+        message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is recommended for each ${roleName} (${color})`
+      })
+    }
+  }
+
+  for (let [otherKey, otherCountPerRole] of requiredRoleEntries) {
+    const { color: otherColor, roleName: otherRoleName } =
+      getRoleDefinition(otherKey);
+    const expectedCount = countOfThisRole * otherCountPerRole;
+    if (rolesCount[otherKey] !== expectedCount) {
+      alerts.push({
+        severity: SetupAlertSeverity.ERROR,
+        message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is required for each ${roleName} (${color})`,
+      });
+    }
+  }
+
+  return alerts;
+};
+
+export const checkOwnRoleCountRestrictions = (rolesCount: RolesCount, roleKey: RoleKey): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
   const roleCount = rolesCount[roleKey];
   const { roleMax, roleMin } = getRoleRestrictions(roleKey)

@@ -1,6 +1,6 @@
 import { RolesCount } from "../types/game.types"
 import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
-import { alertsFromRolesCount, checkRoleCountRestrictions, SetupAlertSeverity } from "./setup-utils"
+import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnRoleCountRestrictions, SetupAlertSeverity } from "./setup-utils"
 
 
 describe('alertsFromRolesCount', () => {
@@ -18,16 +18,59 @@ describe('alertsFromRolesCount', () => {
   })
 })
 
-describe('checkRoleCountRestrictions', () => {
+describe("checkOtherRoleCountRestrictions", () => {
+  describe("Roles that recommend each other", () => {
+    describe("Doctor and Engineer", () => {
+      test("Warns that Doctor is recommended with Engineer", () => {
+        const result = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 0, ENGINEER_RED: 1 },
+          "ENGINEER_RED"
+        );
+
+        expect(result).toHaveLength(1);
+        expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+        expect(result[0].message).toMatch(/doctor/i);
+      });
+
+      test("Warns that Engineer is recommended with Doctor", () => {
+        const result = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 1, ENGINEER_RED: 0 },
+          "DOCTOR_BLUE"
+        );
+
+        expect(result).toHaveLength(1);
+        expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+        expect(result[0].message).toMatch(/engineer/i);
+      });
+
+      test("No warning when both present", () => {
+        const doctorCheck = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 1, ENGINEER_RED: 1 },
+          "DOCTOR_BLUE"
+        );
+
+        const engineerCheck = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 1, ENGINEER_RED: 1 },
+          "DOCTOR_BLUE"
+        );
+
+        expect(doctorCheck).toHaveLength(0);
+        expect(engineerCheck).toHaveLength(0);
+      });
+    })
+  })
+});
+
+describe('checkOwnRoleCountRestrictions', () => {
   test("Error with less than one President", () => {
-    const result = checkRoleCountRestrictions({ ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 0 }, 'PRESIDENT_BLUE')
+    const result = checkOwnRoleCountRestrictions({ ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 0 }, 'PRESIDENT_BLUE')
     
     expect(result).toHaveLength(1);
     expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
   })
 
   test("Error with more than one President", () => {
-    const result = checkRoleCountRestrictions(
+    const result = checkOwnRoleCountRestrictions(
       { ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 2 },
       "PRESIDENT_BLUE"
     );
@@ -37,7 +80,7 @@ describe('checkRoleCountRestrictions', () => {
   });
 
   test("No error with one President", () => {
-    const result = checkRoleCountRestrictions(
+    const result = checkOwnRoleCountRestrictions(
       { ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 1 },
       "PRESIDENT_BLUE"
     );
