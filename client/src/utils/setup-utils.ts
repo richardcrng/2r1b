@@ -13,6 +13,21 @@ export interface SetupAlert {
   message: string;
 }
 
+export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number): SetupAlert[] => {
+  const roleKeys = Object.keys(rolesCount) as RoleKey[];
+
+  const alerts = roleKeys.reduce(
+    (acc, currRoleKey) => [
+      ...acc,
+      ...checkOwnRoleCountRestrictions(rolesCount, currRoleKey),
+      ...checkOtherRoleCountRestrictions(rolesCount, currRoleKey),
+    ],
+    [] as SetupAlert[]
+  );
+
+  return alerts;
+};
+
 export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
   const roleKeys = Object.keys(rolesCount) as RoleKey[];
 
@@ -79,6 +94,45 @@ export const checkOwnRoleCountRestrictions = (rolesCount: RolesCount, roleKey: R
   
   return alerts
 }
+
+export const checkOwnPlayerCountRoleRestrictions = (
+  nPlayers: number,
+  roleKey: RoleKey
+): SetupAlert[] => {
+  const alerts: SetupAlert[] = [];
+  const { playerMax, playerMaxRecommended, playerMin, playerMinRecommended } = getRoleRestrictions(roleKey);
+  const { color, roleName } = getRoleDefinition(roleKey);
+
+  if (nPlayers > playerMax) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `Maximum ${nPlayers} allowed for ${roleName} (${color})`,
+    });
+  }
+
+  if (nPlayers > playerMaxRecommended) {
+    alerts.push({
+      severity: SetupAlertSeverity.WARNING,
+      message: `Maximum ${nPlayers} recommended for ${roleName} (${color})`,
+    });
+  }
+
+  if (nPlayers < playerMin) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `Minimum ${nPlayers} needed for ${roleName} (${color})`,
+    });
+  }
+
+  if (nPlayers < playerMinRecommended) {
+    alerts.push({
+      severity: SetupAlertSeverity.WARNING,
+      message: `Minimum ${nPlayers} recommended for ${roleName} (${color})`,
+    });
+  }
+
+  return alerts;
+};
 
 
 

@@ -1,7 +1,6 @@
 import { RolesCount } from "../types/game.types"
 import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
-import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnRoleCountRestrictions, SetupAlertSeverity } from "./setup-utils"
-
+import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, SetupAlertSeverity } from "./setup-utils"
 
 describe('alertsFromRolesCount', () => {
   test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
@@ -130,6 +129,14 @@ describe("checkOtherRoleCountRestrictions", () => {
     });
   })
 });
+
+describe('checkOwnPlayerCountRoleRestrictions', () => {
+  test("Warning from including Private Eye in a game with more than 10 players", () => {
+    const result = checkOwnPlayerCountRoleRestrictions(11, 'PRIVATE_EYE_GREY');
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.WARNING)
+  })
+})
 
 describe('checkOwnRoleCountRestrictions', () => {
   test("Error with less than one President", () => {
