@@ -16,6 +16,22 @@ describe('alertsFromRolesCount', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toHaveProperty('severity', SetupAlertSeverity.WARNING)
   })
+
+  test("Given a Doctor, no Engineer and no Bomber, gives a warning and an error", () => {
+    const testRolesCount: RolesCount = {
+      ...DEFAULT_STARTING_ROLES_COUNT,
+      DOCTOR_BLUE: 1,
+      ENGINEER_RED: 0,
+      BOMBER_RED: 0
+    };
+
+    const result = alertsFromRolesCount(testRolesCount);
+    expect(result).toHaveLength(2);
+    expect(result.some(({ severity }) => severity === SetupAlertSeverity.WARNING)).toBe(true);
+    expect(
+      result.some(({ severity }) => severity === SetupAlertSeverity.ERROR)
+    ).toBe(true);
+  });
 })
 
 describe("checkOtherRoleCountRestrictions", () => {
