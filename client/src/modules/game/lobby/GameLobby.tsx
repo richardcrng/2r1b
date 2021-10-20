@@ -5,6 +5,8 @@ import { useState } from 'react';
 import GameLobbySetupEdit from "./setup/GameLobbySetupEdit";
 import GameLobbySetupView from "./setup/GameLobbySetupView";
 import { RoleKey } from "../../../types/role.types";
+import { Modal } from "semantic-ui-react";
+import GameLobbySetupModal from "./setup/GameLobbySetupModal";
 
 interface Props {
   game: Game;
@@ -22,26 +24,27 @@ enum LobbyView {
 
 function GameLobby({ game, onGameStart, onRoleIncrement, players, player }: Props): JSX.Element {
 
-  const [view, setView] = useState(LobbyView.HOME)
 
-  const handleViewSetup = () => {
-    player.isHost ? setView(LobbyView.SETUP_EDIT) : setView(LobbyView.SETUP_VIEW)
-  }
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  switch (view) {
-    case LobbyView.HOME:
-      return (
-        <GameLobbyHome
-          {...{ game, onGameStart, handleViewSetup, players, player }}
-        />
-      );
-    
-      case LobbyView.SETUP_EDIT:
-        return <GameLobbySetupEdit game={game} onRoleIncrement={onRoleIncrement} />
-      
-      case LobbyView.SETUP_VIEW:
-        return <GameLobbySetupView />
-  }
+  const handleOpen = () => setIsModalOpen(true)
+  const handleClose = () => setIsModalOpen(false)
+
+  return (
+    <>
+      <GameLobbyHome
+        {...{ game, onGameStart, players, player }}
+        handleViewSetup={handleOpen}
+      />
+      <GameLobbySetupModal
+        {...{ game, onRoleIncrement }}
+        isEditable={!!player.isHost}
+        isOpen={isModalOpen}
+        onOpen={handleOpen}
+        onClose={handleClose}
+      />
+    </>
+  );
 }
 
 export default GameLobby;

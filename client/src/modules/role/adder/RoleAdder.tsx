@@ -1,5 +1,5 @@
 import { Button } from "semantic-ui-react";
-import { ALL_ROLES, RoleKey } from "../../../types/role.types";
+import { RoleKey } from "../../../types/role.types";
 import RoleDropdown from "../dropdown/RoleDropdown";
 import { getRoleRestrictions } from '../../../utils/role-utils';
 
@@ -20,6 +20,7 @@ function RoleAdder({ onRoleIncrement, onRoleSelect, rolesCount, selectedRole }: 
     } else {
       window.alert(`Already at max count for ${roleToIncrement}`);
     }
+    onRoleSelect(undefined)
   };
 
   return (
@@ -27,7 +28,7 @@ function RoleAdder({ onRoleIncrement, onRoleSelect, rolesCount, selectedRole }: 
       <RoleDropdown
         filter={(role) => {
           const currentCount = rolesCount[role.key];
-          return currentCount < ALL_ROLES[role.key].restrictions.roleMax;
+          return currentCount === 0;
         }}
         selectedRole={selectedRole}
         onRoleSelect={onRoleSelect}
