@@ -44,3 +44,8 @@ export const selectRolesInSetup = createSelector(
   selectGameRoleEntriesInGame,
   (entries) => entries.map(([roleKey, roleCount]) => [ALL_ROLES[roleKey], roleCount]) as [PlayerRole, number][]
 )
+
+export const selectRolesInSetupAlphabetised = createSelector(
+  selectRolesInSetup,
+  (roleEntries) => [...roleEntries].sort((a, b) => a[0].roleName < b[0].roleName ? -1 : 0)
+)

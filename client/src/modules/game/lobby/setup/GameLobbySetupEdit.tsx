@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "semantic-ui-react";
 import styled from 'styled-components'
-import { selectGameRolesInPlayCount, selectRolesInSetup } from "../../../../selectors/game";
+import { selectGameRolesInPlayCount, selectRolesInSetupAlphabetised } from "../../../../selectors/game";
 import { Game } from "../../../../types/game.types";
 import { RoleKey } from "../../../../types/role.types";
 import { getRoleRestrictions } from "../../../../utils/role-utils";
@@ -33,7 +33,7 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
   
   const [selectedRole, setSelectedRole] = useState<RoleKey>()
   const rolesCount = selectGameRolesInPlayCount(game);
-  const rolesInSetup = selectRolesInSetup(game);
+  const rolesInSetup = selectRolesInSetupAlphabetised(game);
 
   return (
     <Container className="active-contents">
