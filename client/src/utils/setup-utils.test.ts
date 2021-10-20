@@ -1,6 +1,6 @@
 import { RolesCount } from "../types/game.types"
 import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
-import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, SetupAlertSeverity } from "./setup-utils"
+import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
 
 describe('alertsFromRolesCount', () => {
   test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
@@ -164,4 +164,30 @@ describe('checkOwnRoleCountRestrictions', () => {
 
     expect(result).toHaveLength(0);
   });
+})
+
+describe('checkPlayerCountAgainstRoleCount', () => {
+  test("Error when 2+ fewer players than roles", () => {
+    const result = checkPlayerCountAgainstRoleCount(7, 10);
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
+  })
+
+  test("Warning about Burying when 1 more role than players", () => {
+    const result = checkPlayerCountAgainstRoleCount(9, 10);
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+    expect(result[0].message).toMatch(/bur[y|i]/i);
+  });
+
+  test("No error when players matches roles", () => {
+    const result = checkPlayerCountAgainstRoleCount(10, 10);
+    expect(result).toHaveLength(0);
+  });
+
+  test("Error when more players than roles", () => {
+    const result = checkPlayerCountAgainstRoleCount(11, 10);
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
+  })
 })

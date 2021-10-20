@@ -15,17 +15,20 @@ export interface SetupAlert {
 
 export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number): SetupAlert[] => {
   const roleKeys = Object.keys(rolesCount) as RoleKey[];
+  const totalRolesCount = Object.values(rolesCount).reduce((acc, curr) => acc + curr, 0);
 
   const alerts = roleKeys.reduce(
     (acc, currRoleKey) => [
       ...acc,
-      ...checkOwnRoleCountRestrictions(rolesCount, currRoleKey),
-      ...checkOtherRoleCountRestrictions(rolesCount, currRoleKey),
+      ...checkOwnPlayerCountRoleRestrictions(nPlayers, currRoleKey),
     ],
     [] as SetupAlert[]
   );
 
-  return alerts;
+  return [
+    ...checkPlayerCountAgainstRoleCount(nPlayers, totalRolesCount),
+    ...alerts
+  ]
 };
 
 export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
@@ -134,19 +137,32 @@ export const checkOwnPlayerCountRoleRestrictions = (
   return alerts;
 };
 
+export const checkPlayerCountAgainstRoleCount = (nPlayers: number, totalRolesCount: number): SetupAlert[] => {
+  const alerts: SetupAlert[] = [];
 
+  if (totalRolesCount < nPlayers) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `${
+        nPlayers - totalRolesCount
+      } roles short for ${nPlayers} players`,
+    });
+  } else if (totalRolesCount === nPlayers + 1) {
+    alerts.push({
+      severity: SetupAlertSeverity.WARNING,
+      message: `1 role will be Buried (${totalRolesCount} roles between ${nPlayers} players)`,
+    });
+  } else if (totalRolesCount > nPlayers + 1) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `Max ${
+        nPlayers + 1
+      } roles allowed for a ${nPlayers} players game`,
+    });
+  }
 
-
-
-
-
-
-
-
-
-
-
-
+  return alerts
+}
 
 
 
