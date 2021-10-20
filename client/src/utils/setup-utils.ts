@@ -2,6 +2,8 @@ import { RolesCount } from "../types/game.types";
 import { RoleKey } from "../types/role.types";
 import { getRoleDefinition, getRoleRestrictions } from "./role-utils";
 
+const MINIMUM_PLAYERS_NEEDED = 6;
+const MINIMUM_PLAYERS_RECOMMENDED = 10;
 
 export enum SetupAlertSeverity {
   ERROR = 'error',
@@ -146,18 +148,15 @@ export const checkOwnPlayerCountRoleRestrictions = (
 export const checkPlayerCount = (nPlayers: number): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
 
-  const MINIMUM_NEEDED = 6;
-  const MINIMUM_RECOMMENDED = 10
-
-  if (nPlayers < MINIMUM_NEEDED) {
+  if (nPlayers < MINIMUM_PLAYERS_NEEDED) {
     alerts.push({
       severity: SetupAlertSeverity.ERROR,
-      message: `At least ${MINIMUM_NEEDED} players are needed to play`
+      message: `At least ${MINIMUM_PLAYERS_NEEDED} players are needed to play`
     })
-  } else if (nPlayers < MINIMUM_RECOMMENDED) {
+  } else if (nPlayers < MINIMUM_PLAYERS_RECOMMENDED) {
     alerts.push({
       severity: SetupAlertSeverity.WARNING,
-      message: `At least ${MINIMUM_NEEDED} players are recommended when playing`,
+      message: `At least ${MINIMUM_PLAYERS_NEEDED} players are recommended when playing`,
     });
   }
 
@@ -166,6 +165,9 @@ export const checkPlayerCount = (nPlayers: number): SetupAlert[] => {
 
 export const checkPlayerCountAgainstRoleCount = (nPlayers: number, totalRolesCount: number): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
+
+  // don't bother when there aren't even enough players
+  if (nPlayers < MINIMUM_PLAYERS_NEEDED) return []
 
   if (totalRolesCount < nPlayers) {
     alerts.push({

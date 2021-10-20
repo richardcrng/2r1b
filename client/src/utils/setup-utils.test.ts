@@ -209,4 +209,9 @@ describe('checkPlayerCountAgainstRoleCount', () => {
     expect(result).toHaveLength(1);
     expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
   })
+
+  test("No error when player count doesn't even clear minimum", () => {
+    const result = checkPlayerCountAgainstRoleCount(4, 10);
+    expect(result).toHaveLength(0);
+  })
 })

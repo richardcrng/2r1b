@@ -1,12 +1,11 @@
 import { last } from 'lodash';
 import { createSelector } from 'reselect';
-import { Card, CardType, Game, GameBase, Round } from "../types/game.types";
+import { Game, RolesCount } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
-
-
+import { alertsFromSetup } from '../utils/setup-utils';
 
 export const selectGamePlayers = (game: Game) => game.players;
-export const selectGameRolesInPlayCount = (game: Game): Record<RoleKey, number> => game.rolesCount
+export const selectGameRolesInPlayCount = (game: Game): RolesCount => game.rolesCount;
 
 export const selectTotalCountOfGameRoles = createSelector(
   selectGameRolesInPlayCount,
@@ -21,6 +20,12 @@ export const selectGamePlayersList = createSelector(
 export const selectGamePlayerCount = createSelector(
   selectGamePlayersList,
   list => list.length
+)
+
+export const selectGameSetupAlerts = createSelector(
+  selectGameRolesInPlayCount,
+  selectGamePlayerCount,
+  (rolesCount, nPlayers) => alertsFromSetup(rolesCount, nPlayers)
 )
 
 export interface GameLobbyReadiness {
