@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dropdown } from "semantic-ui-react";
-import { ALPHABETISED_ROLE_VALUES, RoleKey } from "../../../types/role.types";
+import { ALPHABETISED_ROLE_VALUES, FullyDefined, PlayerRole, RoleKey } from "../../../types/role.types";
 import { getColors } from "../card/RoleCard";
 
 const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
@@ -20,20 +20,25 @@ const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
 }));
 
 interface Props {
+  filter?(role: typeof ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS[0]): boolean;
   onRoleSelect?(roleKey: RoleKey): void;
   selectedRole?: RoleKey;
 }
 
-function RoleDropdown({ onRoleSelect, selectedRole: controlledRoleValue }: Props) {
+function RoleDropdown({ filter, onRoleSelect, selectedRole: controlledRoleValue }: Props) {
   const [uncontrolledValue, setUncontrolledValue] = useState<RoleKey>();
   const selectedRole = controlledRoleValue ?? uncontrolledValue;
+
+  const optionsToList = filter
+    ? ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS.filter(filter)
+    : ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS
 
   return (
     <Dropdown
       search
       selection
       fluid
-      options={ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS}
+      options={optionsToList}
       value={selectedRole}
       onChange={(_, { value }) => {
         const newRole = value as RoleKey;

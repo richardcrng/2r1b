@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button } from "semantic-ui-react";
 import styled from 'styled-components'
-import { selectRolesInSetup } from "../../../../selectors/game";
+import { selectGameRolesInPlayCount, selectRolesInSetup } from "../../../../selectors/game";
 import { Game } from "../../../../types/game.types";
-import { RoleKey } from "../../../../types/role.types";
+import { ALL_ROLES, RoleKey } from "../../../../types/role.types";
 import { getColors } from "../../../role/card/RoleCard";
 import RoleDropdown from "../../../role/dropdown/RoleDropdown";
 
@@ -22,7 +22,22 @@ interface Props {
 function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
   
   const [selectedRole, setSelectedRole] = useState<RoleKey>()
+  const rolesCount = selectGameRolesInPlayCount(game);
   const rolesInSetup = selectRolesInSetup(game);
+
+  const handleIncrement = () => {
+    const roleToIncrement = selectedRole!
+    const currentCount = rolesCount[roleToIncrement];
+    const maxCount = ALL_ROLES[roleToIncrement].restrictions.roleMax;
+    if (currentCount < maxCount) {
+      onRoleIncrement(selectedRole!, 1);
+      if (currentCount + 1 === maxCount) {
+        setSelectedRole(undefined)
+      }
+    } else {
+      window.alert(`Already at max count for ${roleToIncrement}`)
+    }
+  }
 
   return (
     <Container className="active-contents">
@@ -41,6 +56,10 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
       </div>
       <div>
         <RoleDropdown
+          filter={(role) => {
+            const currentCount = rolesCount[role.key];
+            return currentCount < ALL_ROLES[role.key].restrictions.roleMax
+          }}
           selectedRole={selectedRole}
           onRoleSelect={(role) => setSelectedRole(role)}
         />
@@ -48,7 +67,7 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
           fluid
           primary
           disabled={!selectedRole}
-          onClick={() => onRoleIncrement(selectedRole!, 1)}
+          onClick={handleIncrement}
         >
           Add role
         </Button>
