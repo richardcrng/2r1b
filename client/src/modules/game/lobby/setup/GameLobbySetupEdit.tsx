@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { selectGameRolesInPlayCount, selectRolesInSetup } from "../../../../selectors/game";
 import { Game } from "../../../../types/game.types";
 import { ALL_ROLES, RoleKey } from "../../../../types/role.types";
+import RoleAdder from "../../../role/adder/RoleAdder";
 import { getColors } from "../../../role/card/RoleCard";
 import RoleDropdown from "../../../role/dropdown/RoleDropdown";
 
@@ -25,20 +26,6 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
   const rolesCount = selectGameRolesInPlayCount(game);
   const rolesInSetup = selectRolesInSetup(game);
 
-  const handleIncrement = () => {
-    const roleToIncrement = selectedRole!
-    const currentCount = rolesCount[roleToIncrement];
-    const maxCount = ALL_ROLES[roleToIncrement].restrictions.roleMax;
-    if (currentCount < maxCount) {
-      onRoleIncrement(selectedRole!, 1);
-      if (currentCount + 1 === maxCount) {
-        setSelectedRole(undefined)
-      }
-    } else {
-      window.alert(`Already at max count for ${roleToIncrement}`)
-    }
-  }
-
   return (
     <Container className="active-contents">
       <div>
@@ -55,22 +42,10 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
         </ul>
       </div>
       <div>
-        <RoleDropdown
-          filter={(role) => {
-            const currentCount = rolesCount[role.key];
-            return currentCount < ALL_ROLES[role.key].restrictions.roleMax
-          }}
-          selectedRole={selectedRole}
+        <RoleAdder
+          {...{ onRoleIncrement, rolesCount, selectedRole }}
           onRoleSelect={(role) => setSelectedRole(role)}
         />
-        <Button
-          fluid
-          primary
-          disabled={!selectedRole}
-          onClick={handleIncrement}
-        >
-          Add role
-        </Button>
         <Button fluid>Back</Button>
       </div>
     </Container>
