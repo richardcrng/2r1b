@@ -15,21 +15,14 @@ export interface SetupAlert {
 
 export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
   const roleKeys = Object.keys(rolesCount) as RoleKey[];
-  const totalRoleCount = Object.values(rolesCount).reduce((acc, curr) => acc + curr, 0)
-  for (let roleKey of roleKeys) {
-    const {
-      recommended,
-      requires,
-      roleMax,
-      roleMin,
-      playerMax,
-      playerMaxRecommended,
-      playerMin,
-      playerMinRecommended
-    } = getRoleRestrictions(roleKey);
 
+  const alerts = roleKeys.reduce((acc, currRoleKey) => [
+    ...acc,
+    ...checkOwnRoleCountRestrictions(rolesCount, currRoleKey),
+    ...checkOtherRoleCountRestrictions(rolesCount, currRoleKey)
+  ], [] as SetupAlert[])
 
-  }
+  return alerts
 }
 
 export const checkOtherRoleCountRestrictions = (
