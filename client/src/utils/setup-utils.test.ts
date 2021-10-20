@@ -20,6 +20,60 @@ describe('alertsFromRolesCount', () => {
 
 describe("checkOtherRoleCountRestrictions", () => {
   describe("Roles that recommend each other", () => {
+    describe("Red Team and Blue Team", () => {
+      test("Warns that Red Team is recommended with Blue Team", () => {
+        const result = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 0 },
+          "TEAM_RED"
+        );
+
+        expect(result).toHaveLength(1);
+        expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+        expect(result[0].message).toMatch(/blue team/i);
+      });
+
+      test("Warns that Blue Team is recommended with Red Team", () => {
+        const result = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 0, TEAM_BLUE: 1 },
+          "TEAM_BLUE"
+        );
+
+        expect(result).toHaveLength(1);
+        expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+        expect(result[0].message).toMatch(/red team/i);
+      });
+
+      test("No warning when both present in equal numbers", () => {
+        const blueCheck = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 1 },
+          "TEAM_BLUE"
+        );
+
+        const redCheck = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 1 },
+          "TEAM_RED"
+        );
+
+        expect(blueCheck).toHaveLength(0);
+        expect(redCheck).toHaveLength(0);
+      });
+
+      test("Warning when both present in unequal numbers - asymmetrically", () => {
+        const blueCheck = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 2 },
+          "TEAM_BLUE"
+        );
+
+        const redCheck = checkOtherRoleCountRestrictions(
+          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 2 },
+          "TEAM_RED"
+        );
+
+        expect(blueCheck).toHaveLength(1);
+        expect(redCheck).toHaveLength(0);
+      });
+    })
+
     describe("Doctor and Engineer", () => {
       test("Warns that Doctor is recommended with Engineer", () => {
         const result = checkOtherRoleCountRestrictions(
@@ -57,7 +111,7 @@ describe("checkOtherRoleCountRestrictions", () => {
         expect(doctorCheck).toHaveLength(0);
         expect(engineerCheck).toHaveLength(0);
       });
-    })
+    });
   })
 });
 

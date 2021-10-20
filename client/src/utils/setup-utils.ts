@@ -32,12 +32,6 @@ export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
   }
 }
 
-const checkRestrictions = (rolesCount: RolesCount, roleKey: RoleKey, { recommended, requires, roleMax, roleMin, playerMax, playerMaxRecommended, playerMin, playerMinRecommended }: Restrictions): SetupAlert[] => {
-  const roleCount = rolesCount[roleKey];
-
-  // if ()
-}
-
 export const checkOtherRoleCountRestrictions = (
   rolesCount: RolesCount,
   roleKey: RoleKey
@@ -52,7 +46,7 @@ export const checkOtherRoleCountRestrictions = (
   for (let [otherKey, otherCountPerRole] of recommendedRoleEntries) {
     const { color: otherColor, roleName: otherRoleName } = getRoleDefinition(otherKey);
     const expectedCount = countOfThisRole * otherCountPerRole;
-    if (rolesCount[otherKey] !== expectedCount) {
+    if (rolesCount[otherKey] < expectedCount) {
       alerts.push({
         severity: SetupAlertSeverity.WARNING,
         message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is recommended for each ${roleName} (${color})`
@@ -64,7 +58,7 @@ export const checkOtherRoleCountRestrictions = (
     const { color: otherColor, roleName: otherRoleName } =
       getRoleDefinition(otherKey);
     const expectedCount = countOfThisRole * otherCountPerRole;
-    if (rolesCount[otherKey] !== expectedCount) {
+    if (rolesCount[otherKey] < expectedCount) {
       alerts.push({
         severity: SetupAlertSeverity.ERROR,
         message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is required for each ${roleName} (${color})`,
