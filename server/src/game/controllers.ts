@@ -7,9 +7,10 @@ import {
 import { ALL_ROLES, RoleKey } from '../../../client/src/types/role.types';
 import { games, getGameById } from "../db";
 import { generateRandomGameId, getColors } from "../utils";
+import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 
 export const incrementRoleInGame = (game: Game, role: RoleKey, increment: number): void => {
-  game.roles.inPlay[role] += increment;
+  game.rolesCount[role] += increment;
 }
 
 export const createGame = (data: CreateGameEvent): Game => {
@@ -25,10 +26,7 @@ export const createGame = (data: CreateGameEvent): Game => {
         colors: getColors(5)
       },
     },
-    roles: {
-      inPlay: mapValues(ALL_ROLES, role => role.restrictions.roleMin),
-      allocated: {}
-    },
+    rolesCount: DEFAULT_STARTING_ROLES_COUNT,
     status: GameStatus.LOBBY,
     rounds: []
   };

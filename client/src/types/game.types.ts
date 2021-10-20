@@ -131,16 +131,15 @@ export interface Round {
 
 export type Game = GameBase | GameInLobby | GameOngoing | GameComplete;
 
+export type RolesCount = Record<RoleKey, number>
+
 export interface GameBase {
   id: string;
   players: {
     [playerSocketId: string]: Player;
   };
   rounds: Round[];
-  roles: {
-    inPlay: Record<RoleKey, number>;
-    allocated: Partial<Record<RoleKey, number>>;
-  };
+  rolesCount: RolesCount;
   status: GameStatus;
 }
 

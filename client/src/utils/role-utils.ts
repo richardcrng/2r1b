@@ -1,10 +1,14 @@
+import { RolesCount } from "../types/game.types";
 import { ALL_ROLES, RoleKey } from "../types/role.types";
+import { mapValues } from 'lodash';
 
 export const getRoleDefinition = (roleKey: RoleKey) => ALL_ROLES[roleKey]
 
-export const getRoleRanking = (roleKey: RoleKey) => ALL_ROLES[roleKey].info.ranking
+export const getRoleName = (roleKey: RoleKey) => getRoleDefinition(roleKey).roleName;
 
-export const getRoleRestrictions = (roleKey: RoleKey) => ALL_ROLES[roleKey].restrictions
+export const getRoleRanking = (roleKey: RoleKey) => getRoleDefinition(roleKey).info.ranking
+
+export const getRoleRestrictions = (roleKey: RoleKey) => getRoleDefinition(roleKey).restrictions
 
 export const getRoleRemovability = (roleKey: RoleKey, currentCount: number) => {
   const { roleMin, roleMax } = getRoleRestrictions(roleKey);
@@ -14,3 +18,5 @@ export const getRoleRemovability = (roleKey: RoleKey, currentCount: number) => {
     isBelowMax: currentCount < roleMax
   }
 }
+
+export const DEFAULT_STARTING_ROLES_COUNT: RolesCount = mapValues(ALL_ROLES, (role) => role.restrictions.roleMin)

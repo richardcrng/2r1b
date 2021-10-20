@@ -6,7 +6,12 @@ import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
 
 
 export const selectGamePlayers = (game: Game) => game.players;
-export const selectGameRolesInPlayCount = (game: Game): Record<RoleKey, number> => game.roles.inPlay
+export const selectGameRolesInPlayCount = (game: Game): Record<RoleKey, number> => game.rolesCount
+
+export const selectTotalCountOfGameRoles = createSelector(
+  selectGameRolesInPlayCount,
+  (rolesCount) => Object.values(rolesCount).reduce((acc, val) => acc + val, 0)
+)
 
 export const selectGamePlayersList = createSelector(
   selectGamePlayers,
