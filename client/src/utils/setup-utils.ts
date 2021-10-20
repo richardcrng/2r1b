@@ -1,5 +1,5 @@
-import { Game, RolesCount } from "../types/game.types";
-import { Restrictions, RoleKey } from "../types/role.types";
+import { RolesCount } from "../types/game.types";
+import { RoleKey } from "../types/role.types";
 import { getRoleDefinition, getRoleRestrictions } from "./role-utils";
 
 
@@ -12,6 +12,11 @@ export interface SetupAlert {
   severity: SetupAlertSeverity,
   message: string;
 }
+
+export const alertsFromSetup = (rolesCount: RolesCount, nPlayers: number): SetupAlert[] => [
+  ...alertsFromPlayersCount(rolesCount, nPlayers),
+  ...alertsFromRolesCount(rolesCount)
+]
 
 export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number): SetupAlert[] => {
   const roleKeys = Object.keys(rolesCount) as RoleKey[];
@@ -26,6 +31,7 @@ export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number)
   );
 
   return [
+    ...checkPlayerCount(nPlayers),
     ...checkPlayerCountAgainstRoleCount(nPlayers, totalRolesCount),
     ...alerts
   ]
