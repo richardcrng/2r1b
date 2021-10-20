@@ -33,7 +33,6 @@ function RoleDropdown({ onRoleSelect, selectedRole: controlledRoleValue }: Props
       search
       selection
       fluid
-      export
       options={ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS}
       value={selectedRole}
       onChange={(_, { value }) => {
