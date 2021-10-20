@@ -7,6 +7,7 @@ import { RoleKey } from "../../../../types/role.types";
 import { getRoleRestrictions } from "../../../../utils/role-utils";
 import RoleAdder from "../../../role/adder/RoleAdder";
 import { getColors } from "../../../role/card/RoleCard";
+import RoleSetup from "../../../role/setup/RoleSetup";
 
 const Container = styled.div`
   display: flex;
@@ -39,34 +40,7 @@ function GameLobbySetupEdit({ game, onRoleIncrement }: Props) {
     <Container className="active-contents">
       <div>
         <p>Edit setup here!</p>
-        <RoleUl>
-          {rolesInSetup.map(([role, count]) => {
-            const { roleMin, roleMax } = getRoleRestrictions(role.key);
-            const handleIncrement = () => onRoleIncrement(role.key, 1);
-            const handleDecrement = () => onRoleIncrement(role.key, -1);
-
-            return (
-              <RoleLi key={role.key}>
-                <div>
-                  <span style={{ color: getColors(role.color).primary }}>
-                    {role.roleName}
-                  </span>{" "}
-                  x {count}
-                </div>
-                {roleMin !== roleMax && (
-                  <div>
-                    {roleMax > 1 && (
-                      <button disabled={count >= roleMax} onClick={handleIncrement}>+</button>
-                    )}
-                    {roleMin === 0 && (
-                      <button disabled={count <= roleMin} onClick={handleDecrement}>-</button>
-                    )}
-                  </div>
-                )}
-              </RoleLi>
-            );
-          })}
-        </RoleUl>
+        <RoleSetup {...{ rolesInSetup, onRoleIncrement }} />  
       </div>
       <div>
         <RoleAdder
