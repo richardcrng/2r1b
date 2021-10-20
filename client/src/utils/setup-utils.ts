@@ -137,6 +137,27 @@ export const checkOwnPlayerCountRoleRestrictions = (
   return alerts;
 };
 
+export const checkPlayerCount = (nPlayers: number): SetupAlert[] => {
+  const alerts: SetupAlert[] = [];
+
+  const MINIMUM_NEEDED = 6;
+  const MINIMUM_RECOMMENDED = 10
+
+  if (nPlayers < MINIMUM_NEEDED) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `At least ${MINIMUM_NEEDED} players are needed to play`
+    })
+  } else if (nPlayers < MINIMUM_RECOMMENDED) {
+    alerts.push({
+      severity: SetupAlertSeverity.WARNING,
+      message: `At least ${MINIMUM_NEEDED} players are recommended when playing`,
+    });
+  }
+
+  return alerts
+}
+
 export const checkPlayerCountAgainstRoleCount = (nPlayers: number, totalRolesCount: number): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
 

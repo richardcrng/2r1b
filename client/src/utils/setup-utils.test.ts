@@ -1,6 +1,6 @@
 import { RolesCount } from "../types/game.types"
 import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
-import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
+import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCount, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
 
 describe('alertsFromRolesCount', () => {
   test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
@@ -162,6 +162,25 @@ describe('checkOwnRoleCountRestrictions', () => {
       "PRESIDENT_BLUE"
     );
 
+    expect(result).toHaveLength(0);
+  });
+})
+
+describe('checkPlayerCount', () => {
+  it("Errors on fewer than 6 players", () => {
+    const result = checkPlayerCount(5);
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
+  })
+
+  it("Warns on fewer than 10 players", () => {
+    const result = checkPlayerCount(9);
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+  });
+
+  it("Has no alerts on 10 or more players", () => {
+    const result = checkPlayerCount(10);
     expect(result).toHaveLength(0);
   });
 })
