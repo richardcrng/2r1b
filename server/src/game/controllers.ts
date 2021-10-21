@@ -19,6 +19,7 @@ export const createGame = (data: CreateGameEvent): Game => {
   const gameId = generateRandomGameId();
   const game: Game = {
     id: gameId,
+    actions: [],
     players: {
       [data.socketId]: {
         name: data.playerName,
@@ -42,9 +43,10 @@ export const startGame = (
   const game = getGameById(gameId);
   if (game) {
     game.status = GameStatus.ONGOING;
-    const roomAllocation = assignPlayersToRooms(Object.keys(game.players));
     const firstRound = game.rounds[0]
-    firstRound.playerAllocation = roomAllocation;
+    firstRound.playerAllocation = assignPlayersToRooms(
+      Object.keys(game.players)
+    );
     firstRound.status = RoundStatus.ONGOING;
     game.currentTimerSeconds = firstRound.timerSeconds;
     return game;

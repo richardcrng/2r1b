@@ -1,6 +1,21 @@
 import { chunk, shuffle } from "lodash";
-import { Game, PlayerRoomAllocation, RoomName } from "../../../client/src/types/game.types";
+import { Player, PlayerRoomAllocation, RolesCount, RoomName } from "../../../client/src/types/game.types";
+import { RoleKey } from "../../../client/src/types/role.types";
 
+export const assignRolesToPlayers = (rolesCount: Partial<RolesCount>, players: Record<string, Partial<Player>>): void => {
+  const keysToShuffle = Object.keys(rolesCount).reduce(
+    (acc, currRoleKey) => [...acc, ...Array(rolesCount[currRoleKey as RoleKey]).fill(currRoleKey)],
+    [] as RoleKey[]
+  )
+
+  const playerIds = Object.keys(players);
+  const shuffledRoleKeys = shuffle(keysToShuffle);
+
+  for (let idx = 0; idx < playerIds.length; idx++) {
+    const playerId = playerIds[idx];
+    players[playerId].role = shuffledRoleKeys[idx]
+  }
+}
 
 export const assignPlayersToRooms = (playerIds: string[]): PlayerRoomAllocation => {
   const shuffledIds = shuffle(playerIds);

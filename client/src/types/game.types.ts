@@ -41,7 +41,7 @@ export interface Player {
   gameId?: string;
   name?: string;
   isHost?: boolean;
-  role?: PlayerRole;
+  role?: RoleKey;
   colors?: string[]
 }
 
@@ -115,7 +115,7 @@ export interface PlayerActionCardShare extends PlayerActionShareBase {
   type: PlayerActionType.CARD_SHARE;
 }
 
-export type PlayerAction = PlayerActionColorShare | PlayerActionColorShare
+export type PlayerAction = PlayerActionCardShare | PlayerActionColorShare
 
 export interface RoomRound {
   leadersRecord: LeaderRecord[];
@@ -128,7 +128,7 @@ export enum RoomName {
 }
 
 export interface Round {
-  actions: PlayerAction[];
+  // actions: PlayerAction[];
   status: RoundStatus;
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
@@ -136,7 +136,7 @@ export interface Round {
 }
 
 export const createRound = (timerSeconds: number): Round => ({
-  actions: [],
+  // actions: [],
   status: RoundStatus.PENDING,
   timerSeconds,
   rooms: {
@@ -154,29 +154,23 @@ export const createStartingRounds = () => [
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
 
-export type Game = GameBase | GameInLobby | GameOngoing | GameComplete;
 
 export type RolesCount = Record<RoleKey, number>
 
-export interface GameBase {
+export interface Game {
   id: string;
+  actions: PlayerAction[];
   players: {
     [playerSocketId: string]: Player;
   };
   currentTimerSeconds?: number;
   rounds: Round[];
   rolesCount: RolesCount;
+  buriedRole?: RoleKey;
   status: GameStatus;
 }
 
-export interface GameInLobby extends GameBase {
-  status: GameStatus.LOBBY;
+export interface GameStateFromActions {
+
 }
 
-export interface GameOngoing extends GameBase {
-  status: GameStatus.ONGOING;
-}
-
-export interface GameComplete extends GameBase {
-  status: GameStatus.COMPLETE;
-}
