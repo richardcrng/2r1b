@@ -20,9 +20,6 @@ function GameLobbySetupModal({ game, isEditable, isOpen, onClose, onOpen, onRole
   const [selectedRole, setSelectedRole] = useState<RoleKey>();
   const rolesCount = selectGameRolesInPlayCount(game);
   const rolesInSetup = selectRolesInSetupAlphabetised(game);
-  const setupAlerts = selectGameSetupAlerts(game);
-
-  console.log("alerts", setupAlerts)
 
   return (
     <Modal
