@@ -1,45 +1,41 @@
 // import { gameLobbyReadiness } from "../../selectors/game";
-import { GameBase, Player } from "../../../types/game.types";
+import { Game, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
 import { useState } from 'react';
-import GameLobbySetupEdit from "./setup/GameLobbySetupEdit";
-import GameLobbySetupView from "./setup/GameLobbySetupView";
+import { RoleKey } from "../../../types/role.types";
+import GameLobbySetupModal from "./setup/GameLobbySetupModal";
 
 interface Props {
-  game: GameBase;
-  handleStartGame(): void;
+  game: Game;
+  onGameStart(): void;
+  onRoleIncrement(roleKey: RoleKey, increment: number): void;
   players: Player[];
   player: Player;
 }
 
-enum LobbyView {
-  HOME = 'home',
-  SETUP_EDIT = 'setup-edit',
-  SETUP_VIEW = 'setup-view'
-}
+function GameLobby({ game, onGameStart, onRoleIncrement, players, player }: Props): JSX.Element {
 
-function GameLobby({ game, handleStartGame, players, player }: Props): JSX.Element {
 
-  const [view, setView] = useState(LobbyView.HOME)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleViewSetup = () => {
-    player.isHost ? setView(LobbyView.SETUP_EDIT) : setView(LobbyView.SETUP_VIEW)
-  }
+  const handleOpen = () => setIsModalOpen(true)
+  const handleClose = () => setIsModalOpen(false)
 
-  switch (view) {
-    case LobbyView.HOME:
-      return (
-        <GameLobbyHome
-          {...{ game, handleStartGame, handleViewSetup, players, player }}
-        />
-      );
-    
-      case LobbyView.SETUP_EDIT:
-        return <GameLobbySetupEdit />
-      
-      case LobbyView.SETUP_VIEW:
-        return <GameLobbySetupView />
-  }
+  return (
+    <>
+      <GameLobbyHome
+        {...{ game, onGameStart, players, player }}
+        handleViewSetup={handleOpen}
+      />
+      <GameLobbySetupModal
+        {...{ game, onRoleIncrement }}
+        isEditable={!!player.isHost}
+        isOpen={isModalOpen}
+        onOpen={handleOpen}
+        onClose={handleClose}
+      />
+    </>
+  );
 }
 
 export default GameLobby;

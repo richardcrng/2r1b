@@ -57,7 +57,7 @@ function GameRoute() {
         {game.data && player.data && (
           <GamePage
             game={game.data}
-            handleStartGame={() => {
+            onGameStart={() => {
               socket.emit(
                 ClientEvent.START_GAME,
                 game.data!.id
@@ -75,6 +75,14 @@ function GameRoute() {
               socket.emit(
                 ClientEvent.NEXT_ROUND,
                 game.data!.id
+              )
+            }}
+            onRoleIncrement={(roleKey, increment) => {
+              socket.emit(
+                ClientEvent.INCREMENT_ROLE,
+                game.data!.id,
+                roleKey,
+                increment
               )
             }}
             players={Object.values(game.data.players)}

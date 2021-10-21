@@ -204,13 +204,13 @@ export const BLUE_ROLES: Record<BlueRoleKey, FullyDefined<BlueRole>> = {
   NURSE_BLUE: RoleDefinition.Blue({
     key: 'NURSE_BLUE',
     roleName: BlueRoleName.NURSE
-  }, { recommended: { TINKERER_RED: 1 } }),
+  }, { recommended: { TINKERER_RED: 1 }, requires: { DOCTOR_BLUE: 1 } }),
 
   PRESIDENT_BLUE: RoleDefinition.Blue({
     key: 'PRESIDENT_BLUE',
     roleName: BlueRoleName.PRESIDENT,
     ranking: RoleRanking.PRIMARY
-  }, { roleMin: 1, requires: { BOMBER_RED: 1 } }),
+  }, { roleMin: 1 }),
 
   VICE_PRESIDENT_BLUE: RoleDefinition.Blue({
     key: 'VICE_PRESIDENT_BLUE',
@@ -235,7 +235,7 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
     key: 'BOMBER_RED',
     roleName: RedRoleName.BOMBER,
     ranking: RoleRanking.PRIMARY
-  }, { roleMin: 1, requires: { PRESIDENT_BLUE: 1 } }),
+  }, { roleMin: 1 }),
 
   ENGINEER_RED: RoleDefinition.Red({
     key: 'ENGINEER_RED',
@@ -256,7 +256,7 @@ export const RED_ROLES: Record<RedRoleKey, FullyDefined<RedRole>> = {
     key: 'TINKERER_RED',
     roleName: RedRoleName.TINKERER,
     ranking: RoleRanking.SECONDARY
-  }, { recommended: { NURSE_BLUE: 1 } })
+  }, { recommended: { NURSE_BLUE: 1 }, requires: { ENGINEER_RED: 1 } })
 };
 
 export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
@@ -276,3 +276,7 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
 };
 
 export const ALL_ROLES = { ...BLUE_ROLES, ...RED_ROLES, ...GREY_ROLES }
+export const ALL_ROLE_KEYS = Object.keys(ALL_ROLES) as RoleKey[];
+export const ALPHABETISED_ROLE_VALUES = Object.freeze(
+  Object.values(ALL_ROLES).sort((a, b) => (a.roleName < b.roleName ? -1 : 1))
+);

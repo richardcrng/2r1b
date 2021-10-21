@@ -1,31 +1,49 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import { useCopyToClipboard } from "react-use";
-import { Button } from "semantic-ui-react";
+import { Button, Message } from "semantic-ui-react";
 import styled from "styled-components";
 // import { gameLobbyReadiness } from "../../selectors/game";
 import { GameBase, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
-import { GameLobbyReadiness } from "../../../../selectors/game";
+import { selectGameSetupErrors, selectGameSetupWarnings } from "../../../../selectors/game";
+import { SetupAlert } from "../../../../utils/setup-utils";
 
 interface Props {
   game: GameBase;
   handleViewSetup(): void;
-  handleStartGame(): void;
+  onGameStart(): void;
   players: Player[];
   player: Player;
 }
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "players"
+    "actions";
+  height: 100%;
   width: 100%;
 `;
 
+const Header = styled.div`
+  grid-area: header;
+  width: 100%;
+`;
+
+const StyledPlayerList = styled(PlayerList)`
+  grid-area: players;
+  overflow-y: scroll;
+  list-style: none;
+  padding-inline-start: 20px
+`
+
 const ActionArea = styled.div`
+  grid-area: actions;
   width: 100%;
 `;
 
@@ -41,18 +59,22 @@ const PlayerListItemContents = styled.div`
   padding-bottom: 10px;
 `;
 
-function GameLobbyHome({ game, handleStartGame, handleViewSetup, players, player }: Props) {
-  // const readiness = gameLobbyReadiness(game);
-  const readiness: GameLobbyReadiness = { isReady: false };
+function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: Props) {
+
+  const setupErrors = selectGameSetupErrors(game);
+  const setupWarnings = selectGameSetupWarnings(game);
+
+  const isReadyToStartGame = setupErrors.length === 0;
+
   // eslint-disable-next-line
   const [_, copyToClipboard] = useCopyToClipboard();
 
-  const disableStart = !readiness.isReady;
-
   return (
     <Container className="active-contents">
-      <div style={{ width: "100%" }}>
-        <h1 style={{ textAlign: "center" }}>Game id: {game.id}</h1>
+      <Header>
+        <h1 style={{ textAlign: "center", marginBottom: 0 }}>
+          Game id: {game.id}
+        </h1>
         <StyledA
           onClick={(e) => {
             e.preventDefault();
@@ -63,56 +85,90 @@ function GameLobbyHome({ game, handleStartGame, handleViewSetup, players, player
         >
           Copy game join link
         </StyledA>
-        <PlayerList
-          players={players}
-          ownPlayerId={player.socketId}
-          listParent={({ children }) => (
-            <ol style={{ listStyle: "none", paddingInlineStart: "20px" }}>
-              {children}
-            </ol>
-          )}
-          renderPlayer={(player, idx, ownPlayerId) => {
-            return (
-              <PlayerListItemContents>
-                <span style={{ marginRight: "10px" }}>{idx + 1}.</span>
-                <PlayerAvatar player={player} size={32} />
-                <p style={{ marginLeft: "10px" }}>
-                  {player.name}
-                  {player.socketId === ownPlayerId && " (you)"}
-                  {player.isHost && " (host)"}
-                </p>
-              </PlayerListItemContents>
-            );
-          }}
-        />
-      </div>
+        <Message
+          color={
+            setupErrors.length
+              ? "red"
+              : setupWarnings.length
+              ? "yellow"
+              : "green"
+          }
+        >
+          <Message.Header>
+            {setupErrors.length
+              ? "Hold on!"
+              : setupWarnings.length
+              ? "Be careful!"
+              : "Looks great!"}
+          </Message.Header>
+          <Message.Content>
+            {setupMessage(setupErrors, setupWarnings)}
+          </Message.Content>
+        </Message>
+      </Header>
+      <StyledPlayerList
+        players={players}
+        ownPlayerId={player.socketId}
+        renderPlayer={(player, idx, ownPlayerId) => {
+          return (
+            <PlayerListItemContents>
+              <span style={{ marginRight: "10px" }}>{idx + 1}.</span>
+              <PlayerAvatar player={player} size={32} />
+              <p style={{ marginLeft: "10px" }}>
+                {player.name}
+                {player.socketId === ownPlayerId && " (you)"}
+                {player.isHost && " (host)"}
+              </p>
+            </PlayerListItemContents>
+          );
+        }}
+      />
       <ActionArea>
-        {!readiness.isReady && (
-          <p>
-            The game cannot yet be started
-            {readiness.reason && ": " + readiness.reason.toLowerCase()}.
-          </p>
-        )}
-        {player.isHost ? (
+        <Button fluid onClick={handleViewSetup}>
+          {player.isHost ? "Edit" : "View"} setup
+        </Button>
+        {player.isHost && (
           <>
             <Button
               fluid
               primary
-              disabled={disableStart}
+              disabled={!isReadyToStartGame}
               onClick={() => {
-                handleStartGame();
+                onGameStart();
               }}
             >
               Start game
             </Button>
           </>
-        ) : (
-          <p>Waiting for the host to start the game</p>
         )}
-        <Button fluid onClick={handleViewSetup}>{player.isHost ? "Edit" : "View"} setup</Button>
       </ActionArea>
     </Container>
   );
 }
+
+const setupMessage = (errors: SetupAlert[], warnings: SetupAlert[]): JSX.Element => {
+  const nErrors = errors.length;
+  const nWarnings = warnings.length;
+
+  if (nErrors >= 2) {
+    return (
+      <>
+        {nErrors} errors: {errors[0].message}, and {nErrors - 1} more
+      </>
+    );
+  } else if (nErrors === 1) {
+    return <>{errors[0].message}</>;
+  } else if (nWarnings >= 2) {
+    return (
+      <>
+        {nWarnings} warnings: {warnings[0].message}, and {nWarnings - 1} more
+      </>
+    )
+  } else if (nWarnings === 1) {
+    return <>{warnings[0].message}</>
+  } else {
+    return <>No setup errors or warnings!</>
+  }
+} 
 
 export default GameLobbyHome;

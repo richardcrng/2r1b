@@ -1,19 +1,13 @@
-import { useState } from "react";
-import { Dropdown } from "semantic-ui-react";
-import { ALL_ROLES, RoleKey } from "../../../../types/role.types";
+import { ALL_ROLES, ALPHABETISED_ROLE_VALUES, RoleKey } from "../../../../types/role.types";
+import RoleDropdown from "../../dropdown/RoleDropdown";
 import RoleCard, { getColors } from "../RoleCard";
 
-const roleValues = Object.values(ALL_ROLES);
-const roleValuesAlphabetised = roleValues.sort((a, b) =>
-  a.roleName < b.roleName ? -1 : 1
-);
-
-const roleValueDropdownOptions: {
+export const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
   key: RoleKey;
   text: string;
   value: RoleKey;
   content: JSX.Element;
-}[] = roleValuesAlphabetised.map((roleValue) => ({
+}[] = ALPHABETISED_ROLE_VALUES.map((roleValue) => ({
   key: roleValue.key,
   text: roleValue.roleName,
   value: roleValue.key,
@@ -29,26 +23,11 @@ interface Props {
   selectedRole?: RoleKey;
 }
 
-function RoleCardViewer({ onRoleSelect, selectedRole: controlledRoleValue }: Props) {
-
-  const [uncontrolledValue, setUncontrolledValue] = useState<RoleKey>();
-  const selectedRole = controlledRoleValue ?? uncontrolledValue;
-
+function RoleCardViewer({ onRoleSelect, selectedRole }: Props) {
   return (
     <>
       <p>Select a role to view</p>
-      <Dropdown
-        search
-        selection
-        fluid
-        options={roleValueDropdownOptions}
-        value={selectedRole}
-        onChange={(_, { value }) => {
-          const newRole = value as RoleKey
-          onRoleSelect && onRoleSelect(newRole);
-          setUncontrolledValue(newRole);
-        }}
-      />
+      <RoleDropdown {...{ onRoleSelect, selectedRole }} />
       <br />
       {selectedRole && (
         <RoleCard role={ALL_ROLES[selectedRole]} />

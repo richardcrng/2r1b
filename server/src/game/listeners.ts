@@ -4,30 +4,23 @@ import {
   ServerSocket,
   ServerIO,
 } from "../../../client/src/types/event.types";
-import { createGame, dealCards, flipCard, resetGame, startGame } from "./controllers";
+import { incrementRoleInGame, createGame, startGame } from "./controllers";
 import { getGameById } from "../db";
 import { joinPlayerToGame } from "../player/controllers";
-import { checkForGameEnd } from "./utils";
 
 export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
+  socket.on(ClientEvent.INCREMENT_ROLE, (gameId, roleKey, increment) => {
+    const game = getGameById(gameId);
+    if (game) {
+      incrementRoleInGame(game, roleKey, increment);
+      io.emit(ServerEvent.GAME_UPDATED, game.id, game)
+    }
+  })
+
   socket.on(ClientEvent.CREATE_GAME, (e) => {
     const createdGame = createGame(e);
     socket.emit(ServerEvent.GAME_CREATED, createdGame);
   });
-
-  socket.on(ClientEvent.FLIP_CARD, (gameId, keyholderId, playerId, cardIdx, card) => {
-    const game = getGameById(gameId);
-    if (game) {
-      flipCard(game, { card, cardIdx, keyholderId, playerId });
-      io.emit(ServerEvent.CARD_FLIPPED, gameId, keyholderId, playerId, cardIdx, card);
-      io.emit(ServerEvent.GAME_UPDATED, game.id, game)
-
-      const gameEnd = checkForGameEnd(game);
-      if (gameEnd.isEnded) {
-        io.emit(ServerEvent.GAME_OVER, gameId, gameEnd.reason, game)
-      }
-    }
-  })
 
   socket.on(ClientEvent.GET_GAME, (gameId) => {
     const game = getGameById(gameId);
@@ -42,18 +35,6 @@ export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
     io.emit(ServerEvent.PLAYER_UPDATED, playerData.socketId, player);
   });
 
-  socket.on(ClientEvent.NEXT_ROUND, (gameId) => {
-    const game = getGameById(gameId);
-    if (game) {
-      dealCards(game);
-      io.emit(ServerEvent.ROUND_STARTED, game.id);
-      io.emit(ServerEvent.GAME_UPDATED, game.id, game);
-    }
-  });
-  socket.on(ClientEvent.RESET_GAME, (gameId) => {
-    const game = resetGame(gameId)
-    io.emit(ServerEvent.GAME_UPDATED, game.id, game)
-  })
 
   socket.on(ClientEvent.SHOW_RESULTS, (gameId) => {
     io.emit(ServerEvent.RESULTS_SHOWN, gameId);

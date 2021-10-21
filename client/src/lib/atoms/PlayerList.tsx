@@ -2,22 +2,26 @@ import { PropsWithChildren } from "react";
 import { Player } from "../../types/game.types";
 
 interface Props {
+  className?: string;
   ownPlayerId?: string;
   players: Player[];
-  listParent?: React.FunctionComponent<PropsWithChildren<{}>>;
-  listItemParent?: React.FunctionComponent<PropsWithChildren<{}>>;
+  listParent?: React.FunctionComponent<PropsWithChildren<{ className?: string, style?: React.CSSProperties }>>;
+  listItemParent?: React.FunctionComponent<PropsWithChildren<{ className?: string }>>;
   renderPlayer?(player: Player, idx: number, ownPlayerId?: string): JSX.Element;
+  style?: React.CSSProperties;
 }
 
 function PlayerList({
+  className,
   ownPlayerId,
   players,
   listParent: List = DefaultListParent,
   listItemParent: ListItem = DefaultListItem,
   renderPlayer = defaultRenderPlayer,
+  style
 }: Props) {
   return (
-    <List>
+    <List className={className} style={style}>
       {players.map((player, idx) => (
         <ListItem key={player.socketId}>{renderPlayer(player, idx, ownPlayerId)}</ListItem>
       ))}
@@ -25,12 +29,12 @@ function PlayerList({
   );
 }
 
-function DefaultListParent({ children }: PropsWithChildren<{}>) {
-  return <ol>{children}</ol>;
+function DefaultListParent({ className, children, style }: PropsWithChildren<{ className?: string, style?: React.CSSProperties }>) {
+  return <ol className={className} style={style}>{children}</ol>;
 }
 
-function DefaultListItem({ children }: PropsWithChildren<{}>) {
-  return <li>{children}</li>;
+function DefaultListItem({ className, children }: PropsWithChildren<{ className?: string }>) {
+  return <li className={className}>{children}</li>;
 }
 
 const defaultRenderPlayer = (player: Player, _: number, ownPlayerId?: string): JSX.Element => (
