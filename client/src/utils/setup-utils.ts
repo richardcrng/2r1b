@@ -1,6 +1,6 @@
 import { RolesCount } from "../types/game.types";
-import { RoleKey } from "../types/role.types";
-import { getRoleDefinition, getRoleRestrictions } from "./role-utils";
+import { RoleKey, TeamColor } from "../types/role.types";
+import { getRoleColor, getRoleDefinition, getRoleRestrictions } from "./role-utils";
 
 const MINIMUM_PLAYERS_NEEDED = 6;
 const MINIMUM_PLAYERS_RECOMMENDED = 10;
@@ -54,7 +54,10 @@ export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
     ...checkOtherRoleCountRestrictions(rolesCount, currRoleKey)
   ], [] as SetupAlert[])
 
-  return alerts
+  return [
+    ...checkTeamBalance(rolesCount),
+    ...alerts
+  ]
 }
 
 export const checkOtherRoleCountRestrictions = (
@@ -214,5 +217,31 @@ export const checkPlayerCountAgainstRoleCount = (nPlayers: number, totalRolesCou
   return alerts
 }
 
+export const checkTeamBalance = (rolesCount: RolesCount): SetupAlert[] => {
+  const alerts: SetupAlert[] = [];
+
+  const roleKeys = Object.keys(rolesCount) as RoleKey[];
+  let blueCount = 0;
+  let redCount = 0;
+
+  for (let roleKey of roleKeys) {
+    const color = getRoleColor(roleKey);
+    if (color === TeamColor.BLUE) {
+      blueCount += rolesCount[roleKey]
+    } else if (color === TeamColor.RED) {
+      redCount += rolesCount[roleKey]
+    }
+  }
+
+  if (blueCount !== redCount) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: "Blue and Red role counts must match",
+      source: SetupAlertSource.ROLE_SETUP
+    })
+  }
+
+  return alerts
+}
 
 

@@ -3,11 +3,26 @@ import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
 import { alertsFromRolesCount, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCount, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
 
 describe('alertsFromRolesCount', () => {
+  test('Given an unbalanced number of Red and Blue roles, errors and says that they must match', () => {
+    const testRolesCount: RolesCount = {
+      ...DEFAULT_STARTING_ROLES_COUNT,
+      TEAM_BLUE: 10,
+      TEAM_RED: 10,
+      CLOWN_RED: 1
+    }
+
+    const result = alertsFromRolesCount(testRolesCount);
+    expect(result).toHaveLength(1);
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR);
+    expect(result[0].message).toMatch(/[equal|match]/i)
+  })
+
   test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
     const testRolesCount: RolesCount = {
       ...DEFAULT_STARTING_ROLES_COUNT,
       TEAM_BLUE: 5,
-      TEAM_RED: 4
+      TEAM_RED: 4,
+      CLOWN_RED: 1 // to balance color numbers
     }
 
     const result = alertsFromRolesCount(testRolesCount);
@@ -15,22 +30,6 @@ describe('alertsFromRolesCount', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toHaveProperty('severity', SetupAlertSeverity.WARNING)
   })
-
-  test("Given a Doctor, no Engineer and no Bomber, gives a warning and an error", () => {
-    const testRolesCount: RolesCount = {
-      ...DEFAULT_STARTING_ROLES_COUNT,
-      DOCTOR_BLUE: 1,
-      ENGINEER_RED: 0,
-      BOMBER_RED: 0
-    };
-
-    const result = alertsFromRolesCount(testRolesCount);
-    expect(result).toHaveLength(2);
-    expect(result.some(({ severity }) => severity === SetupAlertSeverity.WARNING)).toBe(true);
-    expect(
-      result.some(({ severity }) => severity === SetupAlertSeverity.ERROR)
-    ).toBe(true);
-  });
 })
 
 describe("checkOtherRoleCountRestrictions", () => {

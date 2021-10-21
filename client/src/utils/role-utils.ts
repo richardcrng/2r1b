@@ -6,6 +6,8 @@ export const getRoleDefinition = (roleKey: RoleKey) => ALL_ROLES[roleKey]
 
 export const getRoleName = (roleKey: RoleKey) => getRoleDefinition(roleKey).roleName;
 
+export const getRoleColor = (roleKey: RoleKey) => getRoleDefinition(roleKey).color;
+
 export const getRoleRanking = (roleKey: RoleKey) => getRoleDefinition(roleKey).info.ranking
 
 export const getRoleRestrictions = (roleKey: RoleKey) => getRoleDefinition(roleKey).restrictions
