@@ -1,4 +1,3 @@
-import { last } from 'lodash';
 import { createSelector } from 'reselect';
 import { Game, RolesCount } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';

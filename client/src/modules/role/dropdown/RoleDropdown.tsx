@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dropdown } from "semantic-ui-react";
-import { ALPHABETISED_ROLE_VALUES, FullyDefined, PlayerRole, RoleKey } from "../../../types/role.types";
+import { ALPHABETISED_ROLE_VALUES, RoleKey } from "../../../types/role.types";
 import { getColors } from "../card/RoleCard";
 
 const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
