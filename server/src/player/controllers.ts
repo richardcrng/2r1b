@@ -1,6 +1,5 @@
 import {
   Game,
-  GameBase,
   GameStatus,
   Player,
 } from "../../../client/src/types/game.types";
@@ -10,7 +9,7 @@ import { getColors } from "../utils";
 export const joinPlayerToGame = (
   gameId: string,
   playerData: Player
-): [Player, GameBase] => {
+): [Player, Game] => {
   const game = getGameById(gameId);
   if (game) {
     const player: Player = {
@@ -45,7 +44,7 @@ export const makeVote = (
 export const updatePlayer = (
   gameId: string,
   playerData: Player
-): [Player, GameBase] => {
+): [Player, Game] => {
   const game = getGameById(gameId);
   const extantPlayer = game?.players[playerData.socketId];
   if (game && extantPlayer) {

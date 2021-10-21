@@ -1,10 +1,10 @@
-import { Card, GameBase, GameStatus, Player } from "../../types/game.types";
+import { Card, Game, GameStatus, Player } from "../../types/game.types";
 import { RoleKey } from "../../types/role.types";
 import GameLobby from "./lobby/GameLobby";
 import GameOngoing from "./ongoing/GameOngoing";
 
 interface Props {
-  game: GameBase;
+  game: Game;
   onGameStart(): void;
   onCardClick: (card: Card, idx: number, player: Player) => void;
   onGameRestart: () => void;

@@ -9,7 +9,7 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { games, getGameById } from "../db";
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
-import { assignPlayersToRooms } from './utils';
+import { assignPlayersToRooms, assignRolesToPlayers } from './utils';
 
 export const incrementRoleInGame = (game: Game, role: RoleKey, increment: number): void => {
   game.rolesCount[role] += increment;
@@ -43,14 +43,17 @@ export const startGame = (
   const game = getGameById(gameId);
   if (game) {
     game.status = GameStatus.ONGOING;
-    const firstRound = game.rounds[0]
-    firstRound.playerAllocation = assignPlayersToRooms(
-      Object.keys(game.players)
-    );
-    firstRound.status = RoundStatus.ONGOING;
-    game.currentTimerSeconds = firstRound.timerSeconds;
+    assignRolesToPlayers(game.rolesCount, game.players);
+    startFirstRound(game);
     return game;
   } else {
     throw new Error("Couldn't find game");
   }
 };
+
+export const startFirstRound = (game: Game): void => {
+  const firstRound = game.rounds[0];
+  firstRound.playerAllocation = assignPlayersToRooms(Object.keys(game.players));
+  firstRound.status = RoundStatus.ONGOING;
+  game.currentTimerSeconds = firstRound.timerSeconds;
+}
