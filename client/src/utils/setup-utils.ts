@@ -10,9 +10,15 @@ export enum SetupAlertSeverity {
   WARNING = 'warning'
 }
 
+export enum SetupAlertSource {
+  PLAYER_COUNT = 'player count',
+  ROLE_SETUP = 'role setup',
+}
+
 export interface SetupAlert {
-  severity: SetupAlertSeverity,
+  severity: SetupAlertSeverity;
   message: string;
+  source: SetupAlertSource;
 }
 
 export const alertsFromSetup = (rolesCount: RolesCount, nPlayers: number): SetupAlert[] => [
@@ -68,7 +74,8 @@ export const checkOtherRoleCountRestrictions = (
     if (rolesCount[otherKey] < expectedCount) {
       alerts.push({
         severity: SetupAlertSeverity.WARNING,
-        message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is recommended for each ${roleName} (${color})`
+        message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is recommended for each ${roleName} (${color})`,
+        source: SetupAlertSource.ROLE_SETUP
       })
     }
   }
@@ -81,6 +88,7 @@ export const checkOtherRoleCountRestrictions = (
       alerts.push({
         severity: SetupAlertSeverity.ERROR,
         message: `${otherCountPerRole} ${otherRoleName} (${otherColor}) is required for each ${roleName} (${color})`,
+        source: SetupAlertSource.ROLE_SETUP
       });
     }
   }
@@ -95,11 +103,16 @@ export const checkOwnRoleCountRestrictions = (rolesCount: RolesCount, roleKey: R
   const { color, roleName } = getRoleDefinition(roleKey)
 
   if (roleCount > roleMax) {
-    alerts.push({ severity: SetupAlertSeverity.ERROR, message: `Maximum ${roleMax} allowed of ${roleName} (${color})` })
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `Maximum ${roleMax} allowed of ${roleName} (${color})`,
+      source: SetupAlertSource.ROLE_SETUP
+    })
   } else if (roleCount < roleMin) {
     alerts.push({
       severity: SetupAlertSeverity.ERROR,
       message: `Minimum ${roleMin} needed of ${roleName} (${color})`,
+      source: SetupAlertSource.ROLE_SETUP
     });
   }
   
@@ -118,6 +131,7 @@ export const checkOwnPlayerCountRoleRestrictions = (
     alerts.push({
       severity: SetupAlertSeverity.ERROR,
       message: `Maximum ${nPlayers} allowed for ${roleName} (${color})`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   }
 
@@ -125,6 +139,7 @@ export const checkOwnPlayerCountRoleRestrictions = (
     alerts.push({
       severity: SetupAlertSeverity.WARNING,
       message: `Maximum ${nPlayers} recommended for ${roleName} (${color})`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   }
 
@@ -132,6 +147,7 @@ export const checkOwnPlayerCountRoleRestrictions = (
     alerts.push({
       severity: SetupAlertSeverity.ERROR,
       message: `Minimum ${nPlayers} needed for ${roleName} (${color})`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   }
 
@@ -139,6 +155,7 @@ export const checkOwnPlayerCountRoleRestrictions = (
     alerts.push({
       severity: SetupAlertSeverity.WARNING,
       message: `Minimum ${nPlayers} recommended for ${roleName} (${color})`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   }
 
@@ -151,12 +168,14 @@ export const checkPlayerCount = (nPlayers: number): SetupAlert[] => {
   if (nPlayers < MINIMUM_PLAYERS_NEEDED) {
     alerts.push({
       severity: SetupAlertSeverity.ERROR,
-      message: `At least ${MINIMUM_PLAYERS_NEEDED} players are needed to play`
+      message: `At least ${MINIMUM_PLAYERS_NEEDED} players are needed`,
+      source: SetupAlertSource.PLAYER_COUNT
     })
   } else if (nPlayers < MINIMUM_PLAYERS_RECOMMENDED) {
     alerts.push({
       severity: SetupAlertSeverity.WARNING,
-      message: `At least ${MINIMUM_PLAYERS_NEEDED} players are recommended when playing`,
+      message: `At least ${MINIMUM_PLAYERS_RECOMMENDED} players are recommended`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   }
 
@@ -170,16 +189,17 @@ export const checkPlayerCountAgainstRoleCount = (nPlayers: number, totalRolesCou
   if (nPlayers < MINIMUM_PLAYERS_NEEDED) return []
 
   if (totalRolesCount < nPlayers) {
+    const roleGap = nPlayers - totalRolesCount
     alerts.push({
       severity: SetupAlertSeverity.ERROR,
-      message: `${
-        nPlayers - totalRolesCount
-      } roles short for ${nPlayers} players`,
+      message: `${roleGap} more role${roleGap > 1 ? 's' : ''} needed for player count`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   } else if (totalRolesCount === nPlayers + 1) {
     alerts.push({
       severity: SetupAlertSeverity.WARNING,
-      message: `1 role will be Buried (${totalRolesCount} roles between ${nPlayers} players)`,
+      message: `1 role will be Buried at this player count`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   } else if (totalRolesCount > nPlayers + 1) {
     alerts.push({
@@ -187,6 +207,7 @@ export const checkPlayerCountAgainstRoleCount = (nPlayers: number, totalRolesCou
       message: `Max ${
         nPlayers + 1
       } roles allowed for a ${nPlayers} players game`,
+      source: SetupAlertSource.PLAYER_COUNT
     });
   }
 
