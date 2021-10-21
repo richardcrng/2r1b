@@ -1,6 +1,6 @@
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
-import { Card, GameBase, Player } from "./game.types";
+import { Card, Game, Player } from "./game.types";
 import { RoleKey } from "./role.types";
 
 export type ClientSocket = TClientSocket<
@@ -85,13 +85,13 @@ export type ServerEventListeners = {
     cardIdx: number,
     card: Card
   ) => void;
-  [ServerEvent.GAME_CREATED]: (e: GameCreatedEvent) => void;
-  [ServerEvent.GAME_OVER]: (gameId: string, reason: GameOverReason, game: GameBase) => void;
-  [ServerEvent.GAME_GOTTEN]: (gameId: string, game: GameBase) => void;
+  [ServerEvent.GAME_CREATED]: (game: Game) => void;
+  [ServerEvent.GAME_OVER]: (gameId: string, reason: GameOverReason, game: Game) => void;
+  [ServerEvent.GAME_GOTTEN]: (gameId: string, game: Game) => void;
   [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
-  [ServerEvent.GAME_STARTED]: (gameId: string, game: GameBase) => void;
-  [ServerEvent.GAME_UPDATED]: (gameId: string, game: GameBase) => void;
+  [ServerEvent.GAME_STARTED]: (gameId: string, game: Game) => void;
+  [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOT_FOUND]: () => void;
@@ -99,8 +99,6 @@ export type ServerEventListeners = {
   [ServerEvent.RESULTS_SHOWN]: (gameId: string) => void;
   [ServerEvent.ROUND_STARTED]: (gameId: string) => void;
 };
-
-export interface GameCreatedEvent extends GameBase {}
 
 export interface CreateGameEvent {
   playerName?: string;
@@ -110,9 +108,9 @@ export interface CreateGameEvent {
 export interface JoinGameEvent {
   playerName: string;
   socketId: string;
-  gameId: GameBase["id"];
+  gameId: Game["id"];
 }
 
 export interface GameJoinedEvent {
-  game: GameBase;
+  game: Game;
 }
