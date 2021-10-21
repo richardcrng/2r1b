@@ -19,14 +19,31 @@ interface Props {
 }
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "players"
+    "actions";
+  height: 100%;
   width: 100%;
 `;
 
+const Header = styled.div`
+  grid-area: header;
+  width: 100%;
+`;
+
+const StyledPlayerList = styled(PlayerList)`
+  grid-area: players;
+  overflow-y: scroll;
+  list-style: none;
+  padding-inline-start: 20px
+`
+
 const ActionArea = styled.div`
+  grid-area: actions;
   width: 100%;
 `;
 
@@ -54,7 +71,7 @@ function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: 
 
   return (
     <Container className="active-contents">
-      <div style={{ width: "100%" }}>
+      <Header>
         <h1 style={{ textAlign: "center", marginBottom: 0 }}>
           Game id: {game.id}
         </h1>
@@ -88,29 +105,24 @@ function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: 
             {setupMessage(setupErrors, setupWarnings)}
           </Message.Content>
         </Message>
-        <PlayerList
-          players={players}
-          ownPlayerId={player.socketId}
-          listParent={({ children }) => (
-            <ol style={{ listStyle: "none", paddingInlineStart: "20px" }}>
-              {children}
-            </ol>
-          )}
-          renderPlayer={(player, idx, ownPlayerId) => {
-            return (
-              <PlayerListItemContents>
-                <span style={{ marginRight: "10px" }}>{idx + 1}.</span>
-                <PlayerAvatar player={player} size={32} />
-                <p style={{ marginLeft: "10px" }}>
-                  {player.name}
-                  {player.socketId === ownPlayerId && " (you)"}
-                  {player.isHost && " (host)"}
-                </p>
-              </PlayerListItemContents>
-            );
-          }}
-        />
-      </div>
+      </Header>
+      <StyledPlayerList
+        players={players}
+        ownPlayerId={player.socketId}
+        renderPlayer={(player, idx, ownPlayerId) => {
+          return (
+            <PlayerListItemContents>
+              <span style={{ marginRight: "10px" }}>{idx + 1}.</span>
+              <PlayerAvatar player={player} size={32} />
+              <p style={{ marginLeft: "10px" }}>
+                {player.name}
+                {player.socketId === ownPlayerId && " (you)"}
+                {player.isHost && " (host)"}
+              </p>
+            </PlayerListItemContents>
+          );
+        }}
+      />
       <ActionArea>
         <Button fluid onClick={handleViewSetup}>
           {player.isHost ? "Edit" : "View"} setup
