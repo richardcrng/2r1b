@@ -5,6 +5,12 @@ export enum GameStatus {
   ONGOING = "ONGOING",
   COMPLETE = "COMPLETE",
 }
+export enum RoundStatus {
+
+  ONGOING = 'ongoing',
+  COMPLETE = 'complete',
+  PENDING = 'pending'
+}
 
 export enum CardType {
   GOLD = 'gold',
@@ -122,12 +128,29 @@ export enum RoomName {
 }
 
 export interface Round {
-  number: 1 | 2 | 3 | 4 | 5;
+  actions: PlayerAction[];
+  status: RoundStatus;
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
-  actions: PlayerAction[];
   playerAllocation: PlayerRoomAllocation;
 }
+
+export const createRound = (timerSeconds: number): Round => ({
+  actions: [],
+  status: RoundStatus.PENDING,
+  timerSeconds,
+  rooms: {
+    [RoomName.A]: { leadersRecord: [], hostages: [] },
+    [RoomName.B]: { leadersRecord: [], hostages: [] },
+  },
+  playerAllocation: {}
+});
+
+export const createStartingRounds = () => [
+  createRound(180),
+  createRound(120),
+  createRound(60),
+];
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
 
@@ -140,6 +163,7 @@ export interface GameBase {
   players: {
     [playerSocketId: string]: Player;
   };
+  currentTimerSeconds?: number;
   rounds: Round[];
   rolesCount: RolesCount;
   status: GameStatus;

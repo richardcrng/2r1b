@@ -18,6 +18,7 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
   return (
     <Container className="active-contents flex-between">
       Game is ongoing
+      <pre>{JSON.stringify(game, null, 2)}</pre>
     </Container>
   );
 }
