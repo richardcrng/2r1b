@@ -4,7 +4,7 @@ import { ClientSocket } from "./types/event.types";
 
 export const socketUrl =
   process.env.NODE_ENV === "production"
-    ? "https://tempel-des-schreckens-server.herokuapp.com"
+    ? "https://two-rooms-and-a-boom-server.herokuapp.com"
     : "http://localhost:4000";
 
 export const socket: ClientSocket = io(socketUrl);
