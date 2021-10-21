@@ -126,8 +126,10 @@ export interface Round {
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
   actions: PlayerAction[];
-  playerAllocation: Record<string, RoomName>;
+  playerAllocation: PlayerRoomAllocation;
 }
+
+export type PlayerRoomAllocation = Record<string, RoomName>;
 
 export type Game = GameBase | GameInLobby | GameOngoing | GameComplete;
 

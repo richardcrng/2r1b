@@ -1,11 +1,11 @@
-import { GameBase, Player } from "../../client/src/types/game.types";
+import { Game, Player } from "../../client/src/types/game.types";
 
-export const games: Record<GameBase["id"], GameBase> = {};
+export const games: Record<Game["id"], Game> = {};
 // export const players: Record<Socket["id"], Player> = {};
 
 export const getGames = () => games;
 
-export const getGameById = (gameId: GameBase["id"]): GameBase | undefined => {
+export const getGameById = (gameId: Game["id"]): Game | undefined => {
   return getGames()[gameId];
 };
 
