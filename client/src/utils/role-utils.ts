@@ -1,4 +1,3 @@
-import { RolesCount } from "../types/game.types";
 import { ALL_ROLES, RoleKey } from "../types/role.types";
 import { mapValues } from 'lodash';
 
@@ -21,4 +20,6 @@ export const getRoleRemovability = (roleKey: RoleKey, currentCount: number) => {
   }
 }
 
-export const DEFAULT_STARTING_ROLES_COUNT: RolesCount = mapValues(ALL_ROLES, (role) => role.restrictions.roleMin)
+export const DEFAULT_STARTING_ROLES_COUNT = Object.freeze(
+  mapValues(ALL_ROLES, (role) => role.restrictions.roleMin)
+);

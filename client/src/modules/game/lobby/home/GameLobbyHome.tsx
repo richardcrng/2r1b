@@ -4,14 +4,14 @@ import { useCopyToClipboard } from "react-use";
 import { Button, Message } from "semantic-ui-react";
 import styled from "styled-components";
 // import { gameLobbyReadiness } from "../../selectors/game";
-import { GameBase, Player } from "../../../../types/game.types";
+import { Game, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
 import { selectGameSetupErrors, selectGameSetupWarnings } from "../../../../selectors/game";
 import { SetupAlert } from "../../../../utils/setup-utils";
 
 interface Props {
-  game: GameBase;
+  game: Game;
   handleViewSetup(): void;
   onGameStart(): void;
   players: Player[];

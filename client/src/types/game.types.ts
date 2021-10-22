@@ -1,9 +1,15 @@
-import { PlayerRole, RoleKey } from "./role.types";
+import { RoleKey } from "./role.types";
 
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
   COMPLETE = "COMPLETE",
+}
+export enum RoundStatus {
+
+  ONGOING = 'ongoing',
+  COMPLETE = 'complete',
+  PENDING = 'pending'
 }
 
 export enum CardType {
@@ -35,8 +41,12 @@ export interface Player {
   gameId?: string;
   name?: string;
   isHost?: boolean;
-  role?: PlayerRole;
+  role?: RoleKey;
   colors?: string[]
+}
+
+export interface PlayerWithRoom extends Player {
+  room?: RoomName;
 }
 
 export interface Turn {
@@ -59,12 +69,12 @@ export interface LeaderRecordBase {
   leaderId: string;
 }
 
-export interface LeaderAbdication {
+export interface LeaderAbdication extends LeaderRecordBase {
   method: LeaderRecordMethod.ABDICATION;
   abdicaterId: string;
 }
 
-export interface LeaderAppointment {
+export interface LeaderAppointment extends LeaderRecordBase {
   method: LeaderRecordMethod.APPOINTMENT;
   appointerId: string;
 }
@@ -109,7 +119,7 @@ export interface PlayerActionCardShare extends PlayerActionShareBase {
   type: PlayerActionType.CARD_SHARE;
 }
 
-export type PlayerAction = PlayerActionColorShare | PlayerActionColorShare
+export type PlayerAction = PlayerActionCardShare | PlayerActionColorShare
 
 export interface RoomRound {
   leadersRecord: LeaderRecord[];
@@ -117,40 +127,49 @@ export interface RoomRound {
 }
 
 export enum RoomName {
-  A = "a",
-  B = "b"
+  A = "1",
+  B = "2"
 }
 
 export interface Round {
-  number: 1 | 2 | 3 | 4 | 5;
+  // actions: PlayerAction[];
+  status: RoundStatus;
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
-  actions: PlayerAction[];
-  playerAllocation: Record<string, RoomName>;
+  playerAllocation: PlayerRoomAllocation;
 }
 
-export type Game = GameBase | GameInLobby | GameOngoing | GameComplete;
+export const createRound = (timerSeconds: number): Round => ({
+  // actions: [],
+  status: RoundStatus.PENDING,
+  timerSeconds,
+  rooms: {
+    [RoomName.A]: { leadersRecord: [], hostages: [] },
+    [RoomName.B]: { leadersRecord: [], hostages: [] },
+  },
+  playerAllocation: {}
+});
+
+export const createStartingRounds = () => [
+  createRound(180),
+  createRound(120),
+  createRound(60),
+];
+
+export type PlayerRoomAllocation = Record<string, RoomName>;
+
 
 export type RolesCount = Record<RoleKey, number>
 
-export interface GameBase {
+export interface Game {
   id: string;
+  actions: PlayerAction[];
   players: {
     [playerSocketId: string]: Player;
   };
+  currentTimerSeconds?: number;
   rounds: Round[];
   rolesCount: RolesCount;
+  buriedRole?: RoleKey;
   status: GameStatus;
-}
-
-export interface GameInLobby extends GameBase {
-  status: GameStatus.LOBBY;
-}
-
-export interface GameOngoing extends GameBase {
-  status: GameStatus.ONGOING;
-}
-
-export interface GameComplete extends GameBase {
-  status: GameStatus.COMPLETE;
 }
