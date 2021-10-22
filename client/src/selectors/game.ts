@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { Game, RolesCount, RoundStatus } from "../types/game.types";
+import { Game, PlayerWithRoom, RolesCount, RoomName, RoundStatus } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 import { mapValues, last } from 'lodash';
@@ -91,6 +91,15 @@ export const selectCurrentGameRound = createSelector(
 export const selectCurrentGameRoomAllocation = createSelector(
   selectCurrentGameRound,
   (round) => round?.playerAllocation
+)
+
+export const selectGamePlayersWithRooms = createSelector(
+  selectGamePlayers,
+  selectCurrentGameRoomAllocation,
+  (players, roomAllocation = {}): Record<string, PlayerWithRoom> => mapValues(players, (player) => ({
+    ...player,
+    room: roomAllocation[player.socketId] as RoomName | undefined
+  }))
 )
 
 export const selectCurrentRoundRooms = createSelector(

@@ -57,25 +57,32 @@ function GameRoute() {
         {game.data && player.data && (
           <GamePage
             game={game.data}
-            onGameStart={() => {
+            onAppointLeader={(leaderId, currentRoom) => {
               socket.emit(
-                ClientEvent.START_GAME,
-                game.data!.id
+                ClientEvent.APPOINT_ROOM_LEADER,
+                game.data!.id,
+                currentRoom,
+                player.data!.socketId,
+                leaderId
               );
             }}
-            onCardClick={(card, idx, player) => {
+            onGameStart={() => {
+              socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
             onGameRestart={() => {
-              socket.emit(
-                ClientEvent.RESET_GAME,
-                game.data!.id
-              )
+              socket.emit(ClientEvent.RESET_GAME, game.data!.id);
             }}
             onNextRound={() => {
+              socket.emit(ClientEvent.NEXT_ROUND, game.data!.id);
+            }}
+            onProposeLeader={(leaderId, currentRoom) => {
               socket.emit(
-                ClientEvent.NEXT_ROUND,
-                game.data!.id
-              )
+                ClientEvent.PROPOSE_ROOM_LEADER,
+                game.data!.id,
+                currentRoom,
+                player.data!.socketId,
+                leaderId
+              );
             }}
             onRoleIncrement={(roleKey, increment) => {
               socket.emit(
@@ -83,7 +90,7 @@ function GameRoute() {
                 game.data!.id,
                 roleKey,
                 increment
-              )
+              );
             }}
             players={Object.values(game.data.players)}
             player={player.data}

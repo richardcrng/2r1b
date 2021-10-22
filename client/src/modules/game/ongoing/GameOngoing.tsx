@@ -1,19 +1,11 @@
 import { useRiducer } from 'riduce';
 import { Button, Modal } from 'semantic-ui-react';
 import styled from 'styled-components'
-import { Card, Game, Player, PlayerGameState } from "../../../types/game.types";
+import { Game, Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import { getRoleDefinition } from '../../../utils/role-utils';
 import RoleCard from '../../role/card/RoleCard';
-import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders } from '../../../selectors/game';
 import Timer from '../../../lib/atoms/Timer';
-
-interface Props {
-  game: Game;
-  player: Player;
-  onCardClick: (card: Card, idx: number, player: Player) => void;
-  onNextRound: () => void;
-  onGameRestart: () => void;
-}
+import PlayerLeaderProposal from '../../player/interaction/PlayerLeaderProposal';
 
 const Container = styled.div`
   display: grid;
@@ -43,37 +35,78 @@ const Actions = styled.div`
   grid-area: actions;
 `
 
+export interface PlayerGameState {
+  modal: {
+    isOpen: boolean;
+    title?: (props: Props) => string;
+    content?: React.FC<Props>;
+  };
+}
+
 const DEFAULT_PLAYER_GAME_STATE: PlayerGameState = {
   modal: {
     isOpen: false
   }
 }
 
-function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: Props) {
+interface Props {
+  currentLeader?: Player;
+  currentRoom: RoomName;
+  game: Game;
+  player: Player;
+  players: Record<string, PlayerWithRoom>
+  onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
+  onProposeLeader(proposedLeaderId: string, roomName: RoomName): void;
+  onNextRound: () => void;
+  onGameRestart: () => void;
+}
+
+function GameOngoing(props: Props) {
 
   const { state, dispatch, actions } = useRiducer(DEFAULT_PLAYER_GAME_STATE);
 
   const handleModalClose = () => dispatch(actions.modal.isOpen.create.off());
   const handleModalOpen = () => dispatch(actions.modal.isOpen.create.on());
 
-  const currentRooms = selectCurrentGameRoomAllocation(game);
-  const currentRoom = currentRooms && currentRooms[player.socketId];
-
-  const currentLeaders = selectCurrentRoomCurrentLeaders(game);
-
-  const leaderIdInThisRoom = currentRoom && currentLeaders[currentRoom];
-  const currentLeaderName = leaderIdInThisRoom && game.players[leaderIdInThisRoom].name
-
   const handleRoleReveal = () => {
-    if (player.role) {
-      dispatch(
-        actions.modal.create.assign({
-          isOpen: true,
-          title: "Here's your role!",
-          content: <RoleCard role={getRoleDefinition(player.role)} />,
-        })
-      );
-    }
+    dispatch(
+      actions.modal.create.assign({
+        isOpen: true,
+        title: () => "Here's your role!",
+        content: ({ player }) =>
+          player.role ? (
+            <RoleCard role={getRoleDefinition(player.role)} />
+          ) : (
+            <p>'Waiting for role...'</p>
+          ),
+      })
+    );
+  }
+
+  const handleLeaderProposal = () => {
+    dispatch(
+      actions.modal.create.assign({
+        isOpen: true,
+        title: ({ currentLeader }) => `${currentLeader ? "Propose" : "Appoint"} Leader`,
+        content: ({
+          currentRoom,
+          currentLeader,
+          onAppointLeader,
+          onProposeLeader,
+          player,
+          players,
+        }) => (
+          <PlayerLeaderProposal
+            currentLeader={currentLeader}
+            currentRoom={currentRoom}
+            onAppointLeader={onAppointLeader}
+            onProposeLeader={onProposeLeader}
+            player={player}
+            players={players}
+          />
+        ),
+      })
+    );
   }
 
   // useSocketListener(ServerEvent.ROLE_AND_ROOM_ALLOCATIONS_MADE, (gameId) => {
@@ -86,22 +119,24 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
   //   }
   // })
 
+  const ModalContent = state.modal.content
+
   return (
     <>
       <Container className="active-contents">
         <Header>
-          <h1>Situation Room {currentRoom}</h1>
-          <h2>Leader: {currentLeaderName ?? "<none>"}</h2>
+          <h1>Situation Room {props.currentRoom}</h1>
+          <h2>Leader: {props.currentLeader?.name ?? "<none>"}</h2>
         </Header>
         <TimerArea>
-          <Timer secondsShown={game.currentTimerSeconds} />
+          <Timer secondsShown={props.game.currentTimerSeconds} />
         </TimerArea>
         <VotesArea>
           Nothing to show here for now
         </VotesArea>
         <Actions>
-          <Button secondary fluid>
-            {leaderIdInThisRoom ? "PROPOSE" : "APPOINT"} LEADER
+          <Button secondary fluid onClick={handleLeaderProposal}>
+            {props.currentLeader ? "PROPOSE" : "APPOINT"} LEADER
           </Button>
           <Button primary fluid>
             OFFER SHARE
@@ -117,10 +152,9 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
         onClose={handleModalClose}
         onOpen={handleModalOpen}
       >
-        <Modal.Header>{state.modal.title}</Modal.Header>
+        <Modal.Header>{state.modal.title && state.modal.title(props)}</Modal.Header>
         <Modal.Content>
-          {/* {player.role && <RoleCard role={getRoleDefinition(player.role)} />} */}
-          {state.modal.content}
+          {ModalContent && <ModalContent {...props} />}
         </Modal.Content>
       </Modal>
     </>

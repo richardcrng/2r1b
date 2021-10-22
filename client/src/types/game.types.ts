@@ -45,6 +45,10 @@ export interface Player {
   colors?: string[]
 }
 
+export interface PlayerWithRoom extends Player {
+  room?: RoomName;
+}
+
 export interface Turn {
   keyholderId: string;
   selected: {
@@ -168,12 +172,4 @@ export interface Game {
   rolesCount: RolesCount;
   buriedRole?: RoleKey;
   status: GameStatus;
-}
-
-export interface PlayerGameState {
-  modal: {
-    isOpen: boolean;
-    title?: string;
-    content?: JSX.Element;
-  }
 }
