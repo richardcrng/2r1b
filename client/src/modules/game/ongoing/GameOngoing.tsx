@@ -1,12 +1,10 @@
 import { useRiducer } from 'riduce';
 import { Button, Modal } from 'semantic-ui-react';
 import styled from 'styled-components'
-import useSocketListener from '../../../hooks/useSocketListener';
-import { ServerEvent } from '../../../types/event.types';
 import { Card, Game, Player, PlayerGameState } from "../../../types/game.types";
 import { getRoleDefinition } from '../../../utils/role-utils';
 import RoleCard from '../../role/card/RoleCard';
-import { selectCurrentGameRoomAllocation } from '../../../selectors/game';
+import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders } from '../../../selectors/game';
 
 interface Props {
   game: Game;
@@ -36,6 +34,11 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
   const currentRooms = selectCurrentGameRoomAllocation(game);
   const currentRoom = currentRooms && currentRooms[player.socketId];
 
+  const currentLeaders = selectCurrentRoomCurrentLeaders(game);
+
+  const leaderIdInThisRoom = currentRoom && currentLeaders[currentRoom];
+  const currentLeaderName = leaderIdInThisRoom && game.players[leaderIdInThisRoom].name
+
   const handleRoleReveal = () => {
     if (player.role) {
       dispatch(
@@ -61,9 +64,14 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
   return (
     <>
       <Container className="active-contents flex-between">
-        <h1>Situation Room {currentRoom}</h1>
         <div>
-          <Button onClick={handleRoleReveal}>Reveal role</Button>
+          <h1>Situation Room {currentRoom}</h1>
+          <h2>Leader: {currentLeaderName ?? "<none>"}</h2>
+        </div>
+        <div style={{ width: '100%' }}>
+          <Button fluid>{leaderIdInThisRoom ? 'PROPOSE' : 'APPOINT'} LEADER</Button>
+          <Button fluid>OFFER SHARE</Button>
+          <Button fluid onClick={handleRoleReveal}>REVEAL ROLE</Button>
         </div>
       </Container>
       <Modal

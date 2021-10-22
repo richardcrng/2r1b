@@ -65,12 +65,12 @@ export interface LeaderRecordBase {
   leaderId: string;
 }
 
-export interface LeaderAbdication {
+export interface LeaderAbdication extends LeaderRecordBase {
   method: LeaderRecordMethod.ABDICATION;
   abdicaterId: string;
 }
 
-export interface LeaderAppointment {
+export interface LeaderAppointment extends LeaderRecordBase {
   method: LeaderRecordMethod.APPOINTMENT;
   appointerId: string;
 }

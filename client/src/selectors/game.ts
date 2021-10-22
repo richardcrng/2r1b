@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import { Game, RolesCount, RoundStatus } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
+import { mapValues, last } from 'lodash';
 
 export const selectGamePlayers = (game: Game) => game.players;
 export const selectGameRolesInPlayCount = (game: Game): RolesCount => game.rolesCount;
@@ -91,3 +92,24 @@ export const selectCurrentGameRoomAllocation = createSelector(
   selectCurrentGameRound,
   (round) => round?.playerAllocation
 )
+
+export const selectCurrentRoundRooms = createSelector(
+  selectCurrentGameRound,
+  (round) => round?.rooms
+)
+
+export const selectCurrentRoomLeaderRecords = createSelector(
+  selectCurrentRoundRooms,
+  (rooms) => mapValues(rooms, (room) => room.leadersRecord)
+)
+
+export const selectCurrentRoomCurrentLeaderRecord = createSelector(
+  selectCurrentRoomLeaderRecords,
+  (leaderRecordsDict) => mapValues(leaderRecordsDict, (leaderRecords) => last(leaderRecords))
+)
+
+export const selectCurrentRoomCurrentLeaders = createSelector(
+  selectCurrentRoomCurrentLeaderRecord,
+  (leaderRecordDict) =>
+    mapValues(leaderRecordDict, (leaderRecord) => leaderRecord?.leaderId)
+);
