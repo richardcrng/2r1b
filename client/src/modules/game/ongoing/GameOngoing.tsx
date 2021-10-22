@@ -16,7 +16,31 @@ interface Props {
 }
 
 const Container = styled.div`
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "timer"
+    "votes"
+    "actions";
   width: 100%;
+`
+
+const Header = styled.div`
+  grid-area: header;
+`
+
+const TimerArea = styled.div`
+  grid-area: timer;
+`
+
+const VotesArea = styled.div`
+  grid-area: votes;
+`
+
+const Actions = styled.div`
+  grid-area: actions;
 `
 
 const DEFAULT_PLAYER_GAME_STATE: PlayerGameState = {
@@ -64,15 +88,18 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
 
   return (
     <>
-      <Container className="active-contents flex-between">
-        <div>
+      <Container className="active-contents">
+        <Header>
           <h1>Situation Room {currentRoom}</h1>
           <h2>Leader: {currentLeaderName ?? "<none>"}</h2>
-        </div>
-        <div>
+        </Header>
+        <TimerArea>
           <Timer secondsShown={game.currentTimerSeconds} />
-        </div>
-        <div style={{ width: "100%" }}>
+        </TimerArea>
+        <VotesArea>
+          Nothing to show here for now
+        </VotesArea>
+        <Actions>
           <Button secondary fluid>
             {leaderIdInThisRoom ? "PROPOSE" : "APPOINT"} LEADER
           </Button>
@@ -82,7 +109,7 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
           <Button color="red" fluid onClick={handleRoleReveal}>
             REVEAL ROLE
           </Button>
-        </div>
+        </Actions>
       </Container>
       <Modal
         open={state.modal.isOpen}
