@@ -42,7 +42,6 @@ export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
 
   socket.on(ClientEvent.START_GAME, (gameId) => {
     const game = startGame(gameId);
-    io.emit(ServerEvent.GAME_STARTED, game.id, game);
     io.emit(ServerEvent.GAME_UPDATED, game.id, game);
     for (let playerId in game.players) {
       io.emit(ServerEvent.PLAYER_UPDATED, playerId, game.players[playerId]);

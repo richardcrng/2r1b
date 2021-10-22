@@ -1,4 +1,4 @@
-import { PlayerRole, RoleKey } from "./role.types";
+import { RoleKey } from "./role.types";
 
 export enum GameStatus {
   LOBBY = "LOBBY",
@@ -123,8 +123,8 @@ export interface RoomRound {
 }
 
 export enum RoomName {
-  A = "a",
-  B = "b"
+  A = "1",
+  B = "2"
 }
 
 export interface Round {
@@ -170,7 +170,10 @@ export interface Game {
   status: GameStatus;
 }
 
-export interface GameStateFromActions {
-
+export interface PlayerGameState {
+  modal: {
+    isOpen: boolean;
+    title?: string;
+    content?: JSX.Element;
+  }
 }
-

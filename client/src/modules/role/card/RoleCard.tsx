@@ -9,7 +9,7 @@ interface Props {
 const CardContainer = styled.div`
   color: white;
   display: grid;
-  max-width: 300px;
+  max-width: 280px;
   grid-template-columns: 1fr 70px;
   grid-template-rows: 300px 50px;
   grid-template-areas:

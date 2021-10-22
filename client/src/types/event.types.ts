@@ -37,13 +37,13 @@ export enum ServerEvent {
   GAME_JOINED = "game-joined",
   GAME_NOT_FOUND = "game-not-found",
   GAME_OVER = 'game-over',
-  GAME_STARTED = 'game-started',
   GAME_UPDATED = "game-updated",
   PLAYER_GOTTEN = "player-gotten",
   PLAYER_NOT_FOUND = "player-not-found",
   PLAYER_UPDATED = "player-updated",
   REDIRECT_TO_LOBBY = "redirect-to-lobby",
   RESULTS_SHOWN = "results-shown",
+  ROLE_AND_ROOM_ALLOCATIONS_MADE = 'role-and-room-allocations-made',
   ROUND_STARTED = 'round-started'
 }
 
@@ -90,13 +90,13 @@ export type ServerEventListeners = {
   [ServerEvent.GAME_GOTTEN]: (gameId: string, game: Game) => void;
   [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
-  [ServerEvent.GAME_STARTED]: (gameId: string, game: Game) => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOT_FOUND]: () => void;
   [ServerEvent.REDIRECT_TO_LOBBY]: () => void;
   [ServerEvent.RESULTS_SHOWN]: (gameId: string) => void;
+  [ServerEvent.ROLE_AND_ROOM_ALLOCATIONS_MADE]: (gameId: string) => void;
   [ServerEvent.ROUND_STARTED]: (gameId: string) => void;
 };
 

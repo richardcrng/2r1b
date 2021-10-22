@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect';
-import { Game, RolesCount } from "../types/game.types";
+import { Game, RolesCount, RoundStatus } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 
 export const selectGamePlayers = (game: Game) => game.players;
 export const selectGameRolesInPlayCount = (game: Game): RolesCount => game.rolesCount;
+export const selectGameRounds = (game: Game) => game.rounds
 
 export const selectTotalCountOfGameRoles = createSelector(
   selectGameRolesInPlayCount,
@@ -79,4 +80,14 @@ export const selectRolesInSetup = createSelector(
 export const selectRolesInSetupAlphabetised = createSelector(
   selectRolesInSetup,
   (roleEntries) => [...roleEntries].sort((a, b) => a[0].roleName < b[0].roleName ? -1 : 0)
+)
+
+export const selectCurrentGameRound = createSelector(
+  selectGameRounds,
+  (rounds) => rounds.find(round => round.status === RoundStatus.ONGOING)
+)
+
+export const selectCurrentGameRoomAllocation = createSelector(
+  selectCurrentGameRound,
+  (round) => round?.playerAllocation
 )
