@@ -69,9 +69,9 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
           <h2>Leader: {currentLeaderName ?? "<none>"}</h2>
         </div>
         <div style={{ width: '100%' }}>
-          <Button fluid>{leaderIdInThisRoom ? 'PROPOSE' : 'APPOINT'} LEADER</Button>
-          <Button fluid>OFFER SHARE</Button>
-          <Button fluid onClick={handleRoleReveal}>REVEAL ROLE</Button>
+          <Button secondary fluid>{leaderIdInThisRoom ? 'PROPOSE' : 'APPOINT'} LEADER</Button>
+          <Button primary fluid>OFFER SHARE</Button>
+          <Button color='red' fluid onClick={handleRoleReveal}>REVEAL ROLE</Button>
         </div>
       </Container>
       <Modal
