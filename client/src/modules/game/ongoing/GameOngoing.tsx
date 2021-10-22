@@ -5,6 +5,7 @@ import { Card, Game, Player, PlayerGameState } from "../../../types/game.types";
 import { getRoleDefinition } from '../../../utils/role-utils';
 import RoleCard from '../../role/card/RoleCard';
 import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders } from '../../../selectors/game';
+import Timer from '../../../lib/atoms/Timer';
 
 interface Props {
   game: Game;
@@ -68,10 +69,19 @@ function GameOngoing({ game, player, onCardClick, onGameRestart, onNextRound }: 
           <h1>Situation Room {currentRoom}</h1>
           <h2>Leader: {currentLeaderName ?? "<none>"}</h2>
         </div>
-        <div style={{ width: '100%' }}>
-          <Button secondary fluid>{leaderIdInThisRoom ? 'PROPOSE' : 'APPOINT'} LEADER</Button>
-          <Button primary fluid>OFFER SHARE</Button>
-          <Button color='red' fluid onClick={handleRoleReveal}>REVEAL ROLE</Button>
+        <div>
+          <Timer secondsShown={game.currentTimerSeconds} />
+        </div>
+        <div style={{ width: "100%" }}>
+          <Button secondary fluid>
+            {leaderIdInThisRoom ? "PROPOSE" : "APPOINT"} LEADER
+          </Button>
+          <Button primary fluid>
+            OFFER SHARE
+          </Button>
+          <Button color="red" fluid onClick={handleRoleReveal}>
+            REVEAL ROLE
+          </Button>
         </div>
       </Container>
       <Modal
