@@ -7,6 +7,7 @@ import {
 import { incrementRoleInGame, createGame, startGame } from "./controllers";
 import { getGameById } from "../db";
 import { joinPlayerToGame } from "../player/controllers";
+import sleep from '../../../client/src/utils/sleep';
 
 export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
   socket.on(ClientEvent.INCREMENT_ROLE, (gameId, roleKey, increment) => {
@@ -40,11 +41,17 @@ export const addGameListeners = (socket: ServerSocket, io: ServerIO): void => {
     io.emit(ServerEvent.RESULTS_SHOWN, gameId);
   });
 
-  socket.on(ClientEvent.START_GAME, (gameId) => {
+  socket.on(ClientEvent.START_GAME, async (gameId) => {
     const game = startGame(gameId);
     io.emit(ServerEvent.GAME_UPDATED, game.id, game);
     for (let playerId in game.players) {
       io.emit(ServerEvent.PLAYER_UPDATED, playerId, game.players[playerId]);
+    }
+
+    while (game.currentTimerSeconds && game.currentTimerSeconds > 0) {
+      await sleep(1000);
+      game.currentTimerSeconds -= 1;
+      io.emit(ServerEvent.GAME_UPDATED, game.id, game);
     }
   });
 };
