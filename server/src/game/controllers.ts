@@ -55,6 +55,26 @@ export const incrementRoleInGame = (
   })
 };
 
+export const proposeRoomLeader = (
+  gameId: string,
+  roomName: RoomName,
+  voterId: string,
+  proposedLeaderId?: string
+): void => {
+  const gameManager = new GameManager(gameId)
+  gameManager.updatePlayer(voterId, (player) => {
+    if (proposedLeaderId) {
+      player.leaderVote = {
+        roomName,
+        voterId,
+        proposedLeaderId,
+        timestamp: Date.now(),
+      };
+    } else {
+      delete player.leaderVote
+    }
+  });
+}
 
 export const startGame = (
   gameId: string,
