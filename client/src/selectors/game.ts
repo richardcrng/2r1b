@@ -96,7 +96,7 @@ export const selectCurrentGameRound = createSelector(
 export const selectCurrentGameRoomAllocation = createSelector(
   selectCurrentGameRound,
   (round) => round?.playerAllocation
-)
+);
 
 export const selectGamePlayersWithRooms = createSelector(
   selectGamePlayers,
@@ -106,6 +106,23 @@ export const selectGamePlayersWithRooms = createSelector(
     room: roomAllocation[player.socketId] as RoomName | undefined
   }))
 )
+
+export const selectPlayerIdsInEachRoom = createSelector(
+  selectGamePlayersWithRooms,
+  (players): Record<RoomName, string[]> => Object.values(players).reduce(
+    (acc, curr) => {
+      if (curr.room) {
+        return {
+          ...acc,
+          [curr.room]: [...acc[curr.room], curr.socketId]
+        }
+      } else {
+        return acc
+      }
+    },
+    { [RoomName.A]: [], [RoomName.B]: [] }
+  )
+);
 
 export const selectCurrentRoundRooms = createSelector(
   selectCurrentGameRound,

@@ -11,6 +11,8 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
+import { cloneDeep, last } from 'lodash';
+import { selectDictionaryOfVotesForPlayers, selectPlayerIdsInEachRoom } from '../../../client/src/selectors/game';
 
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
@@ -45,6 +47,28 @@ export const createGame = (data: CreateGameEvent): void => {
   new GameManager(gameId).create(game);
 };
 
+export const usurpLeader = (
+  gameId: string,
+  roomName: RoomName,
+  newLeaderId: string,
+  voterIds: string[]
+): void => {
+
+  const gameManager = new GameManager(gameId);
+
+  gameManager.addLeaderRecord(roomName, {
+    method: LeaderRecordMethod.USURPATION,
+    leaderId: newLeaderId,
+    votes: Object.fromEntries(voterIds.map((id) => [id, 1])),
+  });
+
+  for (let voterId of voterIds) {
+    gameManager.updatePlayer(voterId, (player) => {
+      delete player.leaderVote
+    })
+  }
+};
+
 export const incrementRoleInGame = (
   gameId: string,
   role: RoleKey,
@@ -61,9 +85,14 @@ export const proposeRoomLeader = (
   voterId: string,
   proposedLeaderId?: string
 ): void => {
-  const gameManager = new GameManager(gameId)
+  const gameManager = new GameManager(gameId);
+
+  const currentLeader = last(
+    gameManager._pointer().rounds[gameManager.currentRound().idx].rooms[roomName].leadersRecord
+  )?.leaderId;
+
   gameManager.updatePlayer(voterId, (player) => {
-    if (proposedLeaderId) {
+    if (proposedLeaderId && proposedLeaderId !== currentLeader) {
       player.leaderVote = {
         roomName,
         voterId,
@@ -74,6 +103,19 @@ export const proposeRoomLeader = (
       delete player.leaderVote
     }
   });
+
+  if (proposedLeaderId) {
+    const gameClone = cloneDeep(gameManager.snapshot()); // to avoid selector memoisation
+    const playersInThisRoom = selectPlayerIdsInEachRoom(gameClone)[roomName];
+    const votesDict = selectDictionaryOfVotesForPlayers(gameClone);
+    const votesForLeader = votesDict[proposedLeaderId].map(
+      (vote) => vote.voterId
+    );
+
+    if (votesForLeader.length > playersInThisRoom.length / 2) {
+      usurpLeader(gameId, roomName, proposedLeaderId, votesForLeader);
+    }
+  }
 }
 
 export const startGame = (
