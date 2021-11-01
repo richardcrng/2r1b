@@ -6,7 +6,6 @@ export enum GameStatus {
   COMPLETE = "COMPLETE",
 }
 export enum RoundStatus {
-
   ONGOING = 'ongoing',
   COMPLETE = 'complete',
   PENDING = 'pending'

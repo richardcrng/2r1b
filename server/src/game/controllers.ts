@@ -5,6 +5,7 @@ import {
   GameStatus,
   LeaderRecordMethod,
   RoomName,
+  RoundStatus,
 } from "../../../client/src/types/game.types";
 import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
@@ -62,7 +63,8 @@ export const startGame = (
   gameManager.assignInitialRoles();
   gameManager.assignInitialRooms();
   gameManager.update(game => {
-    game.status = GameStatus.ONGOING
+    game.status = GameStatus.ONGOING;
+    game.rounds[0].status = RoundStatus.ONGOING;
   });
   gameManager.startTimer();
 };
