@@ -1,5 +1,5 @@
 
-import { Player, RolesCount, RoomName } from '../../../client/src/types/game.types';
+import { RolesCount, RoomName } from '../../../client/src/types/game.types';
 import { RoleKey } from '../../../client/src/types/role.types';
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { createDummyGame, createDummyPlayers } from '../utils';
