@@ -47,28 +47,6 @@ export const createGame = (data: CreateGameEvent): void => {
   new GameManager(gameId).create(game);
 };
 
-export const usurpLeader = (
-  gameId: string,
-  roomName: RoomName,
-  newLeaderId: string,
-  voterIds: string[]
-): void => {
-
-  const gameManager = new GameManager(gameId);
-
-  gameManager.addLeaderRecord(roomName, {
-    method: LeaderRecordMethod.USURPATION,
-    leaderId: newLeaderId,
-    votes: Object.fromEntries(voterIds.map((id) => [id, 1])),
-  });
-
-  for (let voterId of voterIds) {
-    gameManager.updatePlayer(voterId, (player) => {
-      delete player.leaderVote
-    })
-  }
-};
-
 export const incrementRoleInGame = (
   gameId: string,
   role: RoleKey,
@@ -87,9 +65,7 @@ export const proposeRoomLeader = (
 ): void => {
   const gameManager = new GameManager(gameId);
 
-  const currentLeader = last(
-    gameManager._pointer().rounds[gameManager.currentRound().idx].rooms[roomName].leadersRecord
-  )?.leaderId;
+  const currentLeader = gameManager.currentLeaderRecord(roomName)!.leaderId
 
   gameManager.updatePlayer(voterId, (player) => {
     if (proposedLeaderId && proposedLeaderId !== currentLeader) {
@@ -105,15 +81,11 @@ export const proposeRoomLeader = (
   });
 
   if (proposedLeaderId) {
-    const gameClone = cloneDeep(gameManager.snapshot()); // to avoid selector memoisation
-    const playersInThisRoom = selectPlayerIdsInEachRoom(gameClone)[roomName];
-    const votesDict = selectDictionaryOfVotesForPlayers(gameClone);
-    const votesForLeader = votesDict[proposedLeaderId].map(
-      (vote) => vote.voterId
-    );
+    const playersInThisRoom = gameManager.playersInRoom(roomName);
+    const votesForLeader = gameManager.votesAgainstPlayer(proposedLeaderId);
 
-    if (votesForLeader.length > playersInThisRoom.length / 2) {
-      usurpLeader(gameId, roomName, proposedLeaderId, votesForLeader);
+    if (votesForLeader.length > Object.keys(playersInThisRoom).length / 2) {
+      usurpLeader(gameId, roomName, proposedLeaderId, votesForLeader.map(vote => vote.voterId));
     }
   }
 }
@@ -130,4 +102,25 @@ export const startGame = (
     game.currentTimerSeconds = game.rounds[0].timerSeconds;
   });
   gameManager.startTimer();
+};
+
+const usurpLeader = (
+  gameId: string,
+  roomName: RoomName,
+  newLeaderId: string,
+  voterIds: string[]
+): void => {
+  const gameManager = new GameManager(gameId);
+
+  gameManager.addLeaderRecord(roomName, {
+    method: LeaderRecordMethod.USURPATION,
+    leaderId: newLeaderId,
+    votes: Object.fromEntries(voterIds.map((id) => [id, 1])),
+  });
+
+  for (let voterId of voterIds) {
+    gameManager.updatePlayer(voterId, (player) => {
+      delete player.leaderVote;
+    });
+  }
 };
