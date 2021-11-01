@@ -123,6 +123,10 @@ export class GameManager {
     throw new Error("Couldn't find a round");
   }
 
+  public getPlayer(playerId: string): Player {
+    return this.managePlayer(playerId).snapshot();
+  }
+
   public managePlayer(
     playerId: string,
     aliasIds: string[] = []
@@ -157,6 +161,13 @@ export class GameManager {
     );
   }
 
+  public pushNotificationToPlayerById(
+    playerId: string,
+    message: string,
+    toastOptions: ToastOptions = {}
+  ): void {
+    this.managePlayer(playerId).pushNotification(message, toastOptions)
+  }
 
   public pushNotificationToPlayers(
     message: string,

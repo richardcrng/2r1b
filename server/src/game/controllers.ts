@@ -83,7 +83,7 @@ export const proposeRoomLeader = (
     const votesForLeader = gameManager.votesAgainstPlayer(proposedLeaderId);
 
     if (votesForLeader.length > Object.keys(playersInThisRoom).length / 2) {
-      usurpLeader(gameId, roomName, proposedLeaderId, votesForLeader.map(vote => vote.voterId));
+      usurpLeader(gameId, roomName, proposedLeaderId, currentLeader, votesForLeader.map(vote => vote.voterId));
     }
   }
 }
@@ -106,6 +106,7 @@ const usurpLeader = (
   gameId: string,
   roomName: RoomName,
   newLeaderId: string,
+  oldLeaderId: string,
   voterIds: string[]
 ): void => {
   const gameManager = new GameManager(gameId);
@@ -121,4 +122,12 @@ const usurpLeader = (
       delete player.leaderVote;
     });
   }
+
+  gameManager.pushNotificationToPlayers(
+    `${gameManager.getPlayer(newLeaderId).name} usurps ${
+      gameManager.getPlayer(oldLeaderId).name
+    } as leader`,
+    {},
+    (player) => !!gameManager.playersInRoom(roomName)[player.socketId]
+  );
 };
