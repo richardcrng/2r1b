@@ -131,7 +131,7 @@ export type ServerEventListeners = {
   [ServerEvent.GAME_NOTIFICATION]: (
     gameId: string,
     message: string,
-    toastOptions: ToastOptions
+    toastOptions?: ToastOptions
   ) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
@@ -140,7 +140,7 @@ export type ServerEventListeners = {
   [ServerEvent.PLAYER_NOTIFICATION]: (
     playersToNotify: Record<string, true>,
     message: string,
-    toastOptions: ToastOptions
+    toastOptions?: ToastOptions
   ) => void;
   [ServerEvent.PLAYER_NOT_FOUND]: () => void;
   [ServerEvent.REDIRECT_TO_LOBBY]: () => void;

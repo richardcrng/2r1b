@@ -11,9 +11,6 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
-import { cloneDeep, last } from 'lodash';
-import { selectDictionaryOfVotesForPlayers, selectPlayerIdsInEachRoom } from '../../../client/src/selectors/game';
-
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
   const targetRoom = gameManager.currentRound().round.rooms[roomName];
@@ -44,7 +41,8 @@ export const createGame = (data: CreateGameEvent): void => {
     status: GameStatus.LOBBY,
     rounds: createStartingRounds()
   };
-  new GameManager(gameId).create(game);
+  const gameManager = new GameManager(gameId)
+  gameManager.create(game);
 };
 
 export const incrementRoleInGame = (
