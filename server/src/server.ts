@@ -6,16 +6,17 @@ import { addGameListeners } from "./game/listeners";
 import { addPlayerListeners } from "./player/listeners";
 
 const httpServer = createServer(app);
-const io: ServerIO = new Server(httpServer, {
+
+export const SERVER_IO: ServerIO = new Server(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-io.on("connection", (socket: ServerSocket) => {
-  addGameListeners(socket, io);
-  addPlayerListeners(socket, io);
+SERVER_IO.on("connection", (socket: ServerSocket) => {
+  addGameListeners(socket);
+  addPlayerListeners(socket);
 });
 
 export default httpServer;
