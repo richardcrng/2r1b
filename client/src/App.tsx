@@ -1,14 +1,17 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 import useMobileVH from "./hooks/useMobileVH";
 import GameRoute from "./routes/GameRoute";
 import IndexRoute from "./routes/IndexRoute";
 import ReferenceRoute from "./routes/ReferenceRoute";
 
 function App() {
-  useMobileVH()
+  useMobileVH();
 
   return (
     <Router>
+      <ToastContainer />
       <main
         className='background'
         style={{

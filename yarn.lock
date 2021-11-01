@@ -10585,6 +10585,13 @@ react-storage-hooks@^4.0.1:
   resolved "https://registry.yarnpkg.com/react-storage-hooks/-/react-storage-hooks-4.0.1.tgz#e30ed5cda48c77c431ecc02ec3824bd615f5b7fb"
   integrity sha512-fetDkT5RDHGruc2NrdD1iqqoLuXgbx6AUpQSQLLkrCiJf8i97EtwJNXNTy3+GRfsATLG8TZgNc9lGRZOaU5yQA==
 
+react-toastify@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-8.0.3.tgz#7fbf65f69ec357aab8dd03c1496f9177aa92409a"
+  integrity sha512-rv3koC7f9lKKSkdpYgo/TGzgWlrB/aaiUInF1DyV7BpiM4kyTs+uhu6/r8XDMtBY2FOIHK+FlK3Iv7OzpA/tCA==
+  dependencies:
+    clsx "^1.1.1"
+
 react-universal-interface@^0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/react-universal-interface/-/react-universal-interface-0.6.2.tgz#5e8d438a01729a4dbbcbeeceb0b86be146fe2b3b"

@@ -1,3 +1,4 @@
+import { ToastOptions } from 'react-toastify';
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
@@ -38,15 +39,17 @@ export enum ServerEvent {
   GAME_GOTTEN = "game-gotten",
   GAME_JOINED = "game-joined",
   GAME_NOT_FOUND = "game-not-found",
+  GAME_NOTIFICATION = "game-notification",
   GAME_OVER = 'game-over',
   GAME_UPDATED = "game-updated",
   PLAYER_GOTTEN = "player-gotten",
+  PLAYER_NOTIFICATION = 'player-notification',
   PLAYER_NOT_FOUND = "player-not-found",
   PLAYER_UPDATED = "player-updated",
   REDIRECT_TO_LOBBY = "redirect-to-lobby",
   RESULTS_SHOWN = "results-shown",
   ROLE_AND_ROOM_ALLOCATIONS_MADE = 'role-and-room-allocations-made',
-  ROUND_STARTED = 'round-started'
+  ROUND_STARTED = 'round-started',
 }
 
 export enum GameOverReason {
@@ -65,7 +68,9 @@ export type ClientEventListeners = {
     appointerId: string,
     appointedLeaderId: string
   ) => void;
+
   [ClientEvent.CREATE_GAME]: (e: CreateGameEvent) => void;
+
   [ClientEvent.FLIP_CARD]: (
     gameId: string,
     keyholderId: string,
@@ -73,19 +78,24 @@ export type ClientEventListeners = {
     cardIdx: number,
     card: Card
   ) => void;
+
   [ClientEvent.GET_GAME]: (gameId: string) => void;
+
   [ClientEvent.GET_PLAYER]: (
     gameId: string,
     playerId: string,
     aliasIds: string[]
   ) => void;
+
   [ClientEvent.INCREMENT_ROLE]: (
     gameId: string,
     roleKey: RoleKey,
     increment: number
   ) => void;
+
   [ClientEvent.JOIN_GAME]: (gameId: string, player: Player) => void;
   [ClientEvent.NEXT_ROUND]: (gameId: string) => void;
+
   [ClientEvent.PROPOSE_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -111,13 +121,27 @@ export type ServerEventListeners = {
     card: Card
   ) => void;
   [ServerEvent.GAME_CREATED]: (game: Game) => void;
-  [ServerEvent.GAME_OVER]: (gameId: string, reason: GameOverReason, game: Game) => void;
+  [ServerEvent.GAME_OVER]: (
+    gameId: string,
+    reason: GameOverReason,
+    game: Game
+  ) => void;
   [ServerEvent.GAME_GOTTEN]: (gameId: string, game: Game) => void;
   [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
+  [ServerEvent.GAME_NOTIFICATION]: (
+    gameId: string,
+    message: string,
+    toastOptions: ToastOptions
+  ) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
+  [ServerEvent.PLAYER_NOTIFICATION]: (
+    playersToNotify: Record<string, true>,
+    message: string,
+    toastOptions: ToastOptions
+  ) => void;
   [ServerEvent.PLAYER_NOT_FOUND]: () => void;
   [ServerEvent.REDIRECT_TO_LOBBY]: () => void;
   [ServerEvent.RESULTS_SHOWN]: (gameId: string) => void;
