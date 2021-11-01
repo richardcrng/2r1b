@@ -10,7 +10,7 @@ interface Props {
   onGameStart(): void;
   onGameRestart: () => void;
   onNextRound: () => void;
-  onProposeLeader(proposedLeaderId: string, currentRoom: RoomName): void;
+  onProposeLeader(proposedLeaderId: string | undefined, currentRoom: RoomName): void;
   onRoleIncrement: (roleKey: RoleKey, increment: number) => void;
   players: Player[];
   player: Player;

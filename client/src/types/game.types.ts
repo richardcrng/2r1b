@@ -35,13 +35,21 @@ export interface Deck {
   // stacked: number[];
 }
 
+export interface LeaderVote {
+  voterId: string;
+  proposedLeaderId: string;
+  roomName: RoomName;
+  timestamp: number;
+}
+
 export interface Player {
   socketId: string;
   gameId?: string;
   name?: string;
   isHost?: boolean;
   role?: RoleKey;
-  colors?: string[]
+  colors?: string[];
+  leaderVote?: LeaderVote;
 }
 
 export interface PlayerWithRoom extends Player {

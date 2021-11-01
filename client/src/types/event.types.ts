@@ -90,7 +90,7 @@ export type ClientEventListeners = {
     gameId: string,
     roomName: RoomName,
     proposerId: string,
-    proposedLeaderId: string
+    proposedLeaderId?: string
   ) => void;
 
   [ClientEvent.RESET_GAME]: (gameId: string) => void;

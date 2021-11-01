@@ -4,8 +4,10 @@ import styled from 'styled-components'
 import { Game, Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import { getRoleDefinition } from '../../../utils/role-utils';
 import RoleCard from '../../role/card/RoleCard';
-import Timer from '../../../lib/atoms/Timer';
+import { selectNonZeroOrderedVotesForPlayers } from '../../../selectors/game';
 import PlayerLeaderProposal from '../../player/interaction/PlayerLeaderProposal';
+import GameOngoingVotes from './votes/GameOngoingVotes';
+import Timer from '../../../lib/atoms/Timer';
 
 const Container = styled.div`
   display: grid;
@@ -56,12 +58,15 @@ interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
-  onProposeLeader(proposedLeaderId: string, roomName: RoomName): void;
+  onProposeLeader(proposedLeaderId: string | undefined, roomName: RoomName): void;
   onNextRound: () => void;
   onGameRestart: () => void;
 }
 
 function GameOngoing(props: Props) {
+
+  const votesForPlayers = selectNonZeroOrderedVotesForPlayers(props.game);
+  const votesInThisRoom = votesForPlayers.filter(([playerId]) => props.players[playerId].room === props.currentRoom)
 
   const { state, dispatch, actions } = useRiducer(DEFAULT_PLAYER_GAME_STATE);
 
@@ -99,8 +104,15 @@ function GameOngoing(props: Props) {
           <PlayerLeaderProposal
             currentLeader={currentLeader}
             currentRoom={currentRoom}
-            onAppointLeader={onAppointLeader}
-            onProposeLeader={onProposeLeader}
+            currentVote={player.leaderVote?.proposedLeaderId}
+            onAppointLeader={(id, roomName) => {
+              onAppointLeader(id, roomName);
+              handleModalClose();
+            }}
+            onProposeLeader={(id, roomName) => {
+              onProposeLeader(id, roomName);
+              handleModalClose();
+            }}
             player={player}
             players={players}
           />
@@ -127,12 +139,20 @@ function GameOngoing(props: Props) {
         <Header>
           <h1>Situation Room {props.currentRoom}</h1>
           <h2>Leader: {props.currentLeader?.name ?? "<none>"}</h2>
+          <hr />
         </Header>
         <TimerArea>
           <Timer secondsShown={props.game.currentTimerSeconds} />
+          <hr />
         </TimerArea>
         <VotesArea>
-          Nothing to show here for now
+          <h3>
+            Votes
+          </h3>
+          <GameOngoingVotes
+            players={props.players}
+            votes={votesInThisRoom}
+          />
         </VotesArea>
         <Actions>
           <Button secondary fluid onClick={handleLeaderProposal}>
@@ -152,7 +172,9 @@ function GameOngoing(props: Props) {
         onClose={handleModalClose}
         onOpen={handleModalOpen}
       >
-        <Modal.Header>{state.modal.title && state.modal.title(props)}</Modal.Header>
+        <Modal.Header>
+          {state.modal.title && state.modal.title(props)}
+        </Modal.Header>
         <Modal.Content>
           {ModalContent && <ModalContent {...props} />}
         </Modal.Content>

@@ -11,6 +11,8 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
+import { cloneDeep, last } from 'lodash';
+import { selectDictionaryOfVotesForPlayers, selectPlayerIdsInEachRoom } from '../../../client/src/selectors/game';
 
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
@@ -55,6 +57,38 @@ export const incrementRoleInGame = (
   })
 };
 
+export const proposeRoomLeader = (
+  gameId: string,
+  roomName: RoomName,
+  voterId: string,
+  proposedLeaderId?: string
+): void => {
+  const gameManager = new GameManager(gameId);
+
+  const currentLeader = gameManager.currentLeaderRecord(roomName)!.leaderId
+
+  gameManager.updatePlayer(voterId, (player) => {
+    if (proposedLeaderId && proposedLeaderId !== currentLeader) {
+      player.leaderVote = {
+        roomName,
+        voterId,
+        proposedLeaderId,
+        timestamp: Date.now(),
+      };
+    } else {
+      delete player.leaderVote
+    }
+  });
+
+  if (proposedLeaderId) {
+    const playersInThisRoom = gameManager.playersInRoom(roomName);
+    const votesForLeader = gameManager.votesAgainstPlayer(proposedLeaderId);
+
+    if (votesForLeader.length > Object.keys(playersInThisRoom).length / 2) {
+      usurpLeader(gameId, roomName, proposedLeaderId, votesForLeader.map(vote => vote.voterId));
+    }
+  }
+}
 
 export const startGame = (
   gameId: string,
@@ -68,4 +102,25 @@ export const startGame = (
     game.currentTimerSeconds = game.rounds[0].timerSeconds;
   });
   gameManager.startTimer();
+};
+
+const usurpLeader = (
+  gameId: string,
+  roomName: RoomName,
+  newLeaderId: string,
+  voterIds: string[]
+): void => {
+  const gameManager = new GameManager(gameId);
+
+  gameManager.addLeaderRecord(roomName, {
+    method: LeaderRecordMethod.USURPATION,
+    leaderId: newLeaderId,
+    votes: Object.fromEntries(voterIds.map((id) => [id, 1])),
+  });
+
+  for (let voterId of voterIds) {
+    gameManager.updatePlayer(voterId, (player) => {
+      delete player.leaderVote;
+    });
+  }
 };

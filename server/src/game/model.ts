@@ -1,6 +1,7 @@
-import { chunk, cloneDeep, shuffle } from "lodash";
+import { chunk, cloneDeep, last, shuffle } from "lodash";
+import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
-import { Game, LeaderRecord, LeaderRecordMethod, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
+import { Game, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
@@ -101,6 +102,14 @@ export class GameManager {
     this.io.emit(ServerEvent.GAME_CREATED, this._pointer());
   }
 
+  public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
+    return last(
+      this._pointer().rounds[this.currentRound().idx].rooms[
+        roomName
+      ].leadersRecord
+    );
+  }
+
   public currentRound(): { round: Round, idx: number } {
     for (let [idx, round] of Object.entries(this._pointer().rounds)) {
       if (round.status === RoundStatus.ONGOING) {
@@ -115,6 +124,20 @@ export class GameManager {
     aliasIds: string[] = []
   ): PlayerManager {
     return new PlayerManager(this, playerId, aliasIds);
+  }
+
+  public players(): Readonly<Record<string, Player>> {
+    return this.snapshot().players
+  }
+
+  public playersInRoom(roomName: RoomName): Readonly<Record<string, Player>> {
+    const { playerAllocation } = this.currentRound().round;
+    return Object.values(this.players()).reduce(
+      (acc, curr) => playerAllocation[curr.socketId] === roomName
+        ? { ...acc, [curr.socketId]: curr }
+        : acc,
+      {} as Record<string, Player>
+    )
   }
 
   public set(game: Game): void {
@@ -149,5 +172,13 @@ export class GameManager {
 
   public updatePlayer(playerId: string, mutativeCb: (player: Player) => void) {
     this.managePlayer(playerId).update(mutativeCb);
+  }
+
+  public votesAgainstEachPlayer(): Readonly<Record<string, LeaderVote[]>> {
+    return selectDictionaryOfVotesForPlayers(this.snapshot());
+  }
+
+  public votesAgainstPlayer(playerId: string): ReadonlyArray<LeaderVote> {
+    return this.votesAgainstEachPlayer()[playerId]
   }
 }

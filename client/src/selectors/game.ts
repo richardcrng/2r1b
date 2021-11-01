@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { Game, PlayerWithRoom, RolesCount, RoomName, RoundStatus } from "../types/game.types";
+import { Game, LeaderVote, PlayerWithRoom, RolesCount, RoomName, RoundStatus } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 import { mapValues, last } from 'lodash';
@@ -11,6 +11,11 @@ export const selectGameRounds = (game: Game) => game.rounds
 export const selectTotalCountOfGameRoles = createSelector(
   selectGameRolesInPlayCount,
   (rolesCount) => Object.values(rolesCount).reduce((acc, val) => acc + val, 0)
+)
+
+export const selectGamePlayerIds = createSelector(
+  selectGamePlayers,
+  (players) => Object.keys(players)
 )
 
 export const selectGamePlayersList = createSelector(
@@ -91,7 +96,7 @@ export const selectCurrentGameRound = createSelector(
 export const selectCurrentGameRoomAllocation = createSelector(
   selectCurrentGameRound,
   (round) => round?.playerAllocation
-)
+);
 
 export const selectGamePlayersWithRooms = createSelector(
   selectGamePlayers,
@@ -101,6 +106,23 @@ export const selectGamePlayersWithRooms = createSelector(
     room: roomAllocation[player.socketId] as RoomName | undefined
   }))
 )
+
+export const selectPlayerIdsInEachRoom = createSelector(
+  selectGamePlayersWithRooms,
+  (players): Record<RoomName, string[]> => Object.values(players).reduce(
+    (acc, curr) => {
+      if (curr.room) {
+        return {
+          ...acc,
+          [curr.room]: [...acc[curr.room], curr.socketId]
+        }
+      } else {
+        return acc
+      }
+    },
+    { [RoomName.A]: [], [RoomName.B]: [] }
+  )
+);
 
 export const selectCurrentRoundRooms = createSelector(
   selectCurrentGameRound,
@@ -122,3 +144,39 @@ export const selectCurrentRoomCurrentLeaders = createSelector(
   (leaderRecordDict) =>
     mapValues(leaderRecordDict, (leaderRecord) => leaderRecord?.leaderId)
 );
+
+export const selectDictionaryOfVotesForPlayers = createSelector(
+  selectGamePlayersList,
+  (playerList): Record<string, LeaderVote[]> => {
+    const votes: Record<string, LeaderVote[]> = Object.fromEntries(
+      playerList.map(player => [player.socketId, []])
+    )
+
+    for (let player of playerList) {
+      const currVote = player.leaderVote;
+      if (currVote) {
+        votes[currVote.proposedLeaderId].push(currVote)
+      }
+    }
+
+    for (let playerId in votes) {
+      votes[playerId].sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+    }
+
+    return votes
+  }
+)
+
+export const selectOrderedVotesForPlayers = createSelector(
+  selectDictionaryOfVotesForPlayers,
+  (voteDictionary) => {
+    const voteEntries = Object.entries(voteDictionary);
+    const sortedVoteEntries = voteEntries.sort(([_, votesForA], [__, votesForB]) => votesForA.length < votesForB.length ? -1 : 1)
+    return sortedVoteEntries;
+  }
+)
+
+export const selectNonZeroOrderedVotesForPlayers = createSelector(
+  selectOrderedVotesForPlayers,
+  (voteEntries) => voteEntries.filter(([_, playerVotes]) => playerVotes.length > 0)
+)
