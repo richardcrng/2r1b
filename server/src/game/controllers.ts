@@ -11,15 +11,18 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
+
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
   const targetRoom = gameManager.currentRound().round.rooms[roomName];
+
   if (targetRoom.leadersRecord.length === 0) {
     gameManager.addLeaderRecord(roomName, {
       method: LeaderRecordMethod.APPOINTMENT,
       leaderId: appointedLeaderId,
       appointerId,
     });
+    gameManager.pushNotificationToRoom(roomName, `${gameManager.getPlayer(appointedLeaderId).name} has been appointed as leader by ${gameManager.getPlayer(appointerId).name}`)
   }
 }
 
@@ -123,11 +126,11 @@ const usurpLeader = (
     });
   }
 
-  gameManager.pushNotificationToPlayers(
+  gameManager.pushNotificationToRoom(
+    roomName,
     `${gameManager.getPlayer(newLeaderId).name} usurps ${
       gameManager.getPlayer(oldLeaderId).name
     } as leader`,
     {},
-    (player) => !!gameManager.playersInRoom(roomName)[player.socketId]
   );
 };

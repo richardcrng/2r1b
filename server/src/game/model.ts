@@ -161,12 +161,20 @@ export class GameManager {
     );
   }
 
+  public pushNotificationToRoom(
+    roomName: RoomName,
+    message: string,
+    toastOptions: ToastOptions = {}
+  ): void {
+    this.pushNotificationToPlayers(message, toastOptions, (player) => !!this.playersInRoom(roomName)[player.socketId]);
+  }
+
   public pushNotificationToPlayerById(
     playerId: string,
     message: string,
     toastOptions: ToastOptions = {}
   ): void {
-    this.managePlayer(playerId).pushNotification(message, toastOptions)
+    this.managePlayer(playerId).pushNotification(message, toastOptions);
   }
 
   public pushNotificationToPlayers(
@@ -174,10 +182,13 @@ export class GameManager {
     toastOptions: ToastOptions = {},
     where: (player: Player) => boolean = () => true
   ): void {
-    const playersToNotify = Object.values(this.players()).filter(where)
+    const playersToNotify = Object.values(this.players()).filter(where);
     for (let player of playersToNotify) {
-      this.managePlayer(player.socketId).pushNotification(message, toastOptions)
-    };
+      this.managePlayer(player.socketId).pushNotification(
+        message,
+        toastOptions
+      );
+    }
   }
 
   public set(game: Game): void {
