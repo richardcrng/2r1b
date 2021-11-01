@@ -65,6 +65,7 @@ export const startGame = (
   gameManager.update(game => {
     game.status = GameStatus.ONGOING;
     game.rounds[0].status = RoundStatus.ONGOING;
+    game.currentTimerSeconds = game.rounds[0].timerSeconds;
   });
   gameManager.startTimer();
 };
