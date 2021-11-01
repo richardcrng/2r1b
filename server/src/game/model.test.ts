@@ -1,6 +1,7 @@
 
 import { Player, RolesCount, RoomName } from '../../../client/src/types/game.types';
 import { RoleKey } from '../../../client/src/types/role.types';
+import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { createDummyGame, createDummyPlayers } from '../utils';
 import { GameManager } from './model';
 
@@ -11,7 +12,7 @@ describe('assignPlayersToRooms', () => {
     });
     const gameManager = new GameManager(testGame.id, { [testGame.id]: testGame })
     gameManager.assignInitialRooms();
-    const roomAllocationValues = Object.values(gameManager._pointer().rounds[0].playerAllocation);
+    const roomAllocationValues = Object.values(gameManager.snapshot().rounds[0].playerAllocation);
     expect(roomAllocationValues).toHaveLength(6);
     expect(roomAllocationValues.filter(val => val === RoomName.A)).toHaveLength(3);
     expect(roomAllocationValues.filter((val) => val === RoomName.B)).toHaveLength(3);
@@ -26,7 +27,7 @@ describe('assignPlayersToRooms', () => {
     });
     gameManager.assignInitialRooms();
     const roomAllocationValues = Object.values(
-      gameManager._pointer().rounds[0].playerAllocation
+      gameManager.snapshot().rounds[0].playerAllocation
     );
     expect(roomAllocationValues).toHaveLength(7);
     expect(
@@ -38,91 +39,93 @@ describe('assignPlayersToRooms', () => {
   });
 })
 
-// describe('assignInitialRolesToPlayers', () => {
-//   test("Assigns 8 roles in simple 8 player setup", () => {
-//     const players: Record<string, Partial<Player>> = {
-//       a: {},
-//       b: {},
-//       c: {},
-//       d: {},
-//       e: {},
-//       f: {},
-//       g: {},
-//       h: {}
-//     }
+describe('assignInitialRoles', () => {
+  test("Assigns 8 roles in simple 8 player setup", () => {
+    const testRolesCount: Partial<RolesCount> = {
+      PRESIDENT_BLUE: 1,
+      BOMBER_RED: 1,
+      DOCTOR_BLUE: 1,
+      ENGINEER_RED: 1,
+      TEAM_BLUE: 2,
+      TEAM_RED: 2,
+    };
 
-//     const rolesCount: Partial<RolesCount> = {
-//       PRESIDENT_BLUE: 1,
-//       BOMBER_RED: 1,
-//       DOCTOR_BLUE: 1,
-//       ENGINEER_RED: 1,
-//       TEAM_BLUE: 2,
-//       TEAM_RED: 2
-//     }
+    const testGame = createDummyGame({
+      players: createDummyPlayers(8),
+      rolesCount: {
+        ...DEFAULT_STARTING_ROLES_COUNT,
+        ...testRolesCount,
+      },
+    });
+    const gameManager = new GameManager(testGame.id, {
+      [testGame.id]: testGame,
+    });
 
-//     assignInitialRolesToPlayers(rolesCount, players);
+    gameManager.assignInitialRoles();
 
-//     expect(Object.keys(players)).toHaveLength(8);
+    const { players } = gameManager.snapshot();
 
-//     for (let playerId in players) {
-//       expect(typeof players[playerId].role).toBe('string');
-//       expect(["PRESIDENT_BLUE", "BOMBER_RED", "DOCTOR_BLUE", "ENGINEER_RED", "TEAM_BLUE", "TEAM_RED"]).toContain(players[playerId].role)
-//     }
+    expect(Object.keys(players)).toHaveLength(8);
+    for (let playerId in players) {
+      expect(typeof players[playerId].role).toBe('string');
+      expect(["PRESIDENT_BLUE", "BOMBER_RED", "DOCTOR_BLUE", "ENGINEER_RED", "TEAM_BLUE", "TEAM_RED"]).toContain(players[playerId].role)
+    }
 
-//     const assignedRoles = Object.values(players).map(({ role }) => role);
+    const assignedRoles = Object.values(players).map(({ role }) => role);
 
-//     for (let key in rolesCount) {
-//       const roleKey = key as RoleKey
-//       expect(assignedRoles.filter(role => role === roleKey).length).toBe(rolesCount[roleKey] as number)
-//     }
-//   })
+    for (let key in testRolesCount) {
+      const roleKey = key as RoleKey
+      expect(assignedRoles.filter(role => role === roleKey).length).toBe(testRolesCount[roleKey] as number)
+    }
+  })
 
-//   test("Assigns 8/9 roles in simple 8 player setup", () => {
-//     const players: Record<string, Partial<Player>> = {
-//       a: {},
-//       b: {},
-//       c: {},
-//       d: {},
-//       e: {},
-//       f: {},
-//       g: {},
-//       h: {},
-//     };
+  test("Assigns 8/9 roles in simple 8 player setup", () => {
+    const testRolesCount: Partial<RolesCount> = {
+      PRESIDENT_BLUE: 1,
+      BOMBER_RED: 1,
+      VICE_PRESIDENT_BLUE: 1,
+      TINKERER_RED: 1,
+      TEAM_BLUE: 2,
+      TEAM_RED: 2,
+      PRIVATE_EYE_GREY: 1,
+    };
 
-//     const rolesCount: Partial<RolesCount> = {
-//       PRESIDENT_BLUE: 1,
-//       BOMBER_RED: 1,
-//       VICE_PRESIDENT_BLUE: 1,
-//       TINKERER_RED: 1,
-//       TEAM_BLUE: 2,
-//       TEAM_RED: 2,
-//       PRIVATE_EYE_GREY: 1
-//     };
+    const testGame = createDummyGame({
+      players: createDummyPlayers(8),
+      rolesCount: {
+        ...DEFAULT_STARTING_ROLES_COUNT,
+        ...testRolesCount,
+      },
+    });
+    const gameManager = new GameManager(testGame.id, {
+      [testGame.id]: testGame,
+    });
 
-//     assignInitialRolesToPlayers(rolesCount, players);
+    gameManager.assignInitialRoles();
 
-//     expect(Object.keys(players)).toHaveLength(8);
+    const { players } = gameManager.snapshot();
+    expect(Object.keys(players)).toHaveLength(8);
 
-//     for (let playerId in players) {
-//       expect(typeof players[playerId].role).toBe("string");
-//       expect([
-//         "PRESIDENT_BLUE",
-//         "BOMBER_RED",
-//         "VICE_PRESIDENT_BLUE",
-//         "TINKERER_RED",
-//         "TEAM_BLUE",
-//         "TEAM_RED",
-//         "PRIVATE_EYE_GREY"
-//       ]).toContain(players[playerId].role);
-//     }
+    for (let playerId in players) {
+      expect(typeof players[playerId].role).toBe("string");
+      expect([
+        "PRESIDENT_BLUE",
+        "BOMBER_RED",
+        "VICE_PRESIDENT_BLUE",
+        "TINKERER_RED",
+        "TEAM_BLUE",
+        "TEAM_RED",
+        "PRIVATE_EYE_GREY",
+      ]).toContain(players[playerId].role);
+    }
 
-//     const assignedRoles = Object.values(players).map(({ role }) => role);
+    const assignedRoles = Object.values(players).map(({ role }) => role);
 
-//     for (let key in rolesCount) {
-//       const roleKey = key as RoleKey;
-//       expect(assignedRoles.filter((role) => role === roleKey).length).toBeLessThanOrEqual(
-//         rolesCount[roleKey] as number
-//       );
-//     }
-//   });
-// })
+    for (let key in testRolesCount) {
+      const roleKey = key as RoleKey;
+      expect(
+        assignedRoles.filter((role) => role === roleKey).length
+      ).toBeLessThanOrEqual(testRolesCount[roleKey] as number);
+    }
+  });
+})
