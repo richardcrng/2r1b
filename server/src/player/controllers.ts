@@ -14,7 +14,7 @@ export const joinPlayerToGame = (
     gameId,
     colors: getColors(5)
   });
-  gameManager.pushNotificationToPlayers(`${playerData.name} joined`, {}, ({ socketId }) => socketId !== playerData.socketId)
+  gameManager.pushNotificationToPlayers(`${playerData.name} joined`, { autoClose: 2000 }, ({ socketId }) => socketId !== playerData.socketId)
 };
 
 export const updatePlayer = (
