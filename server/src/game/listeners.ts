@@ -13,7 +13,10 @@ export const addGameListeners = (socket: ServerSocket): void => {
 
   socket.on(ClientEvent.INCREMENT_ROLE, incrementRoleInGame)
 
-  socket.on(ClientEvent.CREATE_GAME, createGame);
+  socket.on(ClientEvent.CREATE_GAME, (data) => {
+    const game = createGame(data);
+    socket.emit(ServerEvent.GAME_CREATED, game);
+  });
 
   socket.on(ClientEvent.GET_GAME, (gameId) => {
     const game = new GameManager(gameId).snapshot();
