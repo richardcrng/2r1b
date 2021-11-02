@@ -44,7 +44,6 @@ export default function usePlayer(
   }, [socket, gameId, playerSocketId, aliasIds]);
 
   useSocketListener(ServerEvent.PLAYER_GOTTEN, (id, player) => {
-    console.log("received player", player);
     [...aliasIds, playerId].includes(id) && setPlayer(player);
   });
 
