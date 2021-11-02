@@ -1,6 +1,6 @@
 import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders, selectGamePlayersWithRooms } from "../../selectors/game";
 import { Game, GameStatus, Player, RoomName } from "../../types/game.types";
-import { PlayerActionAbdicationOffered } from "../../types/player-action.types";
+import { PlayerActionAbdicationOffered, PlayerActionShareType } from "../../types/player-action.types";
 import { RoleKey } from "../../types/role.types";
 import GameLobby from "./lobby/GameLobby";
 import GameOngoing from "./ongoing/GameOngoing";
@@ -12,7 +12,7 @@ interface Props {
   onGameRestart: () => void;
   onNextRound: () => void;
   onOfferAbdication: (roomName: RoomName, proposedLeaderId: string) => void;
-  onOfferShare(roomName: RoomName, offeredPlayerId: string): void;
+  onOfferShare(roomName: RoomName, offeredPlayerId: string, shareType: PlayerActionShareType): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,
     currentRoom: RoomName

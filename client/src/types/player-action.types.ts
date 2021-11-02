@@ -29,8 +29,12 @@ export interface PlayerActionPublicRevealOffered extends PlayerActionBase {
   revealerId: string;
 }
 
+export type PlayerActionShareType =
+  | PlayerActionType.CARD_SHARE_OFFERED
+  | PlayerActionType.COLOR_SHARE_OFFERED;
+
 export interface PlayerActionShareOfferedBase extends PlayerActionBase {
-  type: PlayerActionType.CARD_SHARE_OFFERED | PlayerActionType.COLOR_SHARE_OFFERED;
+  type: PlayerActionShareType;
   sharerId: string;
   offeredPlayerId: string;
 }

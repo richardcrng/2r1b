@@ -2,14 +2,14 @@ import { Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import PlayerDropdown from "../dropdown/PlayerDropdown";
 import { useState } from "react";
 import { Button } from "semantic-ui-react";
-import { PlayerActionShareOffered } from "../../../types/player-action.types";
+import { PlayerActionShareOffered, PlayerActionShareType, PlayerActionType } from "../../../types/player-action.types";
 
 interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>;
   currentRoom: RoomName;
   currentOffer?: PlayerActionShareOffered;
-  onOfferShare(currentRoom: RoomName, playerId: string): void;
+  onOfferShare(currentRoom: RoomName, playerId: string, shareType: PlayerActionShareType): void;
   onPlayerSelect?(playerId: string): void;
   selectedPlayerId?: string;
 }
@@ -54,7 +54,7 @@ function PlayerShareOffer({
         disabled={!!currentOffer?.offeredPlayerId || !selectedPlayerId}
         fluid
         primary
-        onClick={() => onOfferShare(currentRoom, selectedPlayerId!)}
+        onClick={() => onOfferShare(currentRoom, selectedPlayerId!, PlayerActionType.CARD_SHARE_OFFERED)}
       >
         Offer share
       </Button>

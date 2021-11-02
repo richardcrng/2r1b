@@ -10,7 +10,7 @@ import GameOngoingVotes from './votes/GameOngoingVotes';
 import Timer from '../../../lib/atoms/Timer';
 import PlayerLeaderAbdication from '../../player/interaction/PlayerLeaderAbdication';
 import usePlayerActions from '../../player/usePlayerActions';
-import { isPlayerAbdicationAction, isPlayerShareAction, PlayerActionAbdicationOffered } from '../../../types/player-action.types';
+import { isPlayerAbdicationAction, isPlayerShareAction, PlayerActionAbdicationOffered, PlayerActionShareType } from '../../../types/player-action.types';
 import PlayerShareOffer from '../../player/interaction/PlayerShareOffer';
 
 const Container = styled.div`
@@ -63,7 +63,7 @@ interface Props {
   players: Record<string, PlayerWithRoom>;
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
   onOfferAbdication(roomName: RoomName, proposedLeaderId?: string): void;
-  onOfferShare(roomName: RoomName, playerId: string): void
+  onOfferShare(roomName: RoomName, playerId: string, shareType: PlayerActionShareType): void
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,
@@ -182,8 +182,8 @@ function GameOngoing(props: Props) {
               currentRoom={currentRoom}
               player={player}
               players={players}
-              onOfferShare={(currentRoom, playerId) => {
-                onOfferShare(currentRoom, playerId);
+              onOfferShare={(currentRoom, playerId, shareType) => {
+                onOfferShare(currentRoom, playerId, shareType);
                 handleModalClose();
               }}
             />

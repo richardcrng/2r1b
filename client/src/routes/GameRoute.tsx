@@ -85,10 +85,10 @@ function GameRoute() {
             onOfferAbdication={(roomName, proposedLeaderId) => {
               socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
             }}
-            onOfferShare={(room, offeredPlayerId) => {
+            onOfferShare={(room, offeredPlayerId, shareType) => {
               socket.emit(ClientEvent.OFFER_SHARE, game.data!.id, {
                 id: `${ClientEvent.OFFER_SHARE}-${Date.now()}-${player.data!.socketId}`,
-                type: PlayerActionType.CARD_SHARE_OFFERED,
+                type: shareType,
                 room,
                 sharerId: player.data!.socketId,
                 offeredPlayerId
