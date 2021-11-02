@@ -9,7 +9,7 @@ import {
 } from "../../../client/src/types/game.types";
 import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
-import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
+import { DEFAULT_STARTING_ROLES_COUNT, getRoleName } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
 import { NotificationType } from "../../../client/src/types/notification.types";
 import { PlayerActionAbdicationOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
@@ -193,6 +193,12 @@ export const startGame = (
     game.currentTimerSeconds = game.rounds[0].timerSeconds;
   });
   gameManager.startTimer();
+  gameManager.pushPlayersNotification((player) => ({
+    type: NotificationType.GENERAL,
+    message: `⏳ Head to Room ${gameManager.getCurrentRoomFor(
+      player.socketId
+    )} - the round has started!`,
+  }));
 };
 
 const usurpLeader = (

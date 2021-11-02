@@ -162,6 +162,10 @@ export class GameManager {
     }
   }
 
+  public getCurrentRoomFor(playerId: string): RoomName {
+    return this.managePlayer(playerId).roomName();
+  }
+
   public getPlayer(playerId: string): Player | undefined {
     return this.managePlayer(playerId).snapshot();
   }
