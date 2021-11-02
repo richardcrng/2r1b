@@ -42,6 +42,25 @@ export const acceptAbdication: ClientEventListeners[ClientEvent.ACCEPT_ABDICATIO
   }, (player) => ![abdicatingLeaderId, proposedNewLeaderId].includes(player.socketId))
 }
 
+export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] =
+  (gameId, action): void => {
+    const gameManager = new GameManager(gameId);
+    const { sharerId, offeredPlayerId } = action;
+    const shareType = action.type === PlayerActionType.CARD_SHARE_OFFERED ? "card" : 'color';
+    const sharerName = gameManager.getPlayerOrFail(sharerId).name;
+    const offeredPlayerName = gameManager.getPlayerOrFail(offeredPlayerId).name;
+
+    gameManager.managePlayer(sharerId).resolvePendingAction(action, {
+      type: NotificationType.GENERAL,
+      message: `${offeredPlayerName} has accepted your ${shareType} share offer`,
+    });
+
+    gameManager.managePlayer(offeredPlayerId).resolvePendingAction(action, {
+      type: NotificationType.GENERAL,
+      message: `You have accepted ${sharerName}'s ${shareType} share offer`,
+    });
+  };
+
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
   const targetRoom = gameManager.currentRound().round.rooms[roomName];
@@ -113,6 +132,28 @@ export const declineAbdication: ClientEventListeners[ClientEvent.DECLINE_ABDICAT
       message: `${proposedLeaderName} has declined your abdication offer`,
     });
   };
+
+export const declineShare: ClientEventListeners[ClientEvent.DECLINE_SHARE] = (
+  gameId,
+  action
+): void => {
+  const gameManager = new GameManager(gameId);
+  const { sharerId, offeredPlayerId } = action;
+  const shareType =
+    action.type === PlayerActionType.CARD_SHARE_OFFERED ? "card" : "color";
+  const sharerName = gameManager.getPlayerOrFail(sharerId).name;
+  const offeredPlayerName = gameManager.getPlayerOrFail(offeredPlayerId).name;
+
+  gameManager.managePlayer(sharerId).resolvePendingAction(action, {
+    type: NotificationType.GENERAL,
+    message: `${offeredPlayerName} has declined your ${shareType} share offer`,
+  });
+
+  gameManager.managePlayer(offeredPlayerId).resolvePendingAction(action, {
+    type: NotificationType.GENERAL,
+    message: `You have declined ${sharerName}'s ${shareType} share offer`,
+  });
+};
 
 export const incrementRoleInGame = (
   gameId: string,
@@ -272,3 +313,25 @@ export const withdrawAbdicationOffer: ClientEventListeners[ClientEvent.WITHDRAW_
       message: `${abdicatingPlayerName} has withdrawn their abdication offer to you`,
     });
 }
+
+export const withdrawShareOffer: ClientEventListeners[ClientEvent.WITHDRAW_SHARE_OFFER] = (
+  gameId,
+  action
+): void => {
+  const gameManager = new GameManager(gameId);
+  const { sharerId, offeredPlayerId } = action;
+  const shareType =
+    action.type === PlayerActionType.CARD_SHARE_OFFERED ? "card" : "color";
+  const sharerName = gameManager.getPlayerOrFail(sharerId).name;
+  const offeredPlayerName = gameManager.getPlayerOrFail(offeredPlayerId).name;
+
+  gameManager.managePlayer(offeredPlayerId).resolvePendingAction(action, {
+    type: NotificationType.GENERAL,
+    message: `${sharerName} has withdrawn their ${shareType} share offer`,
+  });
+
+  gameManager.managePlayer(sharerId).resolvePendingAction(action, {
+    type: NotificationType.GENERAL,
+    message: `You have withdrawn your ${shareType} share offer for ${offeredPlayerName}`,
+  });
+};

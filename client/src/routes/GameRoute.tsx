@@ -7,7 +7,6 @@ import useSocketAliases from "../hooks/useSocketAliases";
 import { useSocket } from "../socket";
 import { ClientEvent } from "../types/event.types";
 import { GameStatus } from "../types/game.types";
-import { PlayerActionType } from "../types/player-action.types";
 
 function GameRoute() {
   const { gameId } = useParams<{ gameId: string }>();
