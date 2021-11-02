@@ -14,7 +14,7 @@ function ReferenceRoute() {
       <Route exact path={`${path}/roles`}>
         <RoleCardViewer
           onRoleSelect={(newRole) =>
-            history.push(`${url}/roles/${newRole.toLowerCase()}`)
+            history.push(`${url}/roles/${newRole.toLowerCase().replaceAll("_", "-")}`)
           }
         />
       </Route>
@@ -22,12 +22,12 @@ function ReferenceRoute() {
         <Route
           key={roleKey}
           exact
-          path={`${path}/roles/${roleKey.toLowerCase()}`}
+          path={`${path}/roles/${roleKey.toLowerCase().replaceAll("_", "-")}`}
         >
           <RoleCardViewer
             selectedRole={roleKey}
             onRoleSelect={(newRole) =>
-              history.push(`${url}/roles/${newRole.toLowerCase()}`)
+              history.push(`${url}/roles/${newRole.toLowerCase().replaceAll("_", "-")}`)
             }
           />
         </Route>
@@ -38,16 +38,16 @@ function ReferenceRoute() {
           exact
           path={`${path}/roles/${roleKey
             .replace(/(_RED|_BLUE|_GREY)/, "")
-            .toLowerCase()}`}
+            .toLowerCase().replaceAll("_", "-")}`}
         >
-          <Redirect to={`${path}/roles/${roleKey.toLowerCase()}`} />
+          <Redirect to={`${path}/roles/${roleKey.toLowerCase().replaceAll("_", "-")}`} />
         </Route>
       ))}
-      <Route exact path={`${path}/roles/blue_team`}>
-        <Redirect to={`${path}/roles/team_blue`} />
+      <Route exact path={`${path}/roles/blue-team`}>
+        <Redirect to={`${path}/roles/team-blue`} />
       </Route>
-      <Route exact path={`${path}/roles/red_team`}>
-        <Redirect to={`${path}/roles/team_red`} />
+      <Route exact path={`${path}/roles/red-team`}>
+        <Redirect to={`${path}/roles/team-red`} />
       </Route>
     </Switch>
   );
