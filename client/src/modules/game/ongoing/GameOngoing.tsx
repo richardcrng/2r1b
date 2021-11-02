@@ -69,8 +69,6 @@ interface Props {
     proposedLeaderId: string | undefined,
     roomName: RoomName
   ): void;
-  onNextRound: () => void;
-  onGameRestart: () => void;
 }
 
 function GameOngoing(props: Props) {

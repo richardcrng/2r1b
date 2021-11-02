@@ -75,12 +75,6 @@ function GameRoute() {
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
-            onGameRestart={() => {
-              socket.emit(ClientEvent.RESET_GAME, game.data!.id);
-            }}
-            onNextRound={() => {
-              socket.emit(ClientEvent.NEXT_ROUND, game.data!.id);
-            }}
             onOfferAbdication={(roomName, proposedLeaderId) => {
               socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
             }}
