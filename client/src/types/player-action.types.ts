@@ -31,16 +31,41 @@ export interface PlayerActionPublicRevealOffered extends PlayerActionBase {
 
 export interface PlayerActionShareOfferedBase extends PlayerActionBase {
   type: PlayerActionType.CARD_SHARE_OFFERED | PlayerActionType.COLOR_SHARE_OFFERED;
-  proposerId: string;
-  accepterId: string;
+  sharerId: string;
+  offeredPlayerId: string;
+}
+
+export type PlayerActionShareOffered =
+  | PlayerActionCardShareOffered
+  | PlayerActionColorShareOffered;
+
+export function isPlayerShareAction(
+  action: PlayerAction
+): action is PlayerActionShareOffered {
+  return [
+    PlayerActionType.CARD_SHARE_OFFERED,
+    PlayerActionType.COLOR_SHARE_OFFERED,
+  ].includes(action.type);
 }
 
 export interface PlayerActionColorShareOffered extends PlayerActionShareOfferedBase {
   type: PlayerActionType.COLOR_SHARE_OFFERED;
 }
 
+export function isPlayerCardShareAction(
+  action: PlayerAction
+): action is PlayerActionCardShareOffered {
+  return action.type === PlayerActionType.CARD_SHARE_OFFERED;
+}
+
 export interface PlayerActionCardShareOffered extends PlayerActionShareOfferedBase {
   type: PlayerActionType.CARD_SHARE_OFFERED;
 }
 
-export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionCardShareOffered | PlayerActionColorShareOffered
+export function isPlayerColorShareAction(
+  action: PlayerAction
+): action is PlayerActionColorShareOffered {
+  return action.type === PlayerActionType.COLOR_SHARE_OFFERED;
+}
+
+export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionShareOffered

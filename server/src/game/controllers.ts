@@ -148,6 +148,18 @@ export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION]
   }
 }
 
+export const offerShare: ClientEventListeners[ClientEvent.OFFER_SHARE] = (gameId, action): void => {
+  const gameManager = new GameManager(gameId);
+
+  for (let playerId of [action.sharerId, action.offeredPlayerId]) {
+    const playerManager = gameManager.managePlayer(playerId);
+    playerManager.update((player) => {
+      player.pendingActions[action.id] = action;
+    });
+    playerManager.pushPendingAction(action);
+  }
+}
+
 export const proposeRoomLeader = (
   gameId: string,
   roomName: RoomName,

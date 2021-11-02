@@ -3,7 +3,7 @@ import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
-import { PlayerAction, PlayerActionAbdicationOffered } from "./player-action.types";
+import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered, PlayerActionType } from "./player-action.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -19,10 +19,12 @@ export type ServerIO = TServer<ClientEventListeners, ServerEventListeners>;
 
 export enum ClientEvent {
   ACCEPT_ABDICATION = 'accept-abdication',
+  ACCEPT_SHARE = 'accept-share',
   ALIAS_SOCKET = "alias-socket",
   APPOINT_ROOM_LEADER = 'appoint-room-leader',
   CREATE_GAME = "create-game",
   DECLINE_ABDICATION = 'decline-abdication',
+  DECLINE_SHARE = 'decline-share',
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
@@ -30,12 +32,14 @@ export enum ClientEvent {
   FLIP_CARD = "flip-card",
   NEXT_ROUND = "next-round",
   OFFER_ABDICATION = 'offer-abdication',
+  OFFER_SHARE = 'offer-share',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
   RESET_GAME = 'reset-game',
   START_GAME = "start-game",
   SHOW_RESULTS = "show-results",
   UPDATE_PLAYER = "update-player",
-  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer'
+  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer',
+  WITHDRAW_SHARE_OFFER = 'withdraw-share-offer'
 }
 
 export enum ServerEvent {
@@ -74,6 +78,11 @@ export type ClientEventListeners = {
     action: PlayerActionAbdicationOffered
   ) => void;
 
+  [ClientEvent.ACCEPT_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareOffered
+  ) => void;
+
   [ClientEvent.APPOINT_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -86,6 +95,11 @@ export type ClientEventListeners = {
   [ClientEvent.DECLINE_ABDICATION]: (
     gameId: string,
     action: PlayerActionAbdicationOffered
+  ) => void;
+
+  [ClientEvent.DECLINE_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareOffered
   ) => void;
 
   [ClientEvent.FLIP_CARD]: (
@@ -120,6 +134,11 @@ export type ClientEventListeners = {
     proposedLeaderId: string
   ) => void;
 
+  [ClientEvent.OFFER_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareOffered
+  ) => void;
+
   [ClientEvent.PROPOSE_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -131,7 +150,14 @@ export type ClientEventListeners = {
   [ClientEvent.SHOW_RESULTS]: (gameId: string) => void;
   [ClientEvent.START_GAME]: (gameId: string) => void;
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
-  [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (gameId: string, offer: PlayerActionAbdicationOffered) => void;
+  [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (
+    gameId: string,
+    offer: PlayerActionAbdicationOffered
+  ) => void;
+  [ClientEvent.WITHDRAW_SHARE_OFFER]: (
+    gameId: string,
+    action: PlayerActionShareOffered
+  ) => void;
 };
 
 /**

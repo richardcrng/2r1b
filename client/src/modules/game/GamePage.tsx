@@ -12,6 +12,7 @@ interface Props {
   onGameRestart: () => void;
   onNextRound: () => void;
   onOfferAbdication: (roomName: RoomName, proposedLeaderId: string) => void;
+  onOfferShare(roomName: RoomName, offeredPlayerId: string): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,
     currentRoom: RoomName
@@ -29,6 +30,7 @@ function GamePage({
   onGameRestart,
   onNextRound,
   onOfferAbdication,
+  onOfferShare,
   onProposeLeader,
   onRoleIncrement,
   onWithdrawAbdicationOffer,
@@ -51,7 +53,7 @@ function GamePage({
   if (game.status === GameStatus.LOBBY) {
     return <GameLobby {...{ game, onGameStart, onRoleIncrement, players, player }} />;
   } else if (currentRoom) {
-    return <GameOngoing {...{ currentLeader, currentRoom, game, player, players: playersWithRooms, onAppointLeader, onGameRestart, onNextRound, onOfferAbdication, onProposeLeader, onWithdrawAbdicationOffer }} />;
+    return <GameOngoing {...{ currentLeader, currentRoom, game, player, players: playersWithRooms, onAppointLeader, onGameRestart, onNextRound, onOfferAbdication, onOfferShare, onProposeLeader, onWithdrawAbdicationOffer }} />;
   } else {
     return <p>Waiting for room allocation...</p>
   }

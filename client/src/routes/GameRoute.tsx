@@ -7,6 +7,7 @@ import useSocketAliases from "../hooks/useSocketAliases";
 import { useSocket } from "../socket";
 import { ClientEvent } from "../types/event.types";
 import { GameStatus } from "../types/game.types";
+import { PlayerActionType } from "../types/player-action.types";
 
 function GameRoute() {
   const { gameId } = useParams<{ gameId: string }>();
@@ -83,6 +84,15 @@ function GameRoute() {
             }}
             onOfferAbdication={(roomName, proposedLeaderId) => {
               socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
+            }}
+            onOfferShare={(room, offeredPlayerId) => {
+              socket.emit(ClientEvent.OFFER_SHARE, game.data!.id, {
+                id: `${ClientEvent.OFFER_SHARE}-${Date.now()}-${player.data!.socketId}`,
+                type: PlayerActionType.CARD_SHARE_OFFERED,
+                room,
+                sharerId: player.data!.socketId,
+                offeredPlayerId
+              })
             }}
             onProposeLeader={(leaderId, currentRoom) => {
               socket.emit(
