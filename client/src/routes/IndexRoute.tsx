@@ -5,7 +5,6 @@ import useSocketListener from "../hooks/useSocketListener";
 import { socketUrl, useSocket } from "../socket";
 import {
   ClientEvent,
-  CreateGameEvent,
   ServerEvent,
 } from "../types/event.types";
 
@@ -18,10 +17,7 @@ function IndexRoute() {
   });
 
   const handleNewGame = () => {
-    const data: CreateGameEvent = {
-      socketId: socket.id,
-    };
-    socket.emit(ClientEvent.CREATE_GAME, data);
+    socket.emit(ClientEvent.CREATE_GAME, socket.id);
   };
 
   const handleJoinGame = () => {
@@ -69,7 +65,7 @@ function IndexRoute() {
           fluid
           color="black"
           onClick={() =>
-            window.open("https://github.com/richardcrng/tempel-des-schreckens")
+            window.open("https://github.com/richardcrng/2r1b")
           }
         >
           LEARN

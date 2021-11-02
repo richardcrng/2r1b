@@ -1,4 +1,4 @@
-import { ClientEvent, ClientEventListeners, CreateGameEvent } from "../../../client/src/types/event.types";
+import { ClientEvent, ClientEventListeners } from "../../../client/src/types/event.types";
 import {
   createStartingRounds,
   Game,
@@ -61,7 +61,7 @@ export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] =
     });
   };
 
-export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
+export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER] = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
   const targetRoom = gameManager.currentRound().round.rooms[roomName];
 
@@ -90,31 +90,6 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
     })
   }
 }
-
-export const createGame = (data: CreateGameEvent): Game => {
-  const gameId = generateRandomGameId();
-  const game: Game = {
-    id: gameId,
-    actions: [],
-    players: {
-      [data.socketId]: {
-        name: data.playerName,
-        socketId: data.socketId,
-        isHost: true,
-        gameId,
-        colors: getColors(5),
-        pendingActions: {}
-      },
-    },
-    rolesCount: { ...DEFAULT_STARTING_ROLES_COUNT },
-    status: GameStatus.LOBBY,
-    rounds: createStartingRounds()
-  };
-  const gameManager = new GameManager(gameId)
-  gameManager.create(game);
-  
-  return game
-};
 
 export const declineAbdication: ClientEventListeners[ClientEvent.DECLINE_ABDICATION] =
   (gameId, action): void => {
@@ -156,7 +131,7 @@ export const declineShare: ClientEventListeners[ClientEvent.DECLINE_SHARE] = (
   });
 };
 
-export const incrementRoleInGame = (
+export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROLE] = (
   gameId: string,
   role: RoleKey,
   increment: number
@@ -202,7 +177,7 @@ export const offerShare: ClientEventListeners[ClientEvent.OFFER_SHARE] = (gameId
   }
 }
 
-export const proposeRoomLeader = (
+export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LEADER] = (
   gameId: string,
   roomName: RoomName,
   voterId: string,
@@ -235,7 +210,7 @@ export const proposeRoomLeader = (
   }
 }
 
-export const startGame = (
+export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
   gameId: string,
 ): void => {
   const gameManager = new GameManager(gameId);

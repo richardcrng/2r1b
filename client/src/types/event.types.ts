@@ -85,7 +85,7 @@ export type ClientEventListeners = {
     appointedLeaderId: string
   ) => void;
 
-  [ClientEvent.CREATE_GAME]: (e: CreateGameEvent) => void;
+  [ClientEvent.CREATE_GAME]: (socketId: string, playerName?: string) => void;
 
   [ClientEvent.DECLINE_ABDICATION]: (
     gameId: string,
@@ -170,7 +170,7 @@ export type ServerEventListeners = {
     game: Game
   ) => void;
   [ServerEvent.GAME_GOTTEN]: (gameId: string, game: Game) => void;
-  [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
+  [ServerEvent.GAME_JOINED]: (game: Game) => void;
   [ServerEvent.GAME_NOTIFICATION]: (
     gameId: string,
     notification: GameNotification
@@ -189,18 +189,3 @@ export type ServerEventListeners = {
   [ServerEvent.ROLE_AND_ROOM_ALLOCATIONS_MADE]: (gameId: string) => void;
   [ServerEvent.ROUND_STARTED]: (gameId: string) => void;
 };
-
-export interface CreateGameEvent {
-  playerName?: string;
-  socketId: string;
-}
-
-export interface JoinGameEvent {
-  playerName: string;
-  socketId: string;
-  gameId: Game["id"];
-}
-
-export interface GameJoinedEvent {
-  game: Game;
-}

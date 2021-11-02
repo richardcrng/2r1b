@@ -4,7 +4,7 @@ import {
   ServerEvent,
   ServerSocket,
 } from "../../client/src/types/event.types";
-import { incrementRoleInGame, createGame, startGame, appointLeader, proposeRoomLeader, offerAbdication, acceptAbdication, declineAbdication, withdrawAbdicationOffer, offerShare, withdrawShareOffer, declineShare, acceptShare } from "./game/controllers";
+import { incrementRoleInGame, startGame, appointLeader, proposeRoomLeader, offerAbdication, acceptAbdication, declineAbdication, withdrawAbdicationOffer, offerShare, withdrawShareOffer, declineShare, acceptShare } from "./game/controllers";
 import { joinPlayerToGame, updatePlayer } from "./player/controllers";
 import { GameManager } from "./game/model";
 
@@ -14,14 +14,14 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.ACCEPT_ABDICATION]: acceptAbdication,
     [ClientEvent.ACCEPT_SHARE]: acceptShare,
     [ClientEvent.APPOINT_ROOM_LEADER]: appointLeader,
-    [ClientEvent.CREATE_GAME]: (data) => {
-      const game = createGame(data);
-      socket.emit(ServerEvent.GAME_CREATED, game);
+    [ClientEvent.CREATE_GAME]: (socketId, playerName) => {
+      const gameManager = GameManager.hostNew(socketId, playerName)
+      socket.emit(ServerEvent.GAME_CREATED, gameManager._pointer()!);
     },
     [ClientEvent.DECLINE_ABDICATION]: declineAbdication,
     [ClientEvent.DECLINE_SHARE]: declineShare,
     [ClientEvent.GET_GAME]: (gameId) => {
-      const game = new GameManager(gameId).snapshot();
+      const game = new GameManager(gameId)._pointer();
       game
         ? socket.emit(ServerEvent.GAME_GOTTEN, game.id, game)
         : socket.emit(ServerEvent.GAME_NOT_FOUND);
