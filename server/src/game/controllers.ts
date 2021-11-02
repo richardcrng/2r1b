@@ -26,7 +26,7 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
   }
 }
 
-export const createGame = (data: CreateGameEvent): void => {
+export const createGame = (data: CreateGameEvent): Game => {
   const gameId = generateRandomGameId();
   const game: Game = {
     id: gameId,
@@ -46,6 +46,7 @@ export const createGame = (data: CreateGameEvent): void => {
   };
   const gameManager = new GameManager(gameId)
   gameManager.create(game);
+  return game
 };
 
 export const incrementRoleInGame = (

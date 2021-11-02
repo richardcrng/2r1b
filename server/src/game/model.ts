@@ -137,7 +137,6 @@ export class GameManager {
 
   public create(game: Game): void {
     this.set(game);
-    this.io.emit(ServerEvent.GAME_CREATED, game);
   }
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
