@@ -1,3 +1,4 @@
+import { PlayerAction } from "./player-action.types";
 import { RoleKey } from "./role.types";
 
 export enum GameStatus {
@@ -50,6 +51,7 @@ export interface Player {
   role?: RoleKey;
   colors?: string[];
   leaderVote?: LeaderVote;
+  pendingActions: Record<string, PlayerAction>;
 }
 
 export interface PlayerWithRoom extends Player {
@@ -94,39 +96,6 @@ export interface LeaderUsurpation extends LeaderRecordBase {
 }
 
 export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderUsurpation;
-
-export enum PlayerActionType {
-  CARD_SHARE = 'card-share',
-  COLOR_SHARE = 'color-share',
-  PRIVATE_REVEAL = 'private-reveal',
-  PUBLIC_REVEAL = 'public-reveal',
-}
-
-export interface PlayerActionBase {
-  type: PlayerActionType;
-  room: RoomName;
-}
-
-export interface PlayerActionPublicReveal {
-  type: PlayerActionType.PUBLIC_REVEAL;
-  revealerId: string;
-}
-
-export interface PlayerActionShareBase extends PlayerActionBase {
-  type: PlayerActionType.CARD_SHARE | PlayerActionType.COLOR_SHARE;
-  proposerId: string;
-  accepterId: string;
-}
-
-export interface PlayerActionColorShare extends PlayerActionShareBase {
-  type: PlayerActionType.COLOR_SHARE;
-}
-
-export interface PlayerActionCardShare extends PlayerActionShareBase {
-  type: PlayerActionType.CARD_SHARE;
-}
-
-export type PlayerAction = PlayerActionCardShare | PlayerActionColorShare
 
 export interface RoomRound {
   leadersRecord: LeaderRecord[];

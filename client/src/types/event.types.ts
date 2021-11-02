@@ -3,6 +3,7 @@ import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
+import { PlayerAction, PlayerActionAbdicationOffered } from "./player-action.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -17,23 +18,29 @@ export type ServerSocket = TServerSocket<
 export type ServerIO = TServer<ClientEventListeners, ServerEventListeners>;
 
 export enum ClientEvent {
+  ACCEPT_ABDICATION = 'accept-abdication',
   ALIAS_SOCKET = "alias-socket",
   APPOINT_ROOM_LEADER = 'appoint-room-leader',
   CREATE_GAME = "create-game",
+  DECLINE_ABDICATION = 'decline-abdication',
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
   JOIN_GAME = "join",
   FLIP_CARD = "flip-card",
   NEXT_ROUND = "next-round",
+  OFFER_ABDICATION = 'offer-abdication',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
   RESET_GAME = 'reset-game',
   START_GAME = "start-game",
   SHOW_RESULTS = "show-results",
   UPDATE_PLAYER = "update-player",
+  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer'
 }
 
 export enum ServerEvent {
+  ACTION_PENDING = 'action-pending',
+  ACTION_RESOLVED = 'action-resolved',
   CARD_FLIPPED = 'card-picked',
   GAME_CREATED = "game-created",
   GAME_GOTTEN = "game-gotten",
@@ -62,6 +69,11 @@ export enum GameOverReason {
  * Listeners for `ClientEvent`s
  */
 export type ClientEventListeners = {
+  [ClientEvent.ACCEPT_ABDICATION]: (
+    gameId: string,
+    action: PlayerActionAbdicationOffered
+  ) => void;
+
   [ClientEvent.APPOINT_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -70,6 +82,11 @@ export type ClientEventListeners = {
   ) => void;
 
   [ClientEvent.CREATE_GAME]: (e: CreateGameEvent) => void;
+
+  [ClientEvent.DECLINE_ABDICATION]: (
+    gameId: string,
+    action: PlayerActionAbdicationOffered
+  ) => void;
 
   [ClientEvent.FLIP_CARD]: (
     gameId: string,
@@ -96,6 +113,13 @@ export type ClientEventListeners = {
   [ClientEvent.JOIN_GAME]: (gameId: string, player: Player) => void;
   [ClientEvent.NEXT_ROUND]: (gameId: string) => void;
 
+  [ClientEvent.OFFER_ABDICATION]: (
+    gameId: string,
+    roomName: RoomName,
+    abdicaterId: string,
+    proposedLeaderId: string
+  ) => void;
+
   [ClientEvent.PROPOSE_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -107,12 +131,21 @@ export type ClientEventListeners = {
   [ClientEvent.SHOW_RESULTS]: (gameId: string) => void;
   [ClientEvent.START_GAME]: (gameId: string) => void;
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
+  [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (gameId: string, offer: PlayerActionAbdicationOffered) => void;
 };
 
 /**
  * Listeners for `ServerEvent`s
  */
 export type ServerEventListeners = {
+  [ServerEvent.ACTION_PENDING]: (
+    playerId: string,
+    action: PlayerAction
+  ) => void;
+  [ServerEvent.ACTION_RESOLVED]: (
+    playerId: string,
+    action: PlayerAction
+  ) => void;
   [ServerEvent.CARD_FLIPPED]: (
     gameId: string,
     keyholderId: string,

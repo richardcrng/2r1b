@@ -3,6 +3,7 @@ import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
 import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
+import { PlayerAction } from "../../../client/src/types/player-action.types";
 
 export class PlayerManager {
   constructor(
@@ -12,7 +13,7 @@ export class PlayerManager {
   ) {}
 
   _broadcast(): void {
-    this._withPointer(pointer => {
+    this._withPointer((pointer) => {
       this.gameManager.io.emit(
         ServerEvent.PLAYER_UPDATED,
         this.socketId,
@@ -23,26 +24,26 @@ export class PlayerManager {
   }
 
   _mutate(mutativeCb: (player: Player) => void) {
-    this._withPointer(pointer => {
+    this._withPointer((pointer) => {
       mutativeCb(pointer);
       this._broadcast();
-    })
+    });
   }
 
   _pointer(): Player | undefined {
-    const operation = this.gameManager._withPointer(
-      (pointer) => {
-        const canonicalId = [this.socketId, ...this.aliasSocketIds].find(id => pointer.players[id]);
-        return canonicalId ? pointer.players[canonicalId] : undefined
-      }
-    );
+    const operation = this.gameManager._withPointer((pointer) => {
+      const canonicalId = [this.socketId, ...this.aliasSocketIds].find(
+        (id) => pointer.players[id]
+      );
+      return canonicalId ? pointer.players[canonicalId] : undefined;
+    });
     if (operation.status === "success") {
       return operation.result;
     }
   }
 
   _set(player: Player): void {
-    this.gameManager.setWithPointer(gamePointer => ({
+    this.gameManager.setWithPointer((gamePointer) => ({
       ...gamePointer,
       players: {
         ...gamePointer.players,
@@ -57,26 +58,51 @@ export class PlayerManager {
     const pointer = this._pointer();
     if (pointer) {
       const result = cb(pointer);
-      return { status: 'success', result }
+      return { status: "success", result };
     } else {
-      return { status: 'error' }
+      return { status: "error" };
     }
+  }
+
+  public pushPendingAction(playerAction: PlayerAction): void {
+    this.gameManager.io.emit(
+      ServerEvent.ACTION_PENDING,
+      this.socketId,
+      playerAction
+    );
   }
 
   public pushNotification(
     playerNotification: PlayerNotification | PlayerNotificationFn
   ): void {
-    this._withPointer(player => {
-      const notification = typeof playerNotification === 'function'
-      ? playerNotification(player)
-      : playerNotification
+    this._withPointer((player) => {
+      const notification =
+        typeof playerNotification === "function"
+          ? playerNotification(player)
+          : playerNotification;
+
+      this.gameManager.io.emit(
+        ServerEvent.PLAYER_NOTIFICATION,
+        { [this.socketId]: true },
+        notification
+      );
+    });
+  }
+
+  public resolvePendingAction(playerAction: PlayerAction, playerNotification?: PlayerNotification): void {
+    this.update(player => {
+      delete player.pendingActions[playerAction.id];
+    })
 
     this.gameManager.io.emit(
-      ServerEvent.PLAYER_NOTIFICATION,
-      { [this.socketId]: true },
-      notification
+      ServerEvent.ACTION_RESOLVED,
+      this.socketId,
+      playerAction
     );
-    })
+
+    if (playerNotification) {
+      this.pushNotification(playerNotification)
+    }
   }
 
   public set(player: Player): void {

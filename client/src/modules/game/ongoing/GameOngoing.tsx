@@ -8,6 +8,9 @@ import { selectNonZeroOrderedVotesForPlayers } from '../../../selectors/game';
 import PlayerLeaderProposal from '../../player/interaction/PlayerLeaderProposal';
 import GameOngoingVotes from './votes/GameOngoingVotes';
 import Timer from '../../../lib/atoms/Timer';
+import PlayerLeaderAbdication from '../../player/interaction/PlayerLeaderAbdication';
+import usePlayerActions from '../../player/usePlayerActions';
+import { isPlayerAbdicationAction, PlayerActionAbdicationOffered } from '../../../types/player-action.types';
 
 const Container = styled.div`
   display: grid;
@@ -56,14 +59,21 @@ interface Props {
   currentRoom: RoomName;
   game: Game;
   player: Player;
-  players: Record<string, PlayerWithRoom>
+  players: Record<string, PlayerWithRoom>;
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
-  onProposeLeader(proposedLeaderId: string | undefined, roomName: RoomName): void;
+  onOfferAbdication(roomName: RoomName, proposedLeaderId?: string): void;
+  onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
+  onProposeLeader(
+    proposedLeaderId: string | undefined,
+    roomName: RoomName
+  ): void;
   onNextRound: () => void;
   onGameRestart: () => void;
 }
 
 function GameOngoing(props: Props) {
+
+  usePlayerActions(props.game, props.player);
 
   const votesForPlayers = selectNonZeroOrderedVotesForPlayers(props.game);
   const votesInThisRoom = votesForPlayers.filter(([playerId]) => props.players[playerId].room === props.currentRoom)
@@ -86,6 +96,35 @@ function GameOngoing(props: Props) {
           ),
       })
     );
+  }
+
+  const handleAbdicationOffer = () => {
+    dispatch(
+      actions.modal.create.assign({
+        isOpen: true,
+        title: () => "Abdicate Leadership",
+        content: ({ currentRoom, onOfferAbdication, onWithdrawAbdicationOffer, player, players }) => {
+          // there can only be one abdication offer at any given time
+          const currentOffer = Object.values(player.pendingActions).find(
+            isPlayerAbdicationAction
+          );
+
+          return (
+            <PlayerLeaderAbdication
+              currentOffer={currentOffer}
+              currentRoom={currentRoom}
+              player={player}
+              players={players}
+              onOfferAbdication={(currentRoom, playerId) => {
+                onOfferAbdication(currentRoom, playerId);
+                handleModalClose();
+              }}
+              onWithdrawAbdicationOffer={onWithdrawAbdicationOffer}
+            />
+          );
+        }
+      })
+    )
   }
 
   const handleLeaderProposal = () => {
@@ -155,9 +194,15 @@ function GameOngoing(props: Props) {
           />
         </VotesArea>
         <Actions>
-          <Button secondary fluid onClick={handleLeaderProposal}>
-            {props.currentLeader ? "PROPOSE" : "APPOINT"} LEADER
-          </Button>
+          {props.currentLeader?.socketId === props.player.socketId ? (
+            <Button secondary fluid onClick={handleAbdicationOffer}>
+              ABDICATE LEADERSHIP
+            </Button>
+          ): (
+            <Button secondary fluid onClick={handleLeaderProposal}>
+              {props.currentLeader ? "PROPOSE" : "APPOINT"} LEADER
+            </Button>
+          )}
           <Button primary fluid>
             OFFER SHARE
           </Button>

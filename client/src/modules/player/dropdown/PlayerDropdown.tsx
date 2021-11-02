@@ -3,6 +3,7 @@ import { Dropdown } from "semantic-ui-react";
 import { Player } from "../../../types/game.types";
 
 interface Props {
+  disabled?: boolean;
   filter?(player: Player): boolean;
   onPlayerSelect?(playerId: string): void;
   players: Record<string, Player>;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 function PlayerDropdown({
+  disabled,
   filter,
   onPlayerSelect,
   players,
@@ -34,6 +36,7 @@ function PlayerDropdown({
 
   return (
     <Dropdown
+      disabled={disabled}
       search
       selection
       fluid

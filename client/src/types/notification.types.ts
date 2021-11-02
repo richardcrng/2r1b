@@ -8,7 +8,7 @@ export enum NotificationType {
 export type PlayerNotificationFn = (player: Player) => PlayerNotification
 
 export interface NotificationBase {
-  type: NotificationType.GENERAL;
+  type: NotificationType;
 }
 
 export interface GameNotificationGeneral extends NotificationBase {

@@ -41,12 +41,14 @@ function GameRoute() {
                 socketId: socket.id,
                 name,
                 gameId,
+                pendingActions: {}
               });
             } else {
               // player not in game, so join
               socket.emit(ClientEvent.JOIN_GAME, gameId, {
                 socketId: socket.id,
                 name,
+                pendingActions: {}
               });
             }
           }}
@@ -79,6 +81,9 @@ function GameRoute() {
             onNextRound={() => {
               socket.emit(ClientEvent.NEXT_ROUND, game.data!.id);
             }}
+            onOfferAbdication={(roomName, proposedLeaderId) => {
+              socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
+            }}
             onProposeLeader={(leaderId, currentRoom) => {
               socket.emit(
                 ClientEvent.PROPOSE_ROOM_LEADER,
@@ -95,6 +100,13 @@ function GameRoute() {
                 roleKey,
                 increment
               );
+            }}
+            onWithdrawAbdicationOffer={(action) => {
+              socket.emit(
+                ClientEvent.WITHDRAW_ABDICATION_OFFER,
+                game.data!.id,
+                action
+              )
             }}
             players={Object.values(game.data.players)}
             player={player.data}
