@@ -10,6 +10,23 @@ import { ToastOptions } from 'react-toastify';
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
+export interface OperationBase<T = void> {
+  status: 'success' | 'error';
+  result?: T;
+}
+
+export interface OperationSuccess<T = void> extends OperationBase<T> {
+  status: 'success';
+  result: T;
+}
+
+export interface OperationError<T = void> extends OperationBase<T> {
+  status: 'error';
+  result?: never;
+}
+
+export type Operation<T = void> = OperationSuccess<T> | OperationError<T>;
+
 export class GameManager {
   constructor(
     public gameId: string,
@@ -18,21 +35,33 @@ export class GameManager {
   ) {}
 
   _broadcast(): void {
-    this.io.emit(ServerEvent.GAME_UPDATED, this.gameId, this._pointer());
+    this._withPointer(pointer => {
+      this.io.emit(ServerEvent.GAME_UPDATED, this.gameId, pointer);
+    })
   }
 
   _mutate(mutativeCb: (game: Game) => void): void {
-    mutativeCb(this._pointer());
+    this._withPointer(mutativeCb);
     this._broadcast();
   }
 
-  _pointer(): Game {
+  _pointer(): Game | undefined {
     return this.gamesStore[this.gameId];
   }
 
   _set(game: Game): void {
     this.gamesStore[this.gameId] = game;
     this._broadcast();
+  }
+
+  _withPointer<T = void>(cb: (gamePointer: Game) => T): Operation<T> {
+    const pointer = this._pointer();
+    if (pointer) {
+      const result = cb(pointer);
+      return { status: 'success', result }
+    } else {
+      return { status: 'error' }
+    }
   }
 
   public addLeaderRecord(roomName: RoomName, record: LeaderRecord): void {
@@ -61,70 +90,90 @@ export class GameManager {
   }
 
   public assignInitialRoles(): void {
-    const rolesCount = this._pointer().rolesCount;
-    const keysToShuffle = Object.keys(rolesCount).reduce(
-      (acc, currRoleKey) => [
-        ...acc,
-        ...Array(rolesCount[currRoleKey as RoleKey]).fill(currRoleKey),
-      ],
-      [] as RoleKey[]
-    );
+    this._withPointer(pointer => {
+      const rolesCount = pointer.rolesCount;
+      const keysToShuffle = Object.keys(rolesCount).reduce(
+        (acc, currRoleKey) => [
+          ...acc,
+          ...Array(rolesCount[currRoleKey as RoleKey]).fill(currRoleKey),
+        ],
+        [] as RoleKey[]
+      );
 
-    const playerIds = Object.keys(this._pointer().players);
-    const shuffledRoleKeys = shuffle(keysToShuffle);
+      const playerIds = Object.keys(pointer.players);
+      const shuffledRoleKeys = shuffle(keysToShuffle);
 
-    for (let idx = 0; idx < playerIds.length; idx++) {
-      const playerId = playerIds[idx];
-      this.updatePlayer(playerId, (player) => {
-        player.role = shuffledRoleKeys[idx];
-      });
-    }
+      for (let idx = 0; idx < playerIds.length; idx++) {
+        const playerId = playerIds[idx];
+        this.updatePlayer(playerId, (player) => {
+          player.role = shuffledRoleKeys[idx];
+        });
+      }
+    })
   }
 
   public assignInitialRooms(): void {
-    const playerIds = Object.keys(this._pointer().players);
-    const shuffledIds = shuffle(playerIds);
-    const firstRoomSize = Math.ceil(playerIds.length / 2);
-    const [playersInA, playersInB] = chunk(shuffledIds, firstRoomSize);
+    this._withPointer(pointer => {
+      const playerIds = Object.keys(pointer.players);
+      const shuffledIds = shuffle(playerIds);
+      const firstRoomSize = Math.ceil(playerIds.length / 2);
+      const [playersInA, playersInB] = chunk(shuffledIds, firstRoomSize);
 
-    this.update((game) => {
-      const roomAllocation: PlayerRoomAllocation = {};
+      this.update((game) => {
+        const roomAllocation: PlayerRoomAllocation = {};
 
-      for (let playerId of playersInA) {
-        roomAllocation[playerId] = RoomName.A;
-      }
+        for (let playerId of playersInA) {
+          roomAllocation[playerId] = RoomName.A;
+        }
 
-      for (let playerId of playersInB) {
-        roomAllocation[playerId] = RoomName.B;
-      }
+        for (let playerId of playersInB) {
+          roomAllocation[playerId] = RoomName.B;
+        }
 
-      game.rounds[0].playerAllocation = roomAllocation;
-    });
+        game.rounds[0].playerAllocation = roomAllocation;
+      });
+    })
   }
 
   public create(game: Game): void {
     this.set(game);
-    this.io.emit(ServerEvent.GAME_CREATED, this._pointer());
+    this.io.emit(ServerEvent.GAME_CREATED, game);
   }
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
-    return last(
-      this._pointer().rounds[this.currentRound().idx].rooms[roomName]
-        .leadersRecord
+    const operation = this._withPointer((pointer) =>
+      last(pointer.rounds[this.currentRound().idx].rooms[roomName].leadersRecord)
     );
+    return operation.status === 'success' ? operation.result : undefined;
   }
 
   public currentRound(): { round: Round; idx: number } {
-    for (let [idx, round] of Object.entries(this._pointer().rounds)) {
-      if (round.status === RoundStatus.ONGOING) {
-        return { round, idx: parseInt(idx) };
+    const operation = this._withPointer(pointer => {
+      for (let [idx, round] of Object.entries(pointer.rounds)) {
+        if (round.status === RoundStatus.ONGOING) {
+          return { round, idx: parseInt(idx) };
+        }
       }
+    })
+
+    if (operation.status === 'success' && operation.result) {
+      return operation.result
+    } else {
+      throw new Error("No round found")
     }
-    throw new Error("Couldn't find a round");
   }
 
-  public getPlayer(playerId: string): Player {
+  public getPlayer(playerId: string): Player | undefined {
     return this.managePlayer(playerId).snapshot();
+  }
+
+  public getPlayerOrFail(playerId: string) {
+    const player = this.getPlayer(playerId);
+    if (player) {
+      return player
+    } else {
+      throw new Error(`Couldn't find player with id ${playerId}`)
+    }
   }
 
   public managePlayer(
@@ -135,7 +184,12 @@ export class GameManager {
   }
 
   public players(): Readonly<Record<string, Player>> {
-    return this.snapshot().players;
+    const snapshot = this.snapshot();
+    if (snapshot) {
+      return snapshot.players;
+    } else {
+      throw new Error('Could not find game to locate players for')
+    }
   }
 
   public playersInRoom(roomName: RoomName): Readonly<Record<string, Player>> {
@@ -195,20 +249,30 @@ export class GameManager {
     this._set(game);
   }
 
-  public snapshot(): Game {
-    return cloneDeep(this._pointer());
+  public setWithPointer(cb: (gamePointer: Game) => Game): void {
+    this._withPointer(pointer => {
+      this.set(cb(pointer))
+    })
+  }
+
+  public snapshot(): Game | undefined {
+    const operation = this._withPointer(pointer => cloneDeep(pointer))
+    if (operation.status === 'success') {
+      return operation.result;
+    }
   }
 
   public async startTimer(): Promise<void> {
-    const game = this._pointer();
-    while (game.currentTimerSeconds && game.currentTimerSeconds > 0) {
-      await sleep(1000);
-      this.update((gameState) => {
-        if (gameState.currentTimerSeconds) {
-          gameState.currentTimerSeconds -= 1;
-        }
-      });
-    }
+    this._withPointer(async (pointer) => {
+      while (pointer.currentTimerSeconds && pointer.currentTimerSeconds > 0) {
+        await sleep(1000);
+        this.update((gameState) => {
+          if (gameState.currentTimerSeconds) {
+            gameState.currentTimerSeconds -= 1;
+          }
+        });
+      }
+    })
   }
 
   public update(mutativeCb: (game: Game) => void) {
@@ -226,7 +290,12 @@ export class GameManager {
   }
 
   public votesAgainstEachPlayer(): Readonly<Record<string, LeaderVote[]>> {
-    return selectDictionaryOfVotesForPlayers(this.snapshot());
+    const snapshot = this.snapshot(); // prevent memoisation
+    if (snapshot) {
+      return selectDictionaryOfVotesForPlayers(snapshot);
+    } else {
+      throw new Error("Could not find game to locate players for")
+    }
   }
 
   public votesAgainstPlayer(playerId: string): ReadonlyArray<LeaderVote> {
