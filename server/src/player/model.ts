@@ -2,7 +2,7 @@ import { cloneDeep } from "lodash";
 import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
-import { Notification } from "../../../client/src/types/notification.types";
+import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 
 export class PlayerManager {
   constructor(
@@ -64,13 +64,19 @@ export class PlayerManager {
   }
 
   public pushNotification(
-    notification: Notification
+    playerNotification: PlayerNotification | PlayerNotificationFn
   ): void {
+    this._withPointer(player => {
+      const notification = typeof playerNotification === 'function'
+      ? playerNotification(player)
+      : playerNotification
+
     this.gameManager.io.emit(
       ServerEvent.PLAYER_NOTIFICATION,
       { [this.socketId]: true },
       notification
     );
+    })
   }
 
   public set(player: Player): void {

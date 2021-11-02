@@ -15,7 +15,7 @@ export const joinPlayerToGame = (
     gameId,
     colors: getColors(5)
   });
-  gameManager.pushNotificationToPlayers(
+  gameManager.pushPlayersNotification(
     {
       type: NotificationType.GENERAL,
       message: `${playerData.name} joined`,

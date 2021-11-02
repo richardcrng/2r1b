@@ -1,7 +1,7 @@
 import { chunk, cloneDeep, last, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
-import { Notification } from "../../../client/src/types/notification.types";
+import { GameNotification, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { Game, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
@@ -202,32 +202,29 @@ export class GameManager {
     );
   }
 
-  public pushNotificationToAll(
-    notification: Notification
+  public pushGameNotificationToAll(
+    notification: GameNotification
   ): void {
-    this.io.emit(
-      ServerEvent.GAME_NOTIFICATION,
-      this.gameId,
-      notification
-    );
+    this.io.emit(ServerEvent.GAME_NOTIFICATION, this.gameId, notification);
   }
 
-  public pushNotificationToRoom(
+  public pushPlayerNotificationToRoom(
     roomName: RoomName,
-    notification: Notification,
+    notification: PlayerNotification | PlayerNotificationFn,
+    where: (player: Player) => boolean = (player) => true
   ): void {
-    this.pushNotificationToPlayers(notification, (player) => !!this.playersInRoom(roomName)[player.socketId]);
+    this.pushPlayersNotification(notification, (player) => !!this.playersInRoom(roomName)[player.socketId] && where(player));
   }
 
-  public pushNotificationToPlayerById(
+  public pushPlayerNotificationById(
     playerId: string,
-    notification: Notification
+    notification: PlayerNotification | PlayerNotificationFn
   ): void {
     this.managePlayer(playerId).pushNotification(notification);
   }
 
-  public pushNotificationToPlayers(
-    notification: Notification,
+  public pushPlayersNotification(
+    notification: PlayerNotification | PlayerNotificationFn,
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);

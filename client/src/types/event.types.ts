@@ -1,9 +1,8 @@
-import { ToastOptions } from 'react-toastify';
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
-import { Notification } from './notification.types';
+import { GameNotification, PlayerNotification } from './notification.types';
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -131,7 +130,7 @@ export type ServerEventListeners = {
   [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
   [ServerEvent.GAME_NOTIFICATION]: (
     gameId: string,
-    notification: Notification
+    notification: GameNotification
   ) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
@@ -139,7 +138,7 @@ export type ServerEventListeners = {
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOTIFICATION]: (
     playersToNotify: Record<string, true>,
-    notification: Notification
+    notification: PlayerNotification
   ) => void;
   [ServerEvent.PLAYER_NOT_FOUND]: () => void;
   [ServerEvent.REDIRECT_TO_LOBBY]: () => void;

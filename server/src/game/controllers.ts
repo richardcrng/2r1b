@@ -23,14 +23,28 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
       leaderId: appointedLeaderId,
       appointerId,
     });
-    gameManager.pushNotificationToRoom(roomName, {
-      type: NotificationType.GENERAL,
-      message: `${
-        gameManager.getPlayerOrFail(appointedLeaderId).name
-      } has been appointed as leader by ${
-        gameManager.getPlayerOrFail(appointerId).name
-      }`,
-    });
+
+    gameManager.pushPlayerNotificationToRoom(roomName, (player) => {
+      const message =
+        player.socketId === appointerId
+          ? `You have appointed ${
+              gameManager.getPlayerOrFail(appointedLeaderId).name
+            } as leader`
+          : player.socketId === appointedLeaderId
+          ? `You have been appointed as leader by ${
+              gameManager.getPlayerOrFail(appointerId).name
+            }`
+          : `${
+              gameManager.getPlayerOrFail(appointedLeaderId).name
+            } has been appointed as leader by ${
+              gameManager.getPlayerOrFail(appointerId).name
+            }`;
+
+      return {
+        type: NotificationType.GENERAL,
+        message,
+      };
+    })
   }
 }
 
@@ -135,7 +149,7 @@ const usurpLeader = (
     });
   }
 
-  gameManager.pushNotificationToRoom(roomName, {
+  gameManager.pushPlayerNotificationToRoom(roomName, {
     type: NotificationType.GENERAL,
     message: `${gameManager.getPlayerOrFail(newLeaderId).name} usurps ${
       gameManager.getPlayerOrFail(oldLeaderId).name
