@@ -1,10 +1,11 @@
+import { ClientEvent, ClientEventListeners } from "../../../client/src/types/event.types";
 import {
   Player,
 } from "../../../client/src/types/game.types";
 import { GameManager } from "../game/model";
 import { getColors } from "../utils";
 
-export const joinPlayerToGame = (
+export const joinPlayerToGame: ClientEventListeners[ClientEvent.JOIN_GAME] = (
   gameId: string,
   playerData: Player
 ): void => {
@@ -16,7 +17,7 @@ export const joinPlayerToGame = (
   });
 };
 
-export const updatePlayer = (
+export const updatePlayer: ClientEventListeners[ClientEvent.UPDATE_PLAYER] = (
   gameId: string,
   playerData: Player
 ): void => {

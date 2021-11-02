@@ -2,11 +2,13 @@ import { chunk, cloneDeep, last, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { Game, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
+import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
+import { generateRandomGameId, getColors } from "../utils";
+import { DEFAULT_STARTING_ROLES_COUNT } from "../../../client/src/utils/role-utils";
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -34,10 +36,34 @@ export class GameManager {
     public io: ServerIO = SERVER_IO
   ) {}
 
+  static hostNew(socketId: string, playerName?: string): GameManager {
+    const gameId = generateRandomGameId();
+    const game: Game = {
+      id: gameId,
+      actions: [],
+      players: {
+        [socketId]: {
+          name: playerName,
+          socketId,
+          isHost: true,
+          gameId,
+          colors: getColors(5),
+          pendingActions: {},
+        },
+      },
+      rolesCount: { ...DEFAULT_STARTING_ROLES_COUNT },
+      status: GameStatus.LOBBY,
+      rounds: createStartingRounds(),
+    };
+    const gameManager = new GameManager(gameId);
+    gameManager.set(game);
+    return gameManager
+  }
+
   _broadcast(): void {
-    this._withPointer(pointer => {
+    this._withPointer((pointer) => {
       this.io.emit(ServerEvent.GAME_UPDATED, this.gameId, pointer);
-    })
+    });
   }
 
   _mutate(mutativeCb: (game: Game) => void): void {
@@ -58,9 +84,9 @@ export class GameManager {
     const pointer = this._pointer();
     if (pointer) {
       const result = cb(pointer);
-      return { status: 'success', result }
+      return { status: "success", result };
     } else {
-      return { status: 'error' }
+      return { status: "error" };
     }
   }
 
@@ -90,7 +116,7 @@ export class GameManager {
   }
 
   public assignInitialRoles(): void {
-    this._withPointer(pointer => {
+    this._withPointer((pointer) => {
       const rolesCount = pointer.rolesCount;
       const keysToShuffle = Object.keys(rolesCount).reduce(
         (acc, currRoleKey) => [
@@ -109,11 +135,11 @@ export class GameManager {
           player.role = shuffledRoleKeys[idx];
         });
       }
-    })
+    });
   }
 
   public assignInitialRooms(): void {
-    this._withPointer(pointer => {
+    this._withPointer((pointer) => {
       const playerIds = Object.keys(pointer.players);
       const shuffledIds = shuffle(playerIds);
       const firstRoomSize = Math.ceil(playerIds.length / 2);
@@ -132,33 +158,31 @@ export class GameManager {
 
         game.rounds[0].playerAllocation = roomAllocation;
       });
-    })
-  }
-
-  public create(game: Game): void {
-    this.set(game);
+    });
   }
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
     const operation = this._withPointer((pointer) =>
-      last(pointer.rounds[this.currentRound().idx].rooms[roomName].leadersRecord)
+      last(
+        pointer.rounds[this.currentRound().idx].rooms[roomName].leadersRecord
+      )
     );
-    return operation.status === 'success' ? operation.result : undefined;
+    return operation.status === "success" ? operation.result : undefined;
   }
 
   public currentRound(): { round: Round; idx: number } {
-    const operation = this._withPointer(pointer => {
+    const operation = this._withPointer((pointer) => {
       for (let [idx, round] of Object.entries(pointer.rounds)) {
         if (round.status === RoundStatus.ONGOING) {
           return { round, idx: parseInt(idx) };
         }
       }
-    })
+    });
 
-    if (operation.status === 'success' && operation.result) {
-      return operation.result
+    if (operation.status === "success" && operation.result) {
+      return operation.result;
     } else {
-      throw new Error("No round found")
+      throw new Error("No round found");
     }
   }
 
@@ -173,9 +197,9 @@ export class GameManager {
   public getPlayerOrFail(playerId: string) {
     const player = this.getPlayer(playerId);
     if (player) {
-      return player
+      return player;
     } else {
-      throw new Error(`Couldn't find player with id ${playerId}`)
+      throw new Error(`Couldn't find player with id ${playerId}`);
     }
   }
 
@@ -191,7 +215,7 @@ export class GameManager {
     if (snapshot) {
       return snapshot.players;
     } else {
-      throw new Error('Could not find game to locate players for')
+      throw new Error("Could not find game to locate players for");
     }
   }
 
@@ -206,9 +230,7 @@ export class GameManager {
     );
   }
 
-  public pushGameNotificationToAll(
-    notification: GameNotification
-  ): void {
+  public pushGameNotificationToAll(notification: GameNotification): void {
     this.io.emit(ServerEvent.GAME_NOTIFICATION, this.gameId, notification);
   }
 
@@ -217,7 +239,11 @@ export class GameManager {
     notification: PlayerNotification | PlayerNotificationFn,
     where: (player: Player) => boolean = (player) => true
   ): void {
-    this.pushPlayersNotification(notification, (player) => !!this.playersInRoom(roomName)[player.socketId] && where(player));
+    this.pushPlayersNotification(
+      notification,
+      (player) =>
+        !!this.playersInRoom(roomName)[player.socketId] && where(player)
+    );
   }
 
   public pushPlayerNotificationById(
@@ -233,9 +259,7 @@ export class GameManager {
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
     for (let player of playersToNotify) {
-      this.managePlayer(player.socketId).pushNotification(
-        notification
-      );
+      this.managePlayer(player.socketId).pushNotification(notification);
     }
   }
 
@@ -244,14 +268,14 @@ export class GameManager {
   }
 
   public setWithPointer(cb: (gamePointer: Game) => Game): void {
-    this._withPointer(pointer => {
-      this.set(cb(pointer))
-    })
+    this._withPointer((pointer) => {
+      this.set(cb(pointer));
+    });
   }
 
   public snapshot(): Game | undefined {
-    const operation = this._withPointer(pointer => cloneDeep(pointer))
-    if (operation.status === 'success') {
+    const operation = this._withPointer((pointer) => cloneDeep(pointer));
+    if (operation.status === "success") {
       return operation.result;
     }
   }
@@ -266,7 +290,7 @@ export class GameManager {
           }
         });
       }
-    })
+    });
   }
 
   public update(mutativeCb: (game: Game) => void) {
@@ -288,7 +312,7 @@ export class GameManager {
     if (snapshot) {
       return selectDictionaryOfVotesForPlayers(snapshot);
     } else {
-      throw new Error("Could not find game to locate players for")
+      throw new Error("Could not find game to locate players for");
     }
   }
 

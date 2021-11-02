@@ -75,14 +75,17 @@ function GameRoute() {
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
-            onGameRestart={() => {
-              socket.emit(ClientEvent.RESET_GAME, game.data!.id);
-            }}
-            onNextRound={() => {
-              socket.emit(ClientEvent.NEXT_ROUND, game.data!.id);
-            }}
             onOfferAbdication={(roomName, proposedLeaderId) => {
               socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
+            }}
+            onOfferShare={(room, offeredPlayerId, shareType) => {
+              socket.emit(ClientEvent.OFFER_SHARE, game.data!.id, {
+                id: `${ClientEvent.OFFER_SHARE}-${Date.now()}-${player.data!.socketId}`,
+                type: shareType,
+                room,
+                sharerId: player.data!.socketId,
+                offeredPlayerId
+              })
             }}
             onProposeLeader={(leaderId, currentRoom) => {
               socket.emit(

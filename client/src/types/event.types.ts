@@ -3,7 +3,7 @@ import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
-import { PlayerAction, PlayerActionAbdicationOffered } from "./player-action.types";
+import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered } from "./player-action.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -19,23 +19,22 @@ export type ServerIO = TServer<ClientEventListeners, ServerEventListeners>;
 
 export enum ClientEvent {
   ACCEPT_ABDICATION = 'accept-abdication',
-  ALIAS_SOCKET = "alias-socket",
+  ACCEPT_SHARE = 'accept-share',
   APPOINT_ROOM_LEADER = 'appoint-room-leader',
   CREATE_GAME = "create-game",
   DECLINE_ABDICATION = 'decline-abdication',
+  DECLINE_SHARE = 'decline-share',
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
   JOIN_GAME = "join",
-  FLIP_CARD = "flip-card",
-  NEXT_ROUND = "next-round",
   OFFER_ABDICATION = 'offer-abdication',
+  OFFER_SHARE = 'offer-share',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
-  RESET_GAME = 'reset-game',
   START_GAME = "start-game",
-  SHOW_RESULTS = "show-results",
   UPDATE_PLAYER = "update-player",
-  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer'
+  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer',
+  WITHDRAW_SHARE_OFFER = 'withdraw-share-offer'
 }
 
 export enum ServerEvent {
@@ -74,6 +73,11 @@ export type ClientEventListeners = {
     action: PlayerActionAbdicationOffered
   ) => void;
 
+  [ClientEvent.ACCEPT_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareOffered
+  ) => void;
+
   [ClientEvent.APPOINT_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -81,19 +85,16 @@ export type ClientEventListeners = {
     appointedLeaderId: string
   ) => void;
 
-  [ClientEvent.CREATE_GAME]: (e: CreateGameEvent) => void;
+  [ClientEvent.CREATE_GAME]: (socketId: string, playerName?: string) => void;
 
   [ClientEvent.DECLINE_ABDICATION]: (
     gameId: string,
     action: PlayerActionAbdicationOffered
   ) => void;
 
-  [ClientEvent.FLIP_CARD]: (
+  [ClientEvent.DECLINE_SHARE]: (
     gameId: string,
-    keyholderId: string,
-    targetPlayerId: string,
-    cardIdx: number,
-    card: Card
+    action: PlayerActionShareOffered
   ) => void;
 
   [ClientEvent.GET_GAME]: (gameId: string) => void;
@@ -111,13 +112,17 @@ export type ClientEventListeners = {
   ) => void;
 
   [ClientEvent.JOIN_GAME]: (gameId: string, player: Player) => void;
-  [ClientEvent.NEXT_ROUND]: (gameId: string) => void;
 
   [ClientEvent.OFFER_ABDICATION]: (
     gameId: string,
     roomName: RoomName,
     abdicaterId: string,
     proposedLeaderId: string
+  ) => void;
+
+  [ClientEvent.OFFER_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareOffered
   ) => void;
 
   [ClientEvent.PROPOSE_ROOM_LEADER]: (
@@ -127,11 +132,16 @@ export type ClientEventListeners = {
     proposedLeaderId?: string
   ) => void;
 
-  [ClientEvent.RESET_GAME]: (gameId: string) => void;
-  [ClientEvent.SHOW_RESULTS]: (gameId: string) => void;
   [ClientEvent.START_GAME]: (gameId: string) => void;
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
-  [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (gameId: string, offer: PlayerActionAbdicationOffered) => void;
+  [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (
+    gameId: string,
+    offer: PlayerActionAbdicationOffered
+  ) => void;
+  [ClientEvent.WITHDRAW_SHARE_OFFER]: (
+    gameId: string,
+    action: PlayerActionShareOffered
+  ) => void;
 };
 
 /**
@@ -160,7 +170,7 @@ export type ServerEventListeners = {
     game: Game
   ) => void;
   [ServerEvent.GAME_GOTTEN]: (gameId: string, game: Game) => void;
-  [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
+  [ServerEvent.GAME_JOINED]: (game: Game) => void;
   [ServerEvent.GAME_NOTIFICATION]: (
     gameId: string,
     notification: GameNotification
@@ -179,18 +189,3 @@ export type ServerEventListeners = {
   [ServerEvent.ROLE_AND_ROOM_ALLOCATIONS_MADE]: (gameId: string) => void;
   [ServerEvent.ROUND_STARTED]: (gameId: string) => void;
 };
-
-export interface CreateGameEvent {
-  playerName?: string;
-  socketId: string;
-}
-
-export interface JoinGameEvent {
-  playerName: string;
-  socketId: string;
-  gameId: Game["id"];
-}
-
-export interface GameJoinedEvent {
-  game: Game;
-}

@@ -10,7 +10,8 @@ import GameOngoingVotes from './votes/GameOngoingVotes';
 import Timer from '../../../lib/atoms/Timer';
 import PlayerLeaderAbdication from '../../player/interaction/PlayerLeaderAbdication';
 import usePlayerActions from '../../player/usePlayerActions';
-import { isPlayerAbdicationAction, PlayerActionAbdicationOffered } from '../../../types/player-action.types';
+import { isPlayerAbdicationAction, isPlayerShareAction, PlayerActionAbdicationOffered, PlayerActionShareType } from '../../../types/player-action.types';
+import PlayerShareOffer from '../../player/interaction/PlayerShareOffer';
 
 const Container = styled.div`
   display: grid;
@@ -62,13 +63,12 @@ interface Props {
   players: Record<string, PlayerWithRoom>;
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
   onOfferAbdication(roomName: RoomName, proposedLeaderId?: string): void;
+  onOfferShare(roomName: RoomName, playerId: string, shareType: PlayerActionShareType): void
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,
     roomName: RoomName
   ): void;
-  onNextRound: () => void;
-  onGameRestart: () => void;
 }
 
 function GameOngoing(props: Props) {
@@ -160,15 +160,36 @@ function GameOngoing(props: Props) {
     );
   }
 
-  // useSocketListener(ServerEvent.ROLE_AND_ROOM_ALLOCATIONS_MADE, (gameId) => {
-  //   if (gameId === game.id && player.role) {
-  //     dispatch(actions.modal.create.assign({
-  //       isOpen: true,
-  //       title: "Shh, here's your role!",
-  //       content: <RoleCard role={getRoleDefinition(player.role)} />
-  //     }))
-  //   }
-  // })
+  const handleShareOffer = () => {
+    dispatch(
+      actions.modal.create.assign({
+        isOpen: true,
+        title: () => "Offer Share",
+        content: ({
+          currentRoom,
+          onOfferShare,
+          player,
+          players,
+        }) => {
+          // there can only be one abdication offer at any given time
+          const currentOffer = Object.values(player.pendingActions).find(isPlayerShareAction);
+
+          return (
+            <PlayerShareOffer
+              currentOffer={currentOffer}
+              currentRoom={currentRoom}
+              player={player}
+              players={players}
+              onOfferShare={(currentRoom, playerId, shareType) => {
+                onOfferShare(currentRoom, playerId, shareType);
+                handleModalClose();
+              }}
+            />
+          );
+        },
+      })
+    );
+  };
 
   const ModalContent = state.modal.content
 
@@ -203,7 +224,7 @@ function GameOngoing(props: Props) {
               {props.currentLeader ? "PROPOSE" : "APPOINT"} LEADER
             </Button>
           )}
-          <Button primary fluid>
+          <Button primary fluid onClick={handleShareOffer}>
             OFFER SHARE
           </Button>
           <Button color="red" fluid onClick={handleRoleReveal}>
