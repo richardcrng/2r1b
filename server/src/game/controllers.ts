@@ -1,4 +1,4 @@
-import { CreateGameEvent } from "../../../client/src/types/event.types";
+import { ClientEvent, ClientEventListeners, CreateGameEvent } from "../../../client/src/types/event.types";
 import {
   createStartingRounds,
   Game,
@@ -12,6 +12,7 @@ import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
 import { NotificationType } from "../../../client/src/types/notification.types";
+import { PlayerActionAbdicationOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
 
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
@@ -54,7 +55,8 @@ export const createGame = (data: CreateGameEvent): Game => {
         socketId: data.socketId,
         isHost: true,
         gameId,
-        colors: getColors(5)
+        colors: getColors(5),
+        pendingActions: {}
       },
     },
     rolesCount: { ...DEFAULT_STARTING_ROLES_COUNT },
@@ -75,6 +77,30 @@ export const incrementRoleInGame = (
     game.rolesCount[role] += increment;
   })
 };
+
+export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION] = (
+  gameId,
+  room,
+  abdicatingLeaderId,
+  proposedNewLeaderId
+) => {
+  const gameManager = new GameManager(gameId);
+  const abdicationOffer: PlayerActionAbdicationOffered = {
+    id: `${Date.now()}-${Math.random().toFixed(5).slice(2)}`,
+    room,
+    type: PlayerActionType.ABDICATION_OFFERED,
+    abdicatingLeaderId,
+    proposedNewLeaderId
+  }
+
+  for (let playerId of [abdicatingLeaderId, proposedNewLeaderId]) {
+    const playerManager = gameManager.managePlayer(playerId);
+    playerManager.update((player) => {
+      player.pendingActions[abdicationOffer.id] = abdicationOffer;
+    });
+    playerManager.pushPendingAction(abdicationOffer)
+  }
+}
 
 export const proposeRoomLeader = (
   gameId: string,

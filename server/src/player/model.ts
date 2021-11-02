@@ -3,6 +3,7 @@ import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
 import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
+import { PlayerAction } from "../../../client/src/types/player-action.types";
 
 export class PlayerManager {
   constructor(
@@ -61,6 +62,16 @@ export class PlayerManager {
     } else {
       return { status: 'error' }
     }
+  }
+
+  public pushPendingAction(
+    playerAction: PlayerAction
+  ): void {
+    this.gameManager.io.emit(
+      ServerEvent.ACTION_PENDING,
+      this.socketId,
+      playerAction
+    )
   }
 
   public pushNotification(

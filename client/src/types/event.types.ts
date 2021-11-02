@@ -3,6 +3,7 @@ import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
+import { PlayerAction } from "./player-action.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -26,6 +27,7 @@ export enum ClientEvent {
   JOIN_GAME = "join",
   FLIP_CARD = "flip-card",
   NEXT_ROUND = "next-round",
+  OFFER_ABDICATION = 'offer-abdication',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
   RESET_GAME = 'reset-game',
   START_GAME = "start-game",
@@ -34,6 +36,7 @@ export enum ClientEvent {
 }
 
 export enum ServerEvent {
+  ACTION_PENDING = 'action-pending',
   CARD_FLIPPED = 'card-picked',
   GAME_CREATED = "game-created",
   GAME_GOTTEN = "game-gotten",
@@ -62,6 +65,13 @@ export enum GameOverReason {
  * Listeners for `ClientEvent`s
  */
 export type ClientEventListeners = {
+  [ClientEvent.OFFER_ABDICATION]: (
+    gameId: string,
+    roomName: RoomName,
+    abdicaterId: string,
+    proposedLeaderId: string
+  ) => void;
+
   [ClientEvent.APPOINT_ROOM_LEADER]: (
     gameId: string,
     roomName: RoomName,
@@ -113,6 +123,10 @@ export type ClientEventListeners = {
  * Listeners for `ServerEvent`s
  */
 export type ServerEventListeners = {
+  [ServerEvent.ACTION_PENDING]: (
+    playerId: string,
+    action: PlayerAction
+  ) => void;
   [ServerEvent.CARD_FLIPPED]: (
     gameId: string,
     keyholderId: string,

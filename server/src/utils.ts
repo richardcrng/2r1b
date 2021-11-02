@@ -34,14 +34,16 @@ export const createDummyPlayer = ({
   gameId,
   name,
   isHost,
-  role
+  role,
+  pendingActions = {}
 }: Partial<Player> = {}): Player => {
   return {
     socketId,
     gameId,
     name,
     isHost,
-    role
+    role,
+    pendingActions
   }
 }
 
