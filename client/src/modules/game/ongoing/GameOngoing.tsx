@@ -61,7 +61,7 @@ interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
-  onOfferAbdication(roomName: RoomName, proposedLeaderId: string): void;
+  onOfferAbdication(roomName: RoomName, proposedLeaderId?: string): void;
   onProposeLeader(proposedLeaderId: string | undefined, roomName: RoomName): void;
   onNextRound: () => void;
   onGameRestart: () => void;
@@ -110,7 +110,10 @@ function GameOngoing(props: Props) {
               currentRoom={currentRoom}
               player={player}
               players={players}
-              onOfferAbdication={onOfferAbdication}
+              onOfferAbdication={(currentRoom, playerId) => {
+                onOfferAbdication(currentRoom, playerId);
+                handleModalClose();
+              }}
             />
           );
         }
