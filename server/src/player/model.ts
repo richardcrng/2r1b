@@ -35,8 +35,6 @@ export class PlayerManager {
     );
     if (operation.status === "success") {
       return operation.result;
-    } else {
-      throw new Error("Could not find game");
     }
   }
 

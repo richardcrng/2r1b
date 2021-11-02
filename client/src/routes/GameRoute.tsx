@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Redirect, useParams } from "react-router-dom";
 import PlayerNamer from "../lib/atoms/PlayerNamer";
 import GamePage from "../modules/game/GamePage";
 import useGame from "../hooks/useGame";
@@ -20,7 +20,11 @@ function GameRoute() {
     (player) => player.name!
   );
 
-  if (game.data?.status === GameStatus.ONGOING && !player.data) {
+  if (game.loading) {
+    return <p>Loading...</p>
+  } else if (game.error) {
+    return <Redirect to="/" />;
+  } else if (game.data?.status === GameStatus.ONGOING && !player.data) {
     return <p>Can't join a game that is underway - sorry</p>;
   } else if (!player.loading && !player.data?.name) {
     return (
