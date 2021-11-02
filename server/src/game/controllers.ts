@@ -22,7 +22,7 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
       leaderId: appointedLeaderId,
       appointerId,
     });
-    gameManager.pushNotificationToRoom(roomName, `${gameManager.getPlayer(appointedLeaderId).name} has been appointed as leader by ${gameManager.getPlayer(appointerId).name}`)
+    gameManager.pushNotificationToRoom(roomName, `${gameManager.getPlayerOrFail(appointedLeaderId).name} has been appointed as leader by ${gameManager.getPlayerOrFail(appointerId).name}`)
   }
 }
 
@@ -128,8 +128,8 @@ const usurpLeader = (
 
   gameManager.pushNotificationToRoom(
     roomName,
-    `${gameManager.getPlayer(newLeaderId).name} usurps ${
-      gameManager.getPlayer(oldLeaderId).name
+    `${gameManager.getPlayerOrFail(newLeaderId).name} usurps ${
+      gameManager.getPlayerOrFail(oldLeaderId).name
     } as leader`,
     {},
   );
