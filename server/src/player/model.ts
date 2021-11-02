@@ -31,7 +31,11 @@ export class PlayerManager {
 
   _pointer(): Player | undefined {
     const operation = this.gameManager._withPointer(
-      (pointer) => pointer.players[this.socketId]
+      (pointer) => {
+        const canonicalId = [this.socketId, ...this.aliasSocketIds].find(id => pointer.players[id]);
+        if (!canonicalId) throw new Error("Couldn't find player")
+        return pointer.players[canonicalId]
+      }
     );
     if (operation.status === "success") {
       return operation.result;
