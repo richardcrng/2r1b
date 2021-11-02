@@ -13,6 +13,7 @@
     "start:server:compiled": "yarn workspace @2r1b/server start:compiled",
     "start:server:dev": "yarn workspace @2r1b/server start:dev",
     "test": "yarn test:client && yarn test:server",
+    "test:types": "yarn workspace @2r1b/server test:types",
     "test:client": "yarn workspace @2r1b/client test",
     "test:client:watch": "yarn workspace @2r1b/client test:watch",
     "test:server": "yarn workspace @2r1b/server test",

@@ -12,7 +12,7 @@ describe('assignPlayersToRooms', () => {
     });
     const gameManager = new GameManager(testGame.id, { [testGame.id]: testGame })
     gameManager.assignInitialRooms();
-    const roomAllocationValues = Object.values(gameManager.snapshot().rounds[0].playerAllocation);
+    const roomAllocationValues = Object.values(gameManager.snapshot()?.rounds[0].playerAllocation ?? {});
     expect(roomAllocationValues).toHaveLength(6);
     expect(roomAllocationValues.filter(val => val === RoomName.A)).toHaveLength(3);
     expect(roomAllocationValues.filter((val) => val === RoomName.B)).toHaveLength(3);
@@ -27,7 +27,7 @@ describe('assignPlayersToRooms', () => {
     });
     gameManager.assignInitialRooms();
     const roomAllocationValues = Object.values(
-      gameManager.snapshot().rounds[0].playerAllocation
+      gameManager.snapshot()?.rounds[0].playerAllocation ?? {}
     );
     expect(roomAllocationValues).toHaveLength(7);
     expect(
@@ -63,7 +63,7 @@ describe('assignInitialRoles', () => {
 
     gameManager.assignInitialRoles();
 
-    const { players } = gameManager.snapshot();
+    const players = gameManager.players();
 
     expect(Object.keys(players)).toHaveLength(8);
     for (let playerId in players) {
@@ -103,7 +103,7 @@ describe('assignInitialRoles', () => {
 
     gameManager.assignInitialRoles();
 
-    const { players } = gameManager.snapshot();
+    const players = gameManager.players();
     expect(Object.keys(players)).toHaveLength(8);
 
     for (let playerId in players) {
