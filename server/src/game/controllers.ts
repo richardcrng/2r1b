@@ -9,7 +9,7 @@ import {
 } from "../../../client/src/types/game.types";
 import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
-import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
+import { DEFAULT_STARTING_ROLES_COUNT, getRoleName } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
 import { NotificationType } from "../../../client/src/types/notification.types";
 import { PlayerActionAbdicationOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
@@ -186,7 +186,15 @@ export const startGame = (
 ): void => {
   const gameManager = new GameManager(gameId);
   gameManager.assignInitialRoles();
+  gameManager.pushPlayersNotification((player) => ({
+    type: NotificationType.GENERAL,
+    message: `You have been assigned ${getRoleName(player.role!)}`,
+  }));
   gameManager.assignInitialRooms();
+  gameManager.pushPlayersNotification((player) => ({
+    type: NotificationType.GENERAL,
+    message: `Head to Room ${gameManager.getCurrentRoomFor(player.socketId)}`
+  }))
   gameManager.update(game => {
     game.status = GameStatus.ONGOING;
     game.rounds[0].status = RoundStatus.ONGOING;

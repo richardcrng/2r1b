@@ -1,6 +1,6 @@
 import { cloneDeep } from "lodash";
 import { ServerEvent } from "../../../client/src/types/event.types";
-import { Player } from "../../../client/src/types/game.types";
+import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
 import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { PlayerAction } from "../../../client/src/types/player-action.types";
@@ -103,6 +103,10 @@ export class PlayerManager {
     if (playerNotification) {
       this.pushNotification(playerNotification)
     }
+  }
+
+  public roomName(): RoomName {
+    return this.gameManager.currentRound().round.playerAllocation[this.socketId]
   }
 
   public set(player: Player): void {
