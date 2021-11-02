@@ -11,7 +11,10 @@ function App() {
 
   return (
     <Router>
-      <ToastContainer autoClose={3000} />
+      <ToastContainer
+        autoClose={3000}
+        draggablePercent={30}
+      />
       <main
         className='background'
         style={{
