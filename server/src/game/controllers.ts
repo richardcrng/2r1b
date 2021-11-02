@@ -112,6 +112,7 @@ export const createGame = (data: CreateGameEvent): Game => {
   };
   const gameManager = new GameManager(gameId)
   gameManager.create(game);
+  
   return game
 };
 

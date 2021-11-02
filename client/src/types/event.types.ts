@@ -3,7 +3,7 @@ import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
-import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered, PlayerActionType } from "./player-action.types";
+import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered } from "./player-action.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -20,7 +20,6 @@ export type ServerIO = TServer<ClientEventListeners, ServerEventListeners>;
 export enum ClientEvent {
   ACCEPT_ABDICATION = 'accept-abdication',
   ACCEPT_SHARE = 'accept-share',
-  ALIAS_SOCKET = "alias-socket",
   APPOINT_ROOM_LEADER = 'appoint-room-leader',
   CREATE_GAME = "create-game",
   DECLINE_ABDICATION = 'decline-abdication',
@@ -29,14 +28,10 @@ export enum ClientEvent {
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
   JOIN_GAME = "join",
-  FLIP_CARD = "flip-card",
-  NEXT_ROUND = "next-round",
   OFFER_ABDICATION = 'offer-abdication',
   OFFER_SHARE = 'offer-share',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
-  RESET_GAME = 'reset-game',
   START_GAME = "start-game",
-  SHOW_RESULTS = "show-results",
   UPDATE_PLAYER = "update-player",
   WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer',
   WITHDRAW_SHARE_OFFER = 'withdraw-share-offer'
@@ -102,14 +97,6 @@ export type ClientEventListeners = {
     action: PlayerActionShareOffered
   ) => void;
 
-  [ClientEvent.FLIP_CARD]: (
-    gameId: string,
-    keyholderId: string,
-    targetPlayerId: string,
-    cardIdx: number,
-    card: Card
-  ) => void;
-
   [ClientEvent.GET_GAME]: (gameId: string) => void;
 
   [ClientEvent.GET_PLAYER]: (
@@ -125,7 +112,6 @@ export type ClientEventListeners = {
   ) => void;
 
   [ClientEvent.JOIN_GAME]: (gameId: string, player: Player) => void;
-  [ClientEvent.NEXT_ROUND]: (gameId: string) => void;
 
   [ClientEvent.OFFER_ABDICATION]: (
     gameId: string,
@@ -146,8 +132,6 @@ export type ClientEventListeners = {
     proposedLeaderId?: string
   ) => void;
 
-  [ClientEvent.RESET_GAME]: (gameId: string) => void;
-  [ClientEvent.SHOW_RESULTS]: (gameId: string) => void;
   [ClientEvent.START_GAME]: (gameId: string) => void;
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
   [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (
