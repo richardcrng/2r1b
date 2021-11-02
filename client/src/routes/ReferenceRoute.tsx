@@ -43,11 +43,11 @@ function ReferenceRoute() {
           <Redirect to={`${path}/roles/${roleKey.toLowerCase().replaceAll("_", "-")}`} />
         </Route>
       ))}
-      <Route exact path={`${path}/roles/blue_team`}>
-        <Redirect to={`${path}/roles/team_blue`} />
+      <Route exact path={`${path}/roles/blue-team`}>
+        <Redirect to={`${path}/roles/team-blue`} />
       </Route>
-      <Route exact path={`${path}/roles/red_team`}>
-        <Redirect to={`${path}/roles/team_red`} />
+      <Route exact path={`${path}/roles/red-team`}>
+        <Redirect to={`${path}/roles/team-red`} />
       </Route>
     </Switch>
   );
