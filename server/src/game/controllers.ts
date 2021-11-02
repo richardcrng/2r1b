@@ -25,20 +25,15 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
     });
 
     gameManager.pushPlayerNotificationToRoom(roomName, (player) => {
+      const newLeaderName = gameManager.getPlayerOrFail(appointedLeaderId).name;
+      const appointerName = gameManager.getPlayerOrFail(appointerId).name;
+
       const message =
         player.socketId === appointerId
-          ? `You have appointed ${
-              gameManager.getPlayerOrFail(appointedLeaderId).name
-            } as leader`
+          ? `You have appointed ${newLeaderName} as leader`
           : player.socketId === appointedLeaderId
-          ? `You have been appointed as leader by ${
-              gameManager.getPlayerOrFail(appointerId).name
-            }`
-          : `${
-              gameManager.getPlayerOrFail(appointedLeaderId).name
-            } has been appointed as leader by ${
-              gameManager.getPlayerOrFail(appointerId).name
-            }`;
+          ? `You have been appointed as leader by ${appointerName}`
+          : `${newLeaderName} has been appointed as leader by ${appointerName}`;
 
       return {
         type: NotificationType.GENERAL,
@@ -149,10 +144,19 @@ const usurpLeader = (
     });
   }
 
-  gameManager.pushPlayerNotificationToRoom(roomName, {
-    type: NotificationType.GENERAL,
-    message: `${gameManager.getPlayerOrFail(newLeaderId).name} usurps ${
-      gameManager.getPlayerOrFail(oldLeaderId).name
-    } as leader`,
+  gameManager.pushPlayerNotificationToRoom(roomName, (player) => {
+    const oldLeaderName = gameManager.getPlayerOrFail(oldLeaderId).name;
+    const newLeaderName = gameManager.getPlayerOrFail(newLeaderId).name;
+
+    const message = player.socketId === newLeaderId
+      ? `You have usurped ${oldLeaderName} as leader`
+      : player.socketId === oldLeaderId
+        ? `${newLeaderName} has usurped you as leader`
+        : `${newLeaderName} has usurped ${oldLeaderName} as leader`
+
+    return {
+      type: NotificationType.GENERAL,
+      message,
+    };
   });
 };
