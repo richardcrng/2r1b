@@ -1,12 +1,12 @@
 import { chunk, cloneDeep, last, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
+import { Notification } from "../../../client/src/types/notification.types";
 import { Game, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
-import { ToastOptions } from 'react-toastify';
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -203,43 +203,37 @@ export class GameManager {
   }
 
   public pushNotificationToAll(
-    message: string,
-    toastOptions: ToastOptions = {}
+    notification: Notification
   ): void {
     this.io.emit(
       ServerEvent.GAME_NOTIFICATION,
       this.gameId,
-      message,
-      toastOptions
+      notification
     );
   }
 
   public pushNotificationToRoom(
     roomName: RoomName,
-    message: string,
-    toastOptions: ToastOptions = {}
+    notification: Notification,
   ): void {
-    this.pushNotificationToPlayers(message, toastOptions, (player) => !!this.playersInRoom(roomName)[player.socketId]);
+    this.pushNotificationToPlayers(notification, (player) => !!this.playersInRoom(roomName)[player.socketId]);
   }
 
   public pushNotificationToPlayerById(
     playerId: string,
-    message: string,
-    toastOptions: ToastOptions = {}
+    notification: Notification
   ): void {
-    this.managePlayer(playerId).pushNotification(message, toastOptions);
+    this.managePlayer(playerId).pushNotification(notification);
   }
 
   public pushNotificationToPlayers(
-    message: string,
-    toastOptions: ToastOptions = {},
+    notification: Notification,
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
     for (let player of playersToNotify) {
       this.managePlayer(player.socketId).pushNotification(
-        message,
-        toastOptions
+        notification
       );
     }
   }

@@ -11,6 +11,7 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
+import { NotificationType } from "../../../client/src/types/notification.types";
 
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
@@ -22,7 +23,14 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
       leaderId: appointedLeaderId,
       appointerId,
     });
-    gameManager.pushNotificationToRoom(roomName, `${gameManager.getPlayerOrFail(appointedLeaderId).name} has been appointed as leader by ${gameManager.getPlayerOrFail(appointerId).name}`)
+    gameManager.pushNotificationToRoom(roomName, {
+      type: NotificationType.GENERAL,
+      message: `${
+        gameManager.getPlayerOrFail(appointedLeaderId).name
+      } has been appointed as leader by ${
+        gameManager.getPlayerOrFail(appointerId).name
+      }`,
+    });
   }
 }
 
@@ -127,11 +135,10 @@ const usurpLeader = (
     });
   }
 
-  gameManager.pushNotificationToRoom(
-    roomName,
-    `${gameManager.getPlayerOrFail(newLeaderId).name} usurps ${
+  gameManager.pushNotificationToRoom(roomName, {
+    type: NotificationType.GENERAL,
+    message: `${gameManager.getPlayerOrFail(newLeaderId).name} usurps ${
       gameManager.getPlayerOrFail(oldLeaderId).name
     } as leader`,
-    {},
-  );
+  });
 };

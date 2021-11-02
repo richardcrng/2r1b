@@ -49,9 +49,9 @@ export default function useGame(gameId: Game["id"]): UseGameResult {
     );
   });
 
-  useSocketListener(ServerEvent.GAME_NOTIFICATION, (notificationGameId, message, toastOptions) => {
+  useSocketListener(ServerEvent.GAME_NOTIFICATION, (notificationGameId, notification) => {
     if (notificationGameId === gameId) {
-      toast(message, toastOptions)
+      toast(notification.message)
     }
   })
 

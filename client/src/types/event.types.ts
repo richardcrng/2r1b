@@ -3,6 +3,7 @@ import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
+import { Notification } from './notification.types';
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -130,8 +131,7 @@ export type ServerEventListeners = {
   [ServerEvent.GAME_JOINED]: (e: GameJoinedEvent) => void;
   [ServerEvent.GAME_NOTIFICATION]: (
     gameId: string,
-    message: string,
-    toastOptions?: ToastOptions
+    notification: Notification
   ) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
@@ -139,8 +139,7 @@ export type ServerEventListeners = {
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOTIFICATION]: (
     playersToNotify: Record<string, true>,
-    message: string,
-    toastOptions?: ToastOptions
+    notification: Notification
   ) => void;
   [ServerEvent.PLAYER_NOT_FOUND]: () => void;
   [ServerEvent.REDIRECT_TO_LOBBY]: () => void;
