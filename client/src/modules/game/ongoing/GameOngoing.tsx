@@ -138,7 +138,7 @@ function GameOngoing(props: Props) {
       <Container className="active-contents">
         <Header>
           <h1>Situation Room {props.currentRoom}</h1>
-          <h2>Leader: {props.currentLeader?.name ?? "<none>"}</h2>
+          <h2>{leaderMessage(props.player, props.currentLeader)}</h2>
           <hr />
         </Header>
         <TimerArea>
@@ -181,6 +181,16 @@ function GameOngoing(props: Props) {
       </Modal>
     </>
   );
+}
+
+const leaderMessage = (currentPlayer: Player, leader?: Player): JSX.Element => {
+  if (!leader) {
+    return <>No room leader yet</>
+  } else if (currentPlayer.socketId === leader.socketId) {
+    return <><strong>You</strong> are room leader</>
+  } else {
+    return <><strong>{leader.name}</strong> is room leader</>
+  }
 }
 
 export default GameOngoing;
