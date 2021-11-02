@@ -90,6 +90,10 @@ export class PlayerManager {
   }
 
   public resolvePendingAction(playerAction: PlayerAction, playerNotification?: PlayerNotification): void {
+    this.update(player => {
+      delete player.pendingActions[playerAction.id];
+    })
+
     this.gameManager.io.emit(
       ServerEvent.ACTION_RESOLVED,
       this.socketId,
