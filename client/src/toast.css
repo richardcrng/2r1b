@@ -1,0 +1,7 @@
+:root {
+  --toastify-color-progress-light: linear-gradient(
+    to right,
+    #0100E5,
+    #E50000
+  );
+}

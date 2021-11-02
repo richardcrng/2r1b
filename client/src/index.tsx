@@ -7,6 +7,7 @@ import { socket, SocketContext } from "./socket";
 
 import "semantic-ui-css/semantic.min.css";
 import './styles.css';
+import './toast.css'
 
 const queryClient = new QueryClient();
 

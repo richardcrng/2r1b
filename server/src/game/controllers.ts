@@ -11,18 +11,18 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
-import { cloneDeep, last } from 'lodash';
-import { selectDictionaryOfVotesForPlayers, selectPlayerIdsInEachRoom } from '../../../client/src/selectors/game';
 
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
   const targetRoom = gameManager.currentRound().round.rooms[roomName];
+
   if (targetRoom.leadersRecord.length === 0) {
     gameManager.addLeaderRecord(roomName, {
       method: LeaderRecordMethod.APPOINTMENT,
       leaderId: appointedLeaderId,
       appointerId,
     });
+    gameManager.pushNotificationToRoom(roomName, `${gameManager.getPlayer(appointedLeaderId).name} has been appointed as leader by ${gameManager.getPlayer(appointerId).name}`)
   }
 }
 
@@ -44,7 +44,8 @@ export const createGame = (data: CreateGameEvent): void => {
     status: GameStatus.LOBBY,
     rounds: createStartingRounds()
   };
-  new GameManager(gameId).create(game);
+  const gameManager = new GameManager(gameId)
+  gameManager.create(game);
 };
 
 export const incrementRoleInGame = (
@@ -85,7 +86,7 @@ export const proposeRoomLeader = (
     const votesForLeader = gameManager.votesAgainstPlayer(proposedLeaderId);
 
     if (votesForLeader.length > Object.keys(playersInThisRoom).length / 2) {
-      usurpLeader(gameId, roomName, proposedLeaderId, votesForLeader.map(vote => vote.voterId));
+      usurpLeader(gameId, roomName, proposedLeaderId, currentLeader, votesForLeader.map(vote => vote.voterId));
     }
   }
 }
@@ -108,6 +109,7 @@ const usurpLeader = (
   gameId: string,
   roomName: RoomName,
   newLeaderId: string,
+  oldLeaderId: string,
   voterIds: string[]
 ): void => {
   const gameManager = new GameManager(gameId);
@@ -123,4 +125,12 @@ const usurpLeader = (
       delete player.leaderVote;
     });
   }
+
+  gameManager.pushNotificationToRoom(
+    roomName,
+    `${gameManager.getPlayer(newLeaderId).name} usurps ${
+      gameManager.getPlayer(oldLeaderId).name
+    } as leader`,
+    {},
+  );
 };

@@ -6,6 +6,7 @@ import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
+import { ToastOptions } from 'react-toastify';
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -37,11 +38,15 @@ export class GameManager {
   public addLeaderRecord(roomName: RoomName, record: LeaderRecord): void {
     this.updateCurrentRound((round) => {
       const room = round.rooms[roomName];
-      room.leadersRecord.push(record)
+      room.leadersRecord.push(record);
     });
   }
 
-  public appointLeader(roomName: RoomName, leaderId: string, appointerId: string): void {
+  public appointLeader(
+    roomName: RoomName,
+    leaderId: string,
+    appointerId: string
+  ): void {
     const { round } = this.currentRound();
     if (round) {
       const targetRoom = round.rooms[roomName];
@@ -73,7 +78,7 @@ export class GameManager {
       this.updatePlayer(playerId, (player) => {
         player.role = shuffledRoleKeys[idx];
       });
-    };
+    }
   }
 
   public assignInitialRooms(): void {
@@ -82,7 +87,7 @@ export class GameManager {
     const firstRoomSize = Math.ceil(playerIds.length / 2);
     const [playersInA, playersInB] = chunk(shuffledIds, firstRoomSize);
 
-    this.update(game => {
+    this.update((game) => {
       const roomAllocation: PlayerRoomAllocation = {};
 
       for (let playerId of playersInA) {
@@ -104,19 +109,22 @@ export class GameManager {
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
     return last(
-      this._pointer().rounds[this.currentRound().idx].rooms[
-        roomName
-      ].leadersRecord
+      this._pointer().rounds[this.currentRound().idx].rooms[roomName]
+        .leadersRecord
     );
   }
 
-  public currentRound(): { round: Round, idx: number } {
+  public currentRound(): { round: Round; idx: number } {
     for (let [idx, round] of Object.entries(this._pointer().rounds)) {
       if (round.status === RoundStatus.ONGOING) {
-        return { round, idx: parseInt(idx) }
+        return { round, idx: parseInt(idx) };
       }
     }
-    throw new Error("Couldn't find a round")
+    throw new Error("Couldn't find a round");
+  }
+
+  public getPlayer(playerId: string): Player {
+    return this.managePlayer(playerId).snapshot();
   }
 
   public managePlayer(
@@ -127,17 +135,60 @@ export class GameManager {
   }
 
   public players(): Readonly<Record<string, Player>> {
-    return this.snapshot().players
+    return this.snapshot().players;
   }
 
   public playersInRoom(roomName: RoomName): Readonly<Record<string, Player>> {
     const { playerAllocation } = this.currentRound().round;
     return Object.values(this.players()).reduce(
-      (acc, curr) => playerAllocation[curr.socketId] === roomName
-        ? { ...acc, [curr.socketId]: curr }
-        : acc,
+      (acc, curr) =>
+        playerAllocation[curr.socketId] === roomName
+          ? { ...acc, [curr.socketId]: curr }
+          : acc,
       {} as Record<string, Player>
-    )
+    );
+  }
+
+  public pushNotificationToAll(
+    message: string,
+    toastOptions: ToastOptions = {}
+  ): void {
+    this.io.emit(
+      ServerEvent.GAME_NOTIFICATION,
+      this.gameId,
+      message,
+      toastOptions
+    );
+  }
+
+  public pushNotificationToRoom(
+    roomName: RoomName,
+    message: string,
+    toastOptions: ToastOptions = {}
+  ): void {
+    this.pushNotificationToPlayers(message, toastOptions, (player) => !!this.playersInRoom(roomName)[player.socketId]);
+  }
+
+  public pushNotificationToPlayerById(
+    playerId: string,
+    message: string,
+    toastOptions: ToastOptions = {}
+  ): void {
+    this.managePlayer(playerId).pushNotification(message, toastOptions);
+  }
+
+  public pushNotificationToPlayers(
+    message: string,
+    toastOptions: ToastOptions = {},
+    where: (player: Player) => boolean = () => true
+  ): void {
+    const playersToNotify = Object.values(this.players()).filter(where);
+    for (let player of playersToNotify) {
+      this.managePlayer(player.socketId).pushNotification(
+        message,
+        toastOptions
+      );
+    }
   }
 
   public set(game: Game): void {
@@ -152,7 +203,7 @@ export class GameManager {
     const game = this._pointer();
     while (game.currentTimerSeconds && game.currentTimerSeconds > 0) {
       await sleep(1000);
-      this.update(gameState => {
+      this.update((gameState) => {
         if (gameState.currentTimerSeconds) {
           gameState.currentTimerSeconds -= 1;
         }
@@ -166,8 +217,8 @@ export class GameManager {
 
   public updateCurrentRound(mutativeCb: (round: Round) => void): void {
     this.update((game) => {
-      mutativeCb(game.rounds[this.currentRound().idx])
-    })
+      mutativeCb(game.rounds[this.currentRound().idx]);
+    });
   }
 
   public updatePlayer(playerId: string, mutativeCb: (player: Player) => void) {
@@ -179,6 +230,6 @@ export class GameManager {
   }
 
   public votesAgainstPlayer(playerId: string): ReadonlyArray<LeaderVote> {
-    return this.votesAgainstEachPlayer()[playerId]
+    return this.votesAgainstEachPlayer()[playerId];
   }
 }

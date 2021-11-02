@@ -1,5 +1,4 @@
 import {
-  Game,
   Player,
 } from "../../../client/src/types/game.types";
 import { GameManager } from "../game/model";
@@ -9,11 +8,13 @@ export const joinPlayerToGame = (
   gameId: string,
   playerData: Player
 ): void => {
-  new GameManager(gameId).managePlayer(playerData.socketId).set({
+  const gameManager = new GameManager(gameId);
+  gameManager.managePlayer(playerData.socketId).set({
     ...playerData,
     gameId,
     colors: getColors(5)
   });
+  gameManager.pushNotificationToPlayers(`${playerData.name} joined`, { autoClose: 2000 }, ({ socketId }) => socketId !== playerData.socketId)
 };
 
 export const updatePlayer = (
