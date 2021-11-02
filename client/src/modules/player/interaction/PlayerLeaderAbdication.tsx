@@ -2,28 +2,31 @@ import { Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import PlayerDropdown from "../dropdown/PlayerDropdown";
 import { useState } from "react";
 import { Button } from "semantic-ui-react";
+import { PlayerActionAbdicationOffered } from "../../../types/player-action.types";
 
 interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>;
   currentRoom: RoomName;
-  currentOfferId?: string;
+  currentOffer?: PlayerActionAbdicationOffered;
   onOfferAbdication(currentRoom: RoomName, playerId?: string): void;
+  onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
   onPlayerSelect?(playerId: string): void;
   selectedPlayerId?: string;
 }
 function PlayerLeaderAbdication({
   currentRoom,
-  currentOfferId,
+  currentOffer,
   onOfferAbdication,
   onPlayerSelect,
+  // onWithdrawAbdicationOffer,
   player,
   players,
   selectedPlayerId: controlledPlayerId,
 }: Props) {
   const [uncontrolledPlayerId, setUncontrolledPlayerId] = useState<
     string | undefined
-  >(currentOfferId);
+  >(currentOffer?.proposedNewLeaderId);
 
   const selectedPlayerId = controlledPlayerId ?? uncontrolledPlayerId;
 
@@ -33,11 +36,11 @@ function PlayerLeaderAbdication({
   return (
     <>
       <p>Since you are leader, you can offer to abdicate leadership.</p>
-      <p>{currentOfferId ? (
-        <>You can't offer to abdicate to anybody until you withdraw your existing offer to {players[currentOfferId].name}.</>
+      <p>{currentOffer ? (
+        <>You can't offer to abdicate to anybody until you withdraw your existing offer to {players[currentOffer.proposedNewLeaderId].name}.</>
       ) : <>You have no offer pending.</>}</p>
       <PlayerDropdown
-        disabled={!!currentOfferId}
+        disabled={!!currentOffer?.proposedNewLeaderId}
         filter={(playerToCheck) =>
           isPlayerInCurrentRoom(playerToCheck) &&
           playerToCheck.socketId !== player.socketId
@@ -47,23 +50,15 @@ function PlayerLeaderAbdication({
           onPlayerSelect && onPlayerSelect(id);
         }}
         players={players}
-        selectedPlayerId={currentOfferId ?? selectedPlayerId}
+        selectedPlayerId={currentOffer?.proposedNewLeaderId ?? selectedPlayerId}
       />
       <Button
-        disabled={!!currentOfferId || !selectedPlayerId}
+        disabled={!!currentOffer?.proposedNewLeaderId || !selectedPlayerId}
         fluid
         primary
         onClick={() => onOfferAbdication(currentRoom, selectedPlayerId)}
       >
         Offer abdication
-      </Button>
-      <Button
-        color="red"
-        disabled={!currentOfferId}
-        fluid
-        onClick={() => onOfferAbdication(currentRoom, undefined)}
-      >
-        Rescind current offer
       </Button>
     </>
   );

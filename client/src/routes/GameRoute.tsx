@@ -101,6 +101,13 @@ function GameRoute() {
                 increment
               );
             }}
+            onWithdrawAbdicationOffer={(action) => {
+              socket.emit(
+                ClientEvent.WITHDRAW_ABDICATION_OFFER,
+                game.data!.id,
+                action
+              )
+            }}
             players={Object.values(game.data.players)}
             player={player.data}
           />

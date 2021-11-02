@@ -1,5 +1,6 @@
 import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders, selectGamePlayersWithRooms } from "../../selectors/game";
 import { Game, GameStatus, Player, RoomName } from "../../types/game.types";
+import { PlayerActionAbdicationOffered } from "../../types/player-action.types";
 import { RoleKey } from "../../types/role.types";
 import GameLobby from "./lobby/GameLobby";
 import GameOngoing from "./ongoing/GameOngoing";
@@ -11,8 +12,12 @@ interface Props {
   onGameRestart: () => void;
   onNextRound: () => void;
   onOfferAbdication: (roomName: RoomName, proposedLeaderId: string) => void;
-  onProposeLeader(proposedLeaderId: string | undefined, currentRoom: RoomName): void;
+  onProposeLeader(
+    proposedLeaderId: string | undefined,
+    currentRoom: RoomName
+  ): void;
   onRoleIncrement: (roleKey: RoleKey, increment: number) => void;
+  onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
   players: Player[];
   player: Player;
 }
@@ -26,6 +31,7 @@ function GamePage({
   onOfferAbdication,
   onProposeLeader,
   onRoleIncrement,
+  onWithdrawAbdicationOffer,
   players,
   player,
 }: Props) {
@@ -45,7 +51,7 @@ function GamePage({
   if (game.status === GameStatus.LOBBY) {
     return <GameLobby {...{ game, onGameStart, onRoleIncrement, players, player }} />;
   } else if (currentRoom) {
-    return <GameOngoing {...{ currentLeader, currentRoom, game, player, players: playersWithRooms, onAppointLeader, onGameRestart, onNextRound, onOfferAbdication, onProposeLeader }} />;
+    return <GameOngoing {...{ currentLeader, currentRoom, game, player, players: playersWithRooms, onAppointLeader, onGameRestart, onNextRound, onOfferAbdication, onProposeLeader, onWithdrawAbdicationOffer }} />;
   } else {
     return <p>Waiting for room allocation...</p>
   }

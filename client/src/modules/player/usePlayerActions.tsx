@@ -31,7 +31,10 @@ function usePlayerActions(game: Game, player: Player): void {
               <p>Waiting for them to accept the offer...</p>
               <Button
                 color="red"
-                onClick={() => toast.dismiss(toastId)}
+                onClick={() => {
+                  toast.dismiss(toastId);
+                  socket.emit(ClientEvent.WITHDRAW_ABDICATION_OFFER, game.id, action);
+                }}
               >Withdraw offer</Button>
             </div>,
             {

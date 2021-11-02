@@ -35,6 +35,7 @@ export enum ClientEvent {
   START_GAME = "start-game",
   SHOW_RESULTS = "show-results",
   UPDATE_PLAYER = "update-player",
+  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer'
 }
 
 export enum ServerEvent {
@@ -130,6 +131,7 @@ export type ClientEventListeners = {
   [ClientEvent.SHOW_RESULTS]: (gameId: string) => void;
   [ClientEvent.START_GAME]: (gameId: string) => void;
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
+  [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (gameId: string, offer: PlayerActionAbdicationOffered) => void;
 };
 
 /**
