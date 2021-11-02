@@ -3,13 +3,17 @@ import {
   ServerEvent,
   ServerSocket,
 } from "../../../client/src/types/event.types";
-import { incrementRoleInGame, createGame, startGame, appointLeader, proposeRoomLeader, offerAbdication } from "./controllers";
+import { incrementRoleInGame, createGame, startGame, appointLeader, proposeRoomLeader, offerAbdication, acceptAbdication, declineAbdication } from "./controllers";
 import { joinPlayerToGame } from "../player/controllers";
 import { GameManager } from "./model";
 
 export const addGameListeners = (socket: ServerSocket): void => {
 
+  socket.on(ClientEvent.ACCEPT_ABDICATION, acceptAbdication)
+
   socket.on(ClientEvent.APPOINT_ROOM_LEADER, appointLeader)
+
+  socket.on(ClientEvent.DECLINE_ABDICATION, declineAbdication)
 
   socket.on(ClientEvent.INCREMENT_ROLE, incrementRoleInGame)
 

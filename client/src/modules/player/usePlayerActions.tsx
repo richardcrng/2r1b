@@ -1,14 +1,17 @@
 import { Game, Player } from "../../types/game.types";
 import useSocketListener from '../../hooks/useSocketListener';
-import { ServerEvent } from "../../types/event.types";
+import { ClientEvent, ServerEvent } from "../../types/event.types";
 import { toast } from 'react-toastify';
 import { PlayerActionType } from "../../types/player-action.types";
 import { Button } from 'semantic-ui-react';
 import { useSocket } from "../../socket";
+import { useRef } from "react";
 
 
 function usePlayerActions(game: Game, player: Player): void {
-  const socket = useSocket()
+  const socket = useSocket();
+
+  const toastIds = useRef<Record<string, React.ReactText>>({});
 
   useSocketListener(ServerEvent.ACTION_PENDING, (playerId, action) => {
     if (player.socketId !== playerId) return
@@ -39,6 +42,8 @@ function usePlayerActions(game: Game, player: Player): void {
             }
           );
 
+          toastIds.current[action.id] = toastId;
+
         } else if (playerId === action.proposedNewLeaderId) {
           
           const toastId = toast(
@@ -47,10 +52,16 @@ function usePlayerActions(game: Game, player: Player): void {
                 You have been offered the room leadership by{" "}
                 {game.players[action.abdicatingLeaderId].name}.
               </p>
-              <Button color="green" onClick={() => toast.dismiss(toastId)}>
+              <Button color="green" onClick={() => {
+                toast.dismiss(toastId);
+                socket.emit(ClientEvent.ACCEPT_ABDICATION, game.id, action)
+              }}>
                 Accept
               </Button>
-              <Button color="red" onClick={() => toast.dismiss(toastId)}>
+              <Button color="red" onClick={() => {
+                toast.dismiss(toastId);
+                socket.emit(ClientEvent.DECLINE_ABDICATION, game.id, action)
+              }}>
                 Reject
               </Button>
             </div>,
@@ -61,8 +72,19 @@ function usePlayerActions(game: Game, player: Player): void {
               draggable: false,
             }
           );
-        }
 
+          toastIds.current[action.id] = toastId;
+        }
+    }
+  })
+
+  useSocketListener(ServerEvent.ACTION_RESOLVED, (playerId, action) => {
+    if (playerId !== player.socketId) return
+
+    switch (action.type) {
+      case PlayerActionType.ABDICATION_OFFERED:
+        const toastIdToDismiss = toastIds.current[action.id];
+        toast.dismiss(toastIdToDismiss);
     }
   })
 }

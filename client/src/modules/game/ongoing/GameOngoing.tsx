@@ -10,7 +10,7 @@ import GameOngoingVotes from './votes/GameOngoingVotes';
 import Timer from '../../../lib/atoms/Timer';
 import PlayerLeaderAbdication from '../../player/interaction/PlayerLeaderAbdication';
 import usePlayerActions from '../../player/usePlayerActions';
-import { isPlayerAbdicationAction, PlayerActionType } from '../../../types/player-action.types';
+import { isPlayerAbdicationAction } from '../../../types/player-action.types';
 
 const Container = styled.div`
   display: grid;

@@ -14,6 +14,28 @@ import { GameManager } from "./model";
 import { NotificationType } from "../../../client/src/types/notification.types";
 import { PlayerActionAbdicationOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
 
+export const acceptAbdication: ClientEventListeners[ClientEvent.ACCEPT_ABDICATION] = (gameId, action): void => {
+  const gameManager = new GameManager(gameId);
+  const { abdicatingLeaderId, proposedNewLeaderId } = action;
+  const abdicaterName = gameManager.getPlayerOrFail(abdicatingLeaderId).name
+  const newLeaderName = gameManager.getPlayerOrFail(proposedNewLeaderId).name
+
+  gameManager.managePlayer(proposedNewLeaderId).resolvePendingAction(action, {
+    type: NotificationType.GENERAL,
+    message: `${abdicaterName} has abdicated room leadership to you`,
+  });
+
+  gameManager.managePlayer(abdicatingLeaderId).resolvePendingAction(action, {
+    type: NotificationType.GENERAL,
+    message: `You have abdicated room leadership to ${newLeaderName}`
+  });
+
+  gameManager.pushPlayersNotification({
+    type: NotificationType.GENERAL,
+    message: `${abdicaterName} has abdicated room leadership to ${newLeaderName}`
+  }, (player) => ![abdicatingLeaderId, proposedNewLeaderId].includes(player.socketId))
+}
+
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
   const targetRoom = gameManager.currentRound().round.rooms[roomName];
@@ -67,6 +89,24 @@ export const createGame = (data: CreateGameEvent): Game => {
   gameManager.create(game);
   return game
 };
+
+export const declineAbdication: ClientEventListeners[ClientEvent.DECLINE_ABDICATION] =
+  (gameId, action): void => {
+    const gameManager = new GameManager(gameId);
+    const { abdicatingLeaderId, proposedNewLeaderId } = action;
+    const abdicaterName = gameManager.getPlayerOrFail(abdicatingLeaderId).name;
+    const proposedLeaderName = gameManager.getPlayerOrFail(proposedNewLeaderId).name;
+
+    gameManager.managePlayer(proposedNewLeaderId).resolvePendingAction(action, {
+      type: NotificationType.GENERAL,
+      message: `You have declined the abdication offer of ${abdicaterName}`,
+    });
+
+    gameManager.managePlayer(abdicatingLeaderId).resolvePendingAction(action, {
+      type: NotificationType.GENERAL,
+      message: `${proposedLeaderName} has declined your abdication offer`,
+    });
+  };
 
 export const incrementRoleInGame = (
   gameId: string,
