@@ -60,9 +60,9 @@ export default function usePlayer(
     );
   });
 
-  useSocketListener(ServerEvent.PLAYER_NOTIFICATION, (playersToNotify, message, toastOptions) => {
+  useSocketListener(ServerEvent.PLAYER_NOTIFICATION, (playersToNotify, notification) => {
     if (playerId && playersToNotify[playerId]) {
-      toast(message, toastOptions);
+      toast(notification.message);
     }
   })
 

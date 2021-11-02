@@ -1,6 +1,7 @@
 import {
   Player,
 } from "../../../client/src/types/game.types";
+import { NotificationType } from "../../../client/src/types/notification.types";
 import { GameManager } from "../game/model";
 import { getColors } from "../utils";
 
@@ -14,7 +15,13 @@ export const joinPlayerToGame = (
     gameId,
     colors: getColors(5)
   });
-  gameManager.pushNotificationToPlayers(`${playerData.name} joined`, { autoClose: 2000 }, ({ socketId }) => socketId !== playerData.socketId)
+  gameManager.pushPlayersNotification(
+    {
+      type: NotificationType.GENERAL,
+      message: `${playerData.name} joined`,
+    },
+    ({ socketId }) => socketId !== playerData.socketId
+  );
 };
 
 export const updatePlayer = (

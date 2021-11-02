@@ -11,6 +11,7 @@ import { RoleKey } from '../../../client/src/types/role.types';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from "./model";
+import { NotificationType } from "../../../client/src/types/notification.types";
 
 export const appointLeader = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
@@ -22,7 +23,23 @@ export const appointLeader = (gameId: string, roomName: RoomName, appointerId: s
       leaderId: appointedLeaderId,
       appointerId,
     });
-    gameManager.pushNotificationToRoom(roomName, `${gameManager.getPlayerOrFail(appointedLeaderId).name} has been appointed as leader by ${gameManager.getPlayerOrFail(appointerId).name}`)
+
+    gameManager.pushPlayerNotificationToRoom(roomName, (player) => {
+      const newLeaderName = gameManager.getPlayerOrFail(appointedLeaderId).name;
+      const appointerName = gameManager.getPlayerOrFail(appointerId).name;
+
+      const message =
+        player.socketId === appointerId
+          ? `You have appointed ${newLeaderName} as leader`
+          : player.socketId === appointedLeaderId
+          ? `You have been appointed as leader by ${appointerName}`
+          : `${newLeaderName} has been appointed as leader by ${appointerName}`;
+
+      return {
+        type: NotificationType.GENERAL,
+        message,
+      };
+    })
   }
 }
 
@@ -127,11 +144,19 @@ const usurpLeader = (
     });
   }
 
-  gameManager.pushNotificationToRoom(
-    roomName,
-    `${gameManager.getPlayerOrFail(newLeaderId).name} usurps ${
-      gameManager.getPlayerOrFail(oldLeaderId).name
-    } as leader`,
-    {},
-  );
+  gameManager.pushPlayerNotificationToRoom(roomName, (player) => {
+    const oldLeaderName = gameManager.getPlayerOrFail(oldLeaderId).name;
+    const newLeaderName = gameManager.getPlayerOrFail(newLeaderId).name;
+
+    const message = player.socketId === newLeaderId
+      ? `You have usurped ${oldLeaderName} as leader`
+      : player.socketId === oldLeaderId
+        ? `${newLeaderName} has usurped you as leader`
+        : `${newLeaderName} has usurped ${oldLeaderName} as leader`
+
+    return {
+      type: NotificationType.GENERAL,
+      message,
+    };
+  });
 };
