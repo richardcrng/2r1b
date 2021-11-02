@@ -186,21 +186,19 @@ export const startGame = (
 ): void => {
   const gameManager = new GameManager(gameId);
   gameManager.assignInitialRoles();
-  gameManager.pushPlayersNotification((player) => ({
-    type: NotificationType.GENERAL,
-    message: `You have been assigned ${getRoleName(player.role!)}`,
-  }));
   gameManager.assignInitialRooms();
-  gameManager.pushPlayersNotification((player) => ({
-    type: NotificationType.GENERAL,
-    message: `Head to Room ${gameManager.getCurrentRoomFor(player.socketId)}`
-  }))
   gameManager.update(game => {
     game.status = GameStatus.ONGOING;
     game.rounds[0].status = RoundStatus.ONGOING;
     game.currentTimerSeconds = game.rounds[0].timerSeconds;
   });
   gameManager.startTimer();
+  gameManager.pushPlayersNotification((player) => ({
+    type: NotificationType.GENERAL,
+    message: `⏳ Head to Room ${gameManager.getCurrentRoomFor(
+      player.socketId
+    )} - the round has started!`,
+  }));
 };
 
 const usurpLeader = (
