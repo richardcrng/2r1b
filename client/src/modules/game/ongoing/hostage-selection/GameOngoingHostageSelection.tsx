@@ -87,9 +87,10 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
             </Button>
           </>
         ) : (
-          <p>Waiting for {leaderName} to select hostages</p>
+          <p>Waiting for {leaderName} to select and submit hostages</p>
         )}
         <hr />
+        {!isLeader && <h3>Selected hostage{hostageTotal === 1 ? "" : "s"}</h3>}
         {currentHostages.length === 0 ? (
           <p>No hostage{hostageTotal === 1 ? "" : "s"} selected</p>
         ) : (
@@ -113,7 +114,9 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
       </Main>
       <Actions>
         {isLeader && (
-          <Button color='black' fluid>Submit hostages</Button>
+          <Button color="black" fluid>
+            Submit hostages
+          </Button>
         )}
       </Actions>
     </Container>
