@@ -367,10 +367,10 @@ export class GameManager {
               leaderId: newLeader.socketId
             })
           })
-          this.pushPlayerNotificationToRoom(roomName, {
+          this.pushPlayerNotificationToRoom(roomName, (player) => ({
             type: NotificationType.GENERAL,
-            message: `Since no leader existed, ${newLeader.name} was picked at random to be leader`
-          })
+            message: `Since no leader existed, ${newLeader.socketId === player.socketId ? "you were" : `${newLeader.name} was`} picked at random to be leader`
+          }))
         }
       }
 
