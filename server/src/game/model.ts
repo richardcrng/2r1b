@@ -352,6 +352,9 @@ export class GameManager {
           }
         });
       }
+      this.updateCurrentRound(round => {
+        round.status = RoundStatus.HOSTAGE_SELECTION;
+      })
     });
   }
 
