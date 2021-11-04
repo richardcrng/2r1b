@@ -50,6 +50,7 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
   
   const currentHostages = selectCurrentRoundRoomHostages(game)[roomName];
   const hostageTotal = selectCurrentRoundHostageTotal(game)!;
+  const isRightHostageCount = hostageTotal === currentHostages.length;
 
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>();
 
@@ -82,7 +83,7 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
             <Button
               disabled={
                 !selectedPlayerId ||
-                hostageTotal === currentHostages.length ||
+                isRightHostageCount ||
                 isReadyToExchange
               }
               fluid
@@ -126,7 +127,7 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
         {isLeader && (
           <>
             {isReadyToExchange && <p>Waiting for the other room to select and submit their hostage{maybeS}</p>}
-            <Button disabled={isReadyToExchange} color="black" fluid>
+            <Button disabled={!isRightHostageCount || isReadyToExchange} color="black" fluid>
               Submit hostages
             </Button>
           </>
