@@ -2,10 +2,12 @@ import { Game, Player } from "../../types/game.types";
 import useSocketListener from '../../hooks/useSocketListener';
 import { ClientEvent, ServerEvent } from "../../types/event.types";
 import { toast } from 'react-toastify';
-import { PlayerActionType } from "../../types/player-action.types";
+import { isPlayerCardShareRecord, PlayerActionType } from "../../types/player-action.types";
 import { Button } from 'semantic-ui-react';
 import { useSocket } from "../../socket";
 import { useRef } from "react";
+import RoleCard from "../role/card/RoleCard";
+import { getRoleDefinition } from '../../utils/role-utils';
 
 
 function usePlayerActions(game: Game, player: Player): void {
@@ -146,6 +148,44 @@ function usePlayerActions(game: Game, player: Player): void {
           toastIds.current[action.id] = toastId;
         }
 
+        break;
+
+
+      case PlayerActionType.SHARE_RESULT_RECEIVED:
+        const shareRecord = action.record;
+
+        if (isPlayerCardShareRecord(shareRecord)) {
+          const toastId = toast(
+            <div>
+              <p>
+                You are card sharing with{" "}
+                {game.players[shareRecord.playerIdSharedWith].name} - you are seeing their role below, and they are seeing yours.
+              </p>
+              <RoleCard
+                role={getRoleDefinition(shareRecord.sharedWithPlayer)}
+              />
+              <Button
+                color="red"
+                fluid
+                onClick={() => {
+                  toast.dismiss(toastId);
+                  // socket.emit(ClientEvent.DECLINE_ABDICATION, game.id, action);
+                }}
+                style={{ marginTop: '5px' }}
+              >
+                End share
+              </Button>
+            </div>,
+            {
+              autoClose: false,
+              closeButton: false,
+              closeOnClick: false,
+              draggable: false,
+            }
+          );
+
+          toastIds.current[action.id] = toastId;
+        }
     }
   })
 

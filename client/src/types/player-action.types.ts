@@ -46,6 +46,7 @@ export type PlayerActionShareOffered =
 export interface PlayerShareRecordBase {
   roundIdx: number;
   action: PlayerActionShareOffered;
+  playerIdSharedWith: string;
   sharedByPlayer: TeamColor | RoleKey;
   sharedWithPlayer: TeamColor | RoleKey;
 }

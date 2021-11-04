@@ -126,8 +126,14 @@ export class PlayerManager {
     sharedWithPlayer: RoleKey,
     roundIdx: number
   ): void {
+    const playerIdSharedWith = [
+      offerActionToResolve.sharerId,
+      offerActionToResolve.offeredPlayerId,
+    ].find(id => this.socketId !== id)!;
+
     const record: PlayerShareRecord = {
       action: offerActionToResolve,
+      playerIdSharedWith,
       roundIdx,
       sharedByPlayer,
       sharedWithPlayer,
@@ -152,8 +158,14 @@ export class PlayerManager {
     sharedWithPlayer: TeamColor,
     roundIdx: number
   ): void {
+    const playerIdSharedWith = [
+      offerActionToResolve.sharerId,
+      offerActionToResolve.offeredPlayerId,
+    ].find((id) => this.socketId !== id)!;
+
     const record: PlayerShareRecord = {
       action: offerActionToResolve,
+      playerIdSharedWith,
       roundIdx,
       sharedByPlayer,
       sharedWithPlayer,
