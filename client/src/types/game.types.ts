@@ -1,4 +1,4 @@
-import { PlayerAction } from "./player-action.types";
+import { PlayerAction, PlayerShareRecord } from "./player-action.types";
 import { RoleKey } from "./role.types";
 
 export enum GameStatus {
@@ -43,6 +43,11 @@ export interface LeaderVote {
   timestamp: number;
 }
 
+export interface PlayerConditions {
+  shareRecords: PlayerShareRecord[];
+  isDead?: boolean;
+}
+
 export interface Player {
   socketId: string;
   gameId?: string;
@@ -51,6 +56,7 @@ export interface Player {
   role?: RoleKey;
   colors?: string[];
   leaderVote?: LeaderVote;
+  conditions: PlayerConditions;
   pendingActions: Record<string, PlayerAction>;
 }
 

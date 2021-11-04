@@ -1,4 +1,5 @@
 import { RoomName } from "./game.types";
+import { RoleKey, TeamColor } from "./role.types";
 
 export enum PlayerActionType {
   ABDICATION_OFFERED = 'abdication-offered',
@@ -42,6 +43,39 @@ export interface PlayerActionShareOfferedBase extends PlayerActionBase {
 export type PlayerActionShareOffered =
   | PlayerActionCardShareOffered
   | PlayerActionColorShareOffered;
+
+export interface PlayerShareRecordBase {
+  round: number;
+  action: PlayerActionShareOffered;
+  sharedByPlayer: TeamColor | RoleKey;
+  sharedWithPlayer: TeamColor | RoleKey;
+}
+
+export function isPlayerCardShareRecord(
+  shareRecord: PlayerShareRecord
+): shareRecord is PlayerCardShareRecord {
+  return isPlayerCardShareAction(shareRecord.action);
+}
+
+export function isPlayerColorShareRecord(
+  shareRecord: PlayerShareRecord
+): shareRecord is PlayerColorShareRecord {
+  return isPlayerColorShareAction(shareRecord.action);
+}
+
+export interface PlayerCardShareRecord extends PlayerShareRecordBase {
+  action: PlayerActionCardShareOffered;
+  sharedByPlayer: RoleKey;
+  sharedWithPlayer: RoleKey;
+}
+
+export interface PlayerColorShareRecord extends PlayerShareRecordBase {
+  action: PlayerActionColorShareOffered;
+  sharedByPlayer: TeamColor;
+  sharedWithPlayer: TeamColor;
+}
+
+export type PlayerShareRecord = PlayerCardShareRecord | PlayerColorShareRecord;
 
 export function isPlayerShareAction(
   action: PlayerAction

@@ -48,6 +48,9 @@ export class GameManager {
           isHost: true,
           gameId,
           colors: getColors(5),
+          conditions: {
+            shareRecords: []
+          },
           pendingActions: {},
         },
       },
