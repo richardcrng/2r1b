@@ -54,13 +54,14 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
           </p>
           <PlayerDropdown
             filter={(player) =>
-              round.playerAllocation[player.socketId] === roomName
+              round.playerAllocation[player.socketId] === roomName &&
+              !currentHostages.includes(player.socketId)
             }
             onPlayerSelect={setSelectedPlayerId}
             players={players}
           />
           <Button
-            disabled={!selectedPlayerId}
+            disabled={!selectedPlayerId || hostageTotal === currentHostages.length}
             fluid
             onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
             primary
