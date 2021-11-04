@@ -1,7 +1,7 @@
 import { chunk, cloneDeep, last, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
-import { GameNotification, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
+import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
@@ -9,6 +9,7 @@ import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT } from "../../../client/src/utils/role-utils";
+import { PlayerActionCardShareOffered, PlayerActionShareOffered } from "../../../client/src/types/player-action.types";
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -264,6 +265,46 @@ export class GameManager {
     for (let player of playersToNotify) {
       this.managePlayer(player.socketId).pushNotification(notification);
     }
+  }
+
+  public resolveCardShare(cardShareAction: PlayerActionCardShareOffered): void {
+    const sharerCard = this.getPlayerOrFail(cardShareAction.sharerId).role!;
+    const shareeCard = this.getPlayerOrFail(cardShareAction.offeredPlayerId).role!;
+
+    const { idx: roundIdx } = this.currentRound();
+
+    const sharerManager = this.managePlayer(cardShareAction.sharerId);
+    const shareeManager = this.managePlayer(cardShareAction.offeredPlayerId);
+
+    sharerManager.update((player) => {
+      player.conditions.shareRecords.push({
+        action: cardShareAction,
+        roundIdx,
+        sharedByPlayer: sharerCard,
+        sharedWithPlayer: shareeCard,
+      });
+    });
+
+    sharerManager.resolvePendingAction(cardShareAction, {
+      type: NotificationType.CARD_SHARED,
+      sharingPlayerId: cardShareAction.offeredPlayerId,
+      cardShared: shareeCard
+    });
+
+    shareeManager.update(player => {
+      player.conditions.shareRecords.push({
+        action: cardShareAction,
+        roundIdx,
+        sharedByPlayer: shareeCard,
+        sharedWithPlayer: sharerCard
+      })
+    })
+
+    shareeManager.resolvePendingAction(cardShareAction, {
+      type: NotificationType.CARD_SHARED,
+      sharingPlayerId: cardShareAction.sharerId,
+      cardShared: sharerCard,
+    });
   }
 
   public set(game: Game): void {
