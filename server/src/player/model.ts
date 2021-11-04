@@ -120,14 +120,14 @@ export class PlayerManager {
   }
 
   public shareCard(
-    action: PlayerActionCardShareOffered,
-    otherPlayerId: string,
+    newActionId: string,
+    offerActionToResolve: PlayerActionCardShareOffered,
     sharedByPlayer: RoleKey,
     sharedWithPlayer: RoleKey,
     roundIdx: number
   ): void {
     const record: PlayerShareRecord = {
-      action,
+      action: offerActionToResolve,
       roundIdx,
       sharedByPlayer,
       sharedWithPlayer,
@@ -135,12 +135,10 @@ export class PlayerManager {
 
     this.update((player) => player.conditions.shareRecords.push(record));
 
-    this.resolvePendingAction(action);
+    this.resolvePendingAction(offerActionToResolve);
 
     this.pushPendingAction({
-      id: `${
-        PlayerActionType.SHARE_RESULT_RECEIVED
-      }-${Date.now()}-${otherPlayerId}`,
+      id: newActionId,
       room: this.roomName(),
       type: PlayerActionType.SHARE_RESULT_RECEIVED,
       record,
@@ -148,14 +146,14 @@ export class PlayerManager {
   }
 
   public shareColor(
-    action: PlayerActionColorShareOffered,
-    otherPlayerId: string,
+    newActionId: string,
+    offerActionToResolve: PlayerActionColorShareOffered,
     sharedByPlayer: TeamColor,
     sharedWithPlayer: TeamColor,
     roundIdx: number
   ): void {
     const record: PlayerShareRecord = {
-      action,
+      action: offerActionToResolve,
       roundIdx,
       sharedByPlayer,
       sharedWithPlayer,
@@ -163,12 +161,10 @@ export class PlayerManager {
 
     this.update((player) => player.conditions.shareRecords.push(record));
 
-    this.resolvePendingAction(action);
+    this.resolvePendingAction(offerActionToResolve);
 
     this.pushPendingAction({
-      id: `${
-        PlayerActionType.SHARE_RESULT_RECEIVED
-      }-${Date.now()}-${otherPlayerId}`,
+      id: newActionId,
       room: this.roomName(),
       type: PlayerActionType.SHARE_RESULT_RECEIVED,
       record,

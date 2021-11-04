@@ -269,18 +269,19 @@ export class GameManager {
 
   public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
     const { idx: roundIdx } = this.currentRound();
+    const resultId = `${Date.now()}-${PlayerActionType.SHARE_RESULT_RECEIVED}-${Math.random().toString(5).slice(2)}`;
 
     this.managePlayer(cardShareAction.sharerId).shareCard(
+      resultId,
       cardShareAction,
-      cardShareAction.offeredPlayerId,
       sharerCard,
       shareeCard,
       roundIdx
     );
 
     this.managePlayer(cardShareAction.offeredPlayerId).shareCard(
+      resultId,
       cardShareAction,
-      cardShareAction.sharerId,
       shareeCard,
       sharerCard,
       roundIdx
@@ -291,22 +292,22 @@ export class GameManager {
     const sharerColor = getRoleColor(sharerCard);
     const shareeColor = getRoleColor(shareeCard);
 
-
     const { idx: roundIdx } = this.currentRound();
-
-    const sharerManager = this.managePlayer(colorShareAction.sharerId);
-    const shareeManager = this.managePlayer(colorShareAction.offeredPlayerId);
-
-    sharerManager.shareColor(
+    const resultId = `${Date.now()}-${
+      PlayerActionType.SHARE_RESULT_RECEIVED
+    }-${Math.random().toString(5).slice(2)}`;
+    
+    this.managePlayer(colorShareAction.sharerId).shareColor(
+      resultId,
       colorShareAction,
-      colorShareAction.offeredPlayerId,
       sharerColor,
       shareeColor,
       roundIdx
     );
-    shareeManager.shareColor(
+
+    this.managePlayer(colorShareAction.offeredPlayerId).shareColor(
+      resultId,
       colorShareAction,
-      colorShareAction.sharerId,
       shareeColor,
       sharerColor,
       roundIdx
