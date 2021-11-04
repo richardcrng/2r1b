@@ -34,6 +34,7 @@ export enum ClientEvent {
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
   SELECT_HOSTAGE = 'select-hostage',
   START_GAME = "start-game",
+  SUBMIT_HOSTAGES = 'submit-hostages',
   TERMINATE_SHARE = 'terminate-share',
   UPDATE_PLAYER = "update-player",
   WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer',
@@ -148,6 +149,8 @@ export type ClientEventListeners = {
   ) => void;
 
   [ClientEvent.START_GAME]: (gameId: string) => void;
+
+  [ClientEvent.SUBMIT_HOSTAGES]: (gameId: string, roomName: RoomName) => void;
 
   [ClientEvent.TERMINATE_SHARE]: (
     gameId: string,

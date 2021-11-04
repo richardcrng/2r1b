@@ -53,19 +53,23 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
 
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>();
 
+  const { isReadyToExchange } = round.rooms[roomName];
+
+  const maybeS = hostageTotal === 1 ? "" : "s";
+
   return (
     <Container className="active-contents">
       <Main>
-        <h1>Hostage{hostageTotal === 1 ? "" : "s"} selection</h1>
+        <h1>Hostage{maybeS} selection</h1>
         <p>
-          This round, {hostageTotal} hostage{hostageTotal === 1 ? "" : "s"} must
+          This round, {hostageTotal} hostage{maybeS} must
           be sent to the other room.
         </p>
         {isLeader ? (
           <>
             <p>
               As Room Leader, you must choose the hostage
-              {hostageTotal === 1 ? "" : "s"}.
+              {maybeS}.
             </p>
             <PlayerDropdown
               filter={(player) =>
@@ -77,7 +81,9 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
             />
             <Button
               disabled={
-                !selectedPlayerId || hostageTotal === currentHostages.length
+                !selectedPlayerId ||
+                hostageTotal === currentHostages.length ||
+                isReadyToExchange
               }
               fluid
               onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
@@ -87,12 +93,16 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
             </Button>
           </>
         ) : (
-          <p>Waiting for {leaderName} to select and submit hostages</p>
+          <p>
+            {isReadyToExchange
+              ? `Waiting for ${leaderName} to select and submit hostages`
+              : `Waiting for the other room to select and submit their hostage${maybeS}`}
+          </p>
         )}
         <hr />
-        {!isLeader && <h3>Selected hostage{hostageTotal === 1 ? "" : "s"}</h3>}
+        {!isLeader && <h3>Selected hostage{maybeS}</h3>}
         {currentHostages.length === 0 ? (
-          <p>No hostage{hostageTotal === 1 ? "" : "s"} selected</p>
+          <p>No hostage{maybeS} selected</p>
         ) : (
           <HostageOl>
             {currentHostages.map((playerId) => (
@@ -114,9 +124,12 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
       </Main>
       <Actions>
         {isLeader && (
-          <Button color="black" fluid>
-            Submit hostages
-          </Button>
+          <>
+            {isReadyToExchange && <p>Waiting for the other room to select and submit their hostage{maybeS}</p>}
+            <Button disabled={isReadyToExchange} color="black" fluid>
+              Submit hostages
+            </Button>
+          </>
         )}
       </Actions>
     </Container>

@@ -232,6 +232,15 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
   }));
 };
 
+export const submitHostages: ClientEventListeners[ClientEvent.SUBMIT_HOSTAGES] = (
+  gameId,
+  roomName
+) => {
+  new GameManager(gameId).updateCurrentRound(round => {
+    round.rooms[roomName].isReadyToExchange = true;
+  })
+}
+
 export const terminateShare: ClientEventListeners[ClientEvent.TERMINATE_SHARE] = (gameId, shareResultAction) => {
   const gameManager = new GameManager(gameId);
 

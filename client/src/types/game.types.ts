@@ -111,8 +111,9 @@ export interface LeaderUsurpation extends LeaderRecordBase {
 export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderRandomisation | LeaderUsurpation;
 
 export interface RoomRound {
-  leadersRecord: LeaderRecord[];
   hostages: string[];
+  isReadyToExchange: boolean;
+  leadersRecord: LeaderRecord[];
 }
 
 export enum RoomName {
@@ -137,8 +138,8 @@ export const createRound = (timerSeconds: number, number: number, hostageCount =
   hostageCount,
   timerSeconds,
   rooms: {
-    [RoomName.A]: { leadersRecord: [], hostages: [] },
-    [RoomName.B]: { leadersRecord: [], hostages: [] },
+    [RoomName.A]: { leadersRecord: [], hostages: [], isReadyToExchange: false },
+    [RoomName.B]: { leadersRecord: [], hostages: [], isReadyToExchange: false },
   },
   playerAllocation: {}
 });
