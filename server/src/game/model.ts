@@ -8,8 +8,8 @@ import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
 import { generateRandomGameId, getColors } from "../utils";
-import { DEFAULT_STARTING_ROLES_COUNT } from "../../../client/src/utils/role-utils";
-import { PlayerActionCardShareOffered, PlayerActionShareOffered } from "../../../client/src/types/player-action.types";
+import { DEFAULT_STARTING_ROLES_COUNT, getRoleColor } from "../../../client/src/utils/role-utils";
+import { PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionShareOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -50,7 +50,7 @@ export class GameManager {
           gameId,
           colors: getColors(5),
           conditions: {
-            shareRecords: []
+            shareRecords: [],
           },
           pendingActions: {},
         },
@@ -61,7 +61,7 @@ export class GameManager {
     };
     const gameManager = new GameManager(gameId);
     gameManager.set(game);
-    return gameManager
+    return gameManager;
   }
 
   _broadcast(): void {
@@ -267,17 +267,61 @@ export class GameManager {
     }
   }
 
-  public resolveCardShare(cardShareAction: PlayerActionCardShareOffered): void {
-    const sharerCard = this.getPlayerOrFail(cardShareAction.sharerId).role!;
-    const shareeCard = this.getPlayerOrFail(cardShareAction.offeredPlayerId).role!;
+  public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
+    const { idx: roundIdx } = this.currentRound();
+
+    this.managePlayer(cardShareAction.sharerId).shareCard(
+      cardShareAction,
+      cardShareAction.offeredPlayerId,
+      sharerCard,
+      shareeCard,
+      roundIdx
+    );
+
+    this.managePlayer(cardShareAction.offeredPlayerId).shareCard(
+      cardShareAction,
+      cardShareAction.sharerId,
+      shareeCard,
+      sharerCard,
+      roundIdx
+    );
+  }
+
+  public resolveColorShare(colorShareAction: PlayerActionColorShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
+    const sharerColor = getRoleColor(sharerCard);
+    const shareeColor = getRoleColor(shareeCard);
+
 
     const { idx: roundIdx } = this.currentRound();
 
-    const sharerManager = this.managePlayer(cardShareAction.sharerId);
-    const shareeManager = this.managePlayer(cardShareAction.offeredPlayerId);
+    const sharerManager = this.managePlayer(colorShareAction.sharerId);
+    const shareeManager = this.managePlayer(colorShareAction.offeredPlayerId);
 
-    sharerManager.shareCard(cardShareAction, sharerCard, shareeCard, roundIdx);
-    shareeManager.shareCard(cardShareAction, shareeCard, sharerCard, roundIdx);
+    sharerManager.shareColor(
+      colorShareAction,
+      colorShareAction.offeredPlayerId,
+      sharerColor,
+      shareeColor,
+      roundIdx
+    );
+    shareeManager.shareColor(
+      colorShareAction,
+      colorShareAction.sharerId,
+      shareeColor,
+      sharerColor,
+      roundIdx
+    );
+  }
+
+  public resolveShare(shareAction: PlayerActionShareOffered): void {
+    const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role!;
+    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId)
+      .role!;
+    if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
+      this.resolveCardShare(shareAction, sharerCard, shareeCard);
+    } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
+      this.resolveColorShare(shareAction, sharerCard, shareeCard);
+    }
   }
 
   public set(game: Game): void {

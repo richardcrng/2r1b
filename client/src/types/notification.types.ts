@@ -1,5 +1,5 @@
 import { Player } from "./game.types";
-import { RoleKey } from "./role.types";
+import { RoleKey, TeamColor } from "./role.types";
 
 export enum NotificationType {
   CARD_SHARED = 'card-shared',
@@ -26,14 +26,14 @@ export interface PlayerNotificationGeneral extends NotificationBase {
 
 export interface PlayerNotificationCardShared extends NotificationBase {
   type: NotificationType.CARD_SHARED;
-  sharingPlayerId: string;
-  cardShared: RoleKey;
+  playerIdSharedWith: string;
+  infoSeen: RoleKey;
 }
 
 export interface PlayerNotificationColorShared extends NotificationBase {
   type: NotificationType.COLOR_SHARED;
-  sharingPlayerId: string;
-  cardShared: RoleKey;
+  playerIdSharedWith: string;
+  infoSeen: TeamColor;
 }
 
 export type GameNotification = GameNotificationGeneral;
