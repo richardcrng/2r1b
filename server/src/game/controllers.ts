@@ -41,20 +41,7 @@ export const acceptAbdication: ClientEventListeners[ClientEvent.ACCEPT_ABDICATIO
 export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] =
   (gameId, action): void => {
     const gameManager = new GameManager(gameId);
-    const { sharerId, offeredPlayerId } = action;
-    const shareType = action.type === PlayerActionType.CARD_SHARE_OFFERED ? "card" : 'color';
-    const sharerName = gameManager.getPlayerOrFail(sharerId).name;
-    const offeredPlayerName = gameManager.getPlayerOrFail(offeredPlayerId).name;
-
-    gameManager.managePlayer(sharerId).resolvePendingAction(action, {
-      type: NotificationType.GENERAL,
-      message: `${offeredPlayerName} has accepted your ${shareType} share offer`,
-    });
-
-    gameManager.managePlayer(offeredPlayerId).resolvePendingAction(action, {
-      type: NotificationType.GENERAL,
-      message: `You have accepted ${sharerName}'s ${shareType} share offer`,
-    });
+    gameManager.resolveShare(action);
   };
 
 export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER] = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {

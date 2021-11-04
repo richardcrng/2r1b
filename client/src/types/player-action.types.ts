@@ -5,8 +5,7 @@ export enum PlayerActionType {
   ABDICATION_OFFERED = 'abdication-offered',
   CARD_SHARE_OFFERED = 'card-share-offered',
   COLOR_SHARE_OFFERED = 'color-share-offered',
-  PRIVATE_REVEAL_OFFERED = 'private-reveal',
-  PUBLIC_REVEAL_OFFERED = 'public-reveal',
+  SHARE_RESULT_RECEIVED = 'share-result-received',
 }
 
 export interface PlayerActionBase {
@@ -25,17 +24,17 @@ export function isPlayerAbdicationAction(action: PlayerAction): action is Player
   return action.type === PlayerActionType.ABDICATION_OFFERED
 }
 
-export interface PlayerActionPublicRevealOffered extends PlayerActionBase {
-  type: PlayerActionType.PUBLIC_REVEAL_OFFERED;
-  revealerId: string;
+export interface PlayerActionShareResultReceived extends PlayerActionBase {
+  type: PlayerActionType.SHARE_RESULT_RECEIVED;
+  record: PlayerShareRecord;
 }
 
-export type PlayerActionShareType =
+export type PlayerActionShareOfferedType =
   | PlayerActionType.CARD_SHARE_OFFERED
-  | PlayerActionType.COLOR_SHARE_OFFERED;
+  | PlayerActionType.COLOR_SHARE_OFFERED
 
 export interface PlayerActionShareOfferedBase extends PlayerActionBase {
-  type: PlayerActionShareType;
+  type: PlayerActionShareOfferedType;
   sharerId: string;
   offeredPlayerId: string;
 }
@@ -106,4 +105,4 @@ export function isPlayerColorShareAction(
   return action.type === PlayerActionType.COLOR_SHARE_OFFERED;
 }
 
-export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionShareOffered
+export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionShareOffered | PlayerActionShareResultReceived

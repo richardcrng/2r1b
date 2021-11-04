@@ -2,8 +2,8 @@ import { cloneDeep } from "lodash";
 import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
-import { NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered } from "../../../client/src/types/player-action.types";
+import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
+import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionType, PlayerShareRecord } from "../../../client/src/types/player-action.types";
 import { RoleKey, TeamColor } from "../../../client/src/types/role.types";
 
 export class PlayerManager {
@@ -126,19 +126,24 @@ export class PlayerManager {
     sharedWithPlayer: RoleKey,
     roundIdx: number
   ): void {
-    this.update((player) => {
-      player.conditions.shareRecords.push({
-        action,
-        roundIdx,
-        sharedByPlayer,
-        sharedWithPlayer,
-      });
-    });
+    const record: PlayerShareRecord = {
+      action,
+      roundIdx,
+      sharedByPlayer,
+      sharedWithPlayer,
+    };
 
-    this.resolvePendingAction(action, {
-      type: NotificationType.CARD_SHARED,
-      playerIdSharedWith: otherPlayerId,
-      infoSeen: sharedWithPlayer,
+    this.update((player) => player.conditions.shareRecords.push(record));
+
+    this.resolvePendingAction(action);
+
+    this.pushPendingAction({
+      id: `${
+        PlayerActionType.SHARE_RESULT_RECEIVED
+      }-${Date.now()}-${otherPlayerId}`,
+      room: this.roomName(),
+      type: PlayerActionType.SHARE_RESULT_RECEIVED,
+      record,
     });
   }
 
@@ -149,19 +154,24 @@ export class PlayerManager {
     sharedWithPlayer: TeamColor,
     roundIdx: number
   ): void {
-    this.update((player) => {
-      player.conditions.shareRecords.push({
-        action,
-        roundIdx,
-        sharedByPlayer,
-        sharedWithPlayer,
-      });
-    });
+    const record: PlayerShareRecord = {
+      action,
+      roundIdx,
+      sharedByPlayer,
+      sharedWithPlayer,
+    };
 
-    this.resolvePendingAction(action, {
-      type: NotificationType.COLOR_SHARED,
-      playerIdSharedWith: otherPlayerId,
-      infoSeen: sharedWithPlayer,
+    this.update((player) => player.conditions.shareRecords.push(record));
+
+    this.resolvePendingAction(action);
+
+    this.pushPendingAction({
+      id: `${
+        PlayerActionType.SHARE_RESULT_RECEIVED
+      }-${Date.now()}-${otherPlayerId}`,
+      room: this.roomName(),
+      type: PlayerActionType.SHARE_RESULT_RECEIVED,
+      record,
     });
   }
 
