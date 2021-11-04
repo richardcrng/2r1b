@@ -132,7 +132,7 @@ export class PlayerManager {
     ].find(id => this.socketId !== id)!;
 
     const record: PlayerShareRecord = {
-      action: offerActionToResolve,
+      offerAction: offerActionToResolve,
       playerIdSharedWith,
       roundIdx,
       sharedByPlayer,
@@ -164,7 +164,7 @@ export class PlayerManager {
     ].find((id) => this.socketId !== id)!;
 
     const record: PlayerShareRecord = {
-      action: offerActionToResolve,
+      offerAction: offerActionToResolve,
       playerIdSharedWith,
       roundIdx,
       sharedByPlayer,

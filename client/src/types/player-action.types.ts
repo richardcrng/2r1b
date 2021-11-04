@@ -45,7 +45,7 @@ export type PlayerActionShareOffered =
 
 export interface PlayerShareRecordBase {
   roundIdx: number;
-  action: PlayerActionShareOffered;
+  offerAction: PlayerActionShareOffered;
   playerIdSharedWith: string;
   sharedByPlayer: TeamColor | RoleKey;
   sharedWithPlayer: TeamColor | RoleKey;
@@ -54,23 +54,23 @@ export interface PlayerShareRecordBase {
 export function isPlayerCardShareRecord(
   shareRecord: PlayerShareRecord
 ): shareRecord is PlayerCardShareRecord {
-  return isPlayerCardShareAction(shareRecord.action);
+  return isPlayerCardShareAction(shareRecord.offerAction);
 }
 
 export function isPlayerColorShareRecord(
   shareRecord: PlayerShareRecord
 ): shareRecord is PlayerColorShareRecord {
-  return isPlayerColorShareAction(shareRecord.action);
+  return isPlayerColorShareAction(shareRecord.offerAction);
 }
 
 export interface PlayerCardShareRecord extends PlayerShareRecordBase {
-  action: PlayerActionCardShareOffered;
+  offerAction: PlayerActionCardShareOffered;
   sharedByPlayer: RoleKey;
   sharedWithPlayer: RoleKey;
 }
 
 export interface PlayerColorShareRecord extends PlayerShareRecordBase {
-  action: PlayerActionColorShareOffered;
+  offerAction: PlayerActionColorShareOffered;
   sharedByPlayer: TeamColor;
   sharedWithPlayer: TeamColor;
 }

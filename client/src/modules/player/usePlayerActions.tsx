@@ -169,7 +169,7 @@ function usePlayerActions(game: Game, player: Player): void {
                 fluid
                 onClick={() => {
                   toast.dismiss(toastId);
-                  // socket.emit(ClientEvent.DECLINE_ABDICATION, game.id, action);
+                  socket.emit(ClientEvent.TERMINATE_SHARE, game.id, action);
                 }}
                 style={{ marginTop: '5px' }}
               >
@@ -192,17 +192,8 @@ function usePlayerActions(game: Game, player: Player): void {
   useSocketListener(ServerEvent.ACTION_RESOLVED, (playerId, action) => {
     if (playerId !== player.socketId) return
 
-    switch (action.type) {
-      case PlayerActionType.ABDICATION_OFFERED:
-      case PlayerActionType.CARD_SHARE_OFFERED:
-      case PlayerActionType.COLOR_SHARE_OFFERED:
-        // use block to scope variable
-        {
-          const toastIdToDismiss = toastIds.current[action.id];
-          toast.dismiss(toastIdToDismiss);
-          break;
-        }
-    }
+    const toastIdToDismiss = toastIds.current[action.id];
+    toast.dismiss(toastIdToDismiss);
   })
 }
 
