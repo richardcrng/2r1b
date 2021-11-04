@@ -9,9 +9,16 @@ const Container = styled.div`
 
 `
 
+const HostageOl = styled.ol`
+`;
+
+
 const HostageLi = styled.li`
-  display: flex;
-  justify-content: space-between;
+  div {
+    margin-left: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
 `;
 
 interface Props {
@@ -54,25 +61,36 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
           />
           <Button
             disabled={!selectedPlayerId}
+            fluid
             onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
+            primary
           >
             Add hostage
           </Button>
-          {currentHostages.length === 0 ? (
-            <p>No hostage{hostageTotal === 1 ? "" : "s"} selected</p>
-          ) : (
-            <ol>
-              {currentHostages.map((playerId) => (
-                <HostageLi key={playerId}>
-                  <span>{players[playerId].name}</span>
-                  <button onClick={() => onHostageSelect(playerId, roomName, true)}>X</button>
-                </HostageLi>
-              ))}
-            </ol>
-          )}
         </>
       ) : (
         <p>Waiting for {leaderName} to select hostages</p>
+      )}
+      <hr />
+      {currentHostages.length === 0 ? (
+        <p>No hostage{hostageTotal === 1 ? "" : "s"} selected</p>
+      ) : (
+        <HostageOl>
+          {currentHostages.map((playerId) => (
+            <HostageLi key={playerId}>
+              <div>
+                <span>{players[playerId].name}</span>
+                {isLeader && (
+                  <button
+                    onClick={() => onHostageSelect(playerId, roomName, true)}
+                  >
+                    X
+                  </button>
+                )}
+              </div>
+            </HostageLi>
+          ))}
+        </HostageOl>
       )}
     </Container>
   );

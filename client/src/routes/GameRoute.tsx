@@ -82,7 +82,7 @@ function GameRoute() {
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
-            onHostageSelect={(playerId, roomName, isDeselect) => {
+            onHostageSelect={(playerId, roomName, isDeselect = false) => {
               if (isDeselect) {
                 socket.emit(
                   ClientEvent.DESELECT_HOSTAGE,

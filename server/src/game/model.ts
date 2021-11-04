@@ -177,7 +177,7 @@ export class GameManager {
   public currentRound(): Round {
     const operation = this._withPointer((pointer) => {
       for (let round of Object.values(pointer.rounds)) {
-        if (round.status === RoundStatus.ONGOING) {
+        if ([RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status)) {
           return round;
         }
       }

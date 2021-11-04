@@ -114,6 +114,16 @@ export const declineShare: ClientEventListeners[ClientEvent.DECLINE_SHARE] = (
   });
 };
 
+export const deselectHostage: ClientEventListeners[ClientEvent.DESELECT_HOSTAGE] = (
+  gameId,
+  playerId,
+  roomName
+) => {
+  new GameManager(gameId).updateCurrentRound((round) => {
+    round.rooms[roomName].hostages = round.rooms[roomName].hostages.filter(id => id !== playerId);
+  });
+};
+
 export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROLE] = (
   gameId: string,
   role: RoleKey,
@@ -191,6 +201,15 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
       usurpLeader(gameId, roomName, proposedLeaderId, currentLeader, votesForLeader.map(vote => vote.voterId));
     }
   }
+}
+
+export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (gameId, playerId, roomName) => {
+  console.log('selecting hostage', playerId)
+  new GameManager(gameId).updateCurrentRound(round => {
+    if (!round.rooms[roomName].hostages.includes(playerId)) {
+      round.rooms[roomName].hostages.push(playerId);
+    };
+  })
 }
 
 export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
