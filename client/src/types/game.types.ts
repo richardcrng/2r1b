@@ -8,6 +8,7 @@ export enum GameStatus {
 }
 export enum RoundStatus {
   ONGOING = 'ongoing',
+  HOSTAGE_SELECTION = 'hostage-selection',
   COMPLETE = 'complete',
   PENDING = 'pending'
 }
