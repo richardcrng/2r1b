@@ -1,4 +1,4 @@
-import { chunk, cloneDeep, last, shuffle } from "lodash";
+import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
@@ -352,6 +352,28 @@ export class GameManager {
           }
         });
       }
+
+      this.pushGameNotificationToAll({
+        type: NotificationType.GENERAL,
+        message: 'Round time is up - hostages must be selected'
+      })
+
+      for (let roomName of Object.values(RoomName)) {
+        if (!this.currentLeaderRecord(roomName)) {
+          const newLeader = sample(Object.values(this.playersInRoom(roomName)))!;
+          this.updateCurrentRound(round => {
+            round.rooms[roomName].leadersRecord.push({
+              method: LeaderRecordMethod.RANDOMISATION,
+              leaderId: newLeader.socketId
+            })
+          })
+          this.pushPlayerNotificationToRoom(roomName, {
+            type: NotificationType.GENERAL,
+            message: `Since no leader existed, ${newLeader.name} was picked at random to be leader`
+          })
+        }
+      }
+
       this.updateCurrentRound(round => {
         round.status = RoundStatus.HOSTAGE_SELECTION;
       })

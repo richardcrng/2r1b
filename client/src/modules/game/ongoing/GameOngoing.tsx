@@ -1,4 +1,4 @@
-import { selectCurrentGameRoomAllocation, selectCurrentGameRound, selectCurrentRoomCurrentLeaders } from '../../../selectors/game';
+import { selectCurrentGameRound } from '../../../selectors/game';
 import { Game, Player, PlayerWithRoom, RoomName, RoundStatus } from "../../../types/game.types";
 import { PlayerActionAbdicationOffered, PlayerActionShareOfferedType } from '../../../types/player-action.types';
 import usePlayerActions from '../../player/usePlayerActions';
@@ -20,6 +20,7 @@ interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>;
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
+  onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
   onOfferAbdication(roomName: RoomName, proposedLeaderId?: string): void;
   onOfferShare(roomName: RoomName, playerId: string, shareType: PlayerActionShareOfferedType): void
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
@@ -29,26 +30,48 @@ interface Props {
   ): void;
 }
 
-function GameOngoing(props: Props) {
+function GameOngoing({
+  currentLeader,
+  currentRoom,
+  game,
+  onAppointLeader,
+  onHostageSelect,
+  onOfferAbdication,
+  onOfferShare,
+  onWithdrawAbdicationOffer,
+  onProposeLeader,
+  player,
+  players
+}: Props) {
 
-  usePlayerActions(props.game, props.player);
+  usePlayerActions(game, player);
 
-  const currentRound = selectCurrentGameRound(props.game);
-  const currentRoom = selectCurrentGameRoomAllocation(props.game)![props.player.socketId];
-  const currentLeaderId = selectCurrentRoomCurrentLeaders(props.game)[currentRoom]!;
+  const currentRound = selectCurrentGameRound(game);
 
-  if (currentRound?.status === RoundStatus.ONGOING) {
+  if (!currentLeader || currentRound?.status === RoundStatus.ONGOING) {
     return (
-      <GameOngoingDiscussion {...props} />
+      <GameOngoingDiscussion {...{
+        currentLeader,
+        currentRoom,
+        game,
+        onAppointLeader,
+        onOfferAbdication,
+        onOfferShare,
+        onWithdrawAbdicationOffer,
+        onProposeLeader,
+        player,
+        players
+      }} />
     )
   } else if (currentRound?.status === RoundStatus.HOSTAGE_SELECTION) {
     return (
       <GameOngoingHostageSelection
-        game={props.game}
-        leaderName={props.players[currentLeaderId].name!}
-        isLeader={props.player.socketId === currentLeaderId}
-        player={props.player}
-        players={props.players}
+        game={game}
+        leaderName={currentLeader!.name!}
+        isLeader={player.socketId === currentLeader!.socketId}
+        onHostageSelect={onHostageSelect}
+        player={player}
+        players={players}
         roomName={currentRoom}
         round={currentRound}
       />

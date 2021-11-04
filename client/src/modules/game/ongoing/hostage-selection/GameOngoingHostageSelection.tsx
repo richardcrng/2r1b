@@ -9,17 +9,23 @@ const Container = styled.div`
 
 `
 
+const HostageLi = styled.li`
+  display: flex;
+  justify-content: space-between;
+`;
+
 interface Props {
   game: Game;
   leaderName: string;
   isLeader: boolean;
+  onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
   player: Player;
   players: Record<string, Player>;
   roomName: RoomName;
   round: Round;
 }
 
-function GameOngoingHostageSelection({ game, leaderName, isLeader, player, players, roomName, round }: Props) {
+function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSelect, player, players, roomName, round }: Props) {
   
   const currentHostages = selectCurrentRoundRoomHostages(game)[roomName];
   const hostageTotal = selectCurrentRoundHostageTotal(game)!;
@@ -46,13 +52,21 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, player, playe
             onPlayerSelect={setSelectedPlayerId}
             players={players}
           />
-          <Button disabled={!selectedPlayerId}>Add hostage</Button>
+          <Button
+            disabled={!selectedPlayerId}
+            onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
+          >
+            Add hostage
+          </Button>
           {currentHostages.length === 0 ? (
             <p>No hostage{hostageTotal === 1 ? "" : "s"} selected</p>
           ) : (
             <ol>
               {currentHostages.map((playerId) => (
-                <li key={playerId}>{players[playerId].name}</li>
+                <HostageLi key={playerId}>
+                  <span>{players[playerId].name}</span>
+                  <button onClick={() => onHostageSelect(playerId, roomName, true)}>X</button>
+                </HostageLi>
               ))}
             </ol>
           )}

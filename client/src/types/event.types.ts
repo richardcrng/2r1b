@@ -24,6 +24,7 @@ export enum ClientEvent {
   CREATE_GAME = "create-game",
   DECLINE_ABDICATION = 'decline-abdication',
   DECLINE_SHARE = 'decline-share',
+  DESELECT_HOSTAGE = 'deselect-hostage',
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
@@ -31,6 +32,7 @@ export enum ClientEvent {
   OFFER_ABDICATION = 'offer-abdication',
   OFFER_SHARE = 'offer-share',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
+  SELECT_HOSTAGE = 'select-hostage',
   START_GAME = "start-game",
   TERMINATE_SHARE = 'terminate-share',
   UPDATE_PLAYER = "update-player",
@@ -98,6 +100,12 @@ export type ClientEventListeners = {
     action: PlayerActionShareOffered
   ) => void;
 
+  [ClientEvent.DESELECT_HOSTAGE]: (
+    gameId: string,
+    playerId: string,
+    roomName: RoomName
+  ) => void;
+
   [ClientEvent.GET_GAME]: (gameId: string) => void;
 
   [ClientEvent.GET_PLAYER]: (
@@ -133,9 +141,18 @@ export type ClientEventListeners = {
     proposedLeaderId?: string
   ) => void;
 
+  [ClientEvent.SELECT_HOSTAGE]: (
+    gameId: string,
+    playerId: string,
+    roomName: RoomName
+  ) => void;
+
   [ClientEvent.START_GAME]: (gameId: string) => void;
 
-  [ClientEvent.TERMINATE_SHARE]: (gameId: string, action: PlayerActionShareResultReceived) => void;
+  [ClientEvent.TERMINATE_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareResultReceived
+  ) => void;
 
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
   [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (

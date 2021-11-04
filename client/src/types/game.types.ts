@@ -77,6 +77,7 @@ export interface Turn {
 export enum LeaderRecordMethod {
   APPOINTMENT = "appointment",
   ABDICATION = "abdication",
+  RANDOMISATION = 'randomisation',
   USURPATION = "usurpation"
 }
 
@@ -95,6 +96,11 @@ export interface LeaderAppointment extends LeaderRecordBase {
   appointerId: string;
 }
 
+export interface LeaderRandomisation extends LeaderRecordBase {
+  method: LeaderRecordMethod.RANDOMISATION,
+  leaderId: string;
+}
+
 export interface LeaderUsurpation extends LeaderRecordBase {
   method: LeaderRecordMethod.USURPATION;
   votes: {
@@ -102,7 +108,7 @@ export interface LeaderUsurpation extends LeaderRecordBase {
   }
 }
 
-export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderUsurpation;
+export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderRandomisation | LeaderUsurpation;
 
 export interface RoomRound {
   leadersRecord: LeaderRecord[];
@@ -138,7 +144,7 @@ export const createRound = (timerSeconds: number, number: number, hostageCount =
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
-  1: createRound(180, 1),
+  1: createRound(30, 1),
   2: createRound(120, 2),
   3: createRound(60, 3)
 });

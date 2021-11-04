@@ -82,6 +82,19 @@ function GameRoute() {
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
+            onHostageSelect={(playerId, roomName, isDeselect) => {
+              if (isDeselect) {
+                socket.emit(
+                  ClientEvent.DESELECT_HOSTAGE,
+                  game.data!.id,
+                  playerId,
+                  roomName
+                );
+
+              } else {
+                socket.emit(ClientEvent.SELECT_HOSTAGE, game.data!.id, playerId, roomName)
+              }
+            }}
             onOfferAbdication={(roomName, proposedLeaderId) => {
               socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
             }}
