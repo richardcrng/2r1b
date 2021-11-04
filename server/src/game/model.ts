@@ -106,7 +106,7 @@ export class GameManager {
     leaderId: string,
     appointerId: string
   ): void {
-    const { round } = this.currentRound();
+    const round = this.currentRound();
     if (round) {
       const targetRoom = round.rooms[roomName];
       if (targetRoom.leadersRecord.length === 0) {
@@ -168,17 +168,17 @@ export class GameManager {
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
     const operation = this._withPointer((pointer) =>
       last(
-        pointer.rounds[this.currentRound().idx].rooms[roomName].leadersRecord
+        pointer.rounds[this.currentRound().number].rooms[roomName].leadersRecord
       )
     );
     return operation.status === "success" ? operation.result : undefined;
   }
 
-  public currentRound(): { round: Round; idx: number } {
+  public currentRound(): Round {
     const operation = this._withPointer((pointer) => {
-      for (let [idx, round] of Object.entries(pointer.rounds)) {
+      for (let round of Object.values(pointer.rounds)) {
         if (round.status === RoundStatus.ONGOING) {
-          return { round, idx: parseInt(idx) };
+          return round;
         }
       }
     });
@@ -224,7 +224,7 @@ export class GameManager {
   }
 
   public playersInRoom(roomName: RoomName): Readonly<Record<string, Player>> {
-    const { playerAllocation } = this.currentRound().round;
+    const { playerAllocation } = this.currentRound();
     return Object.values(this.players()).reduce(
       (acc, curr) =>
         playerAllocation[curr.socketId] === roomName
@@ -268,7 +268,7 @@ export class GameManager {
   }
 
   public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
-    const { idx: roundIdx } = this.currentRound();
+    const { number: roundNumber } = this.currentRound();
     const resultId = `${Date.now()}-${PlayerActionType.SHARE_RESULT_RECEIVED}-${Math.random().toString(5).slice(2)}`;
 
     this.managePlayer(cardShareAction.sharerId).shareCard(
@@ -276,7 +276,7 @@ export class GameManager {
       cardShareAction,
       sharerCard,
       shareeCard,
-      roundIdx
+      roundNumber
     );
 
     this.managePlayer(cardShareAction.offeredPlayerId).shareCard(
@@ -284,7 +284,7 @@ export class GameManager {
       cardShareAction,
       shareeCard,
       sharerCard,
-      roundIdx
+      roundNumber
     );
   }
 
@@ -292,7 +292,7 @@ export class GameManager {
     const sharerColor = getRoleColor(sharerCard);
     const shareeColor = getRoleColor(shareeCard);
 
-    const { idx: roundIdx } = this.currentRound();
+    const { number: roundNumber } = this.currentRound();
     const resultId = `${Date.now()}-${
       PlayerActionType.SHARE_RESULT_RECEIVED
     }-${Math.random().toString(5).slice(2)}`;
@@ -302,7 +302,7 @@ export class GameManager {
       colorShareAction,
       sharerColor,
       shareeColor,
-      roundIdx
+      roundNumber
     );
 
     this.managePlayer(colorShareAction.offeredPlayerId).shareColor(
@@ -310,7 +310,7 @@ export class GameManager {
       colorShareAction,
       shareeColor,
       sharerColor,
-      roundIdx
+      roundNumber
     );
   }
 
@@ -364,7 +364,7 @@ export class GameManager {
 
   public updateCurrentRound(mutativeCb: (round: Round) => void): void {
     this.update((game) => {
-      mutativeCb(game.rounds[this.currentRound().idx]);
+      mutativeCb(game.rounds[this.currentRound().number]);
     });
   }
 

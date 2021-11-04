@@ -116,14 +116,16 @@ export enum RoomName {
 
 export interface Round {
   // actions: PlayerAction[];
+  number: number;
   status: RoundStatus;
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
   playerAllocation: PlayerRoomAllocation;
 }
 
-export const createRound = (timerSeconds: number): Round => ({
+export const createRound = (timerSeconds: number, number: number): Round => ({
   // actions: [],
+  number,
   status: RoundStatus.PENDING,
   timerSeconds,
   rooms: {
@@ -133,11 +135,11 @@ export const createRound = (timerSeconds: number): Round => ({
   playerAllocation: {}
 });
 
-export const createStartingRounds = () => [
-  createRound(180),
-  createRound(120),
-  createRound(60),
-];
+export const createStartingRounds = (): Record<number, Round> => ({
+  1: createRound(180, 1),
+  2: createRound(120, 2),
+  3: createRound(60, 3)
+});
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
 
@@ -151,7 +153,7 @@ export interface Game {
     [playerSocketId: string]: Player;
   };
   currentTimerSeconds?: number;
-  rounds: Round[];
+  rounds: Record<number, Round>;
   rolesCount: RolesCount;
   buriedRole?: RoleKey;
   status: GameStatus;

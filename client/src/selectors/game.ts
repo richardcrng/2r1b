@@ -90,7 +90,7 @@ export const selectRolesInSetupAlphabetised = createSelector(
 
 export const selectCurrentGameRound = createSelector(
   selectGameRounds,
-  (rounds) => rounds.find(round => [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status))
+  (rounds) => Object.values(rounds).find(round => [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status))
 )
 
 export const selectCurrentGameRoomAllocation = createSelector(
