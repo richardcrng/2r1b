@@ -2,8 +2,9 @@ import { cloneDeep } from "lodash";
 import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
-import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { PlayerAction } from "../../../client/src/types/player-action.types";
+import { NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
+import { PlayerAction, PlayerActionCardShareOffered } from "../../../client/src/types/player-action.types";
+import { RoleKey } from "../../../client/src/types/role.types";
 
 export class PlayerManager {
   constructor(
@@ -111,6 +112,23 @@ export class PlayerManager {
 
   public set(player: Player): void {
     this._set(player);
+  }
+
+  public shareCard(action: PlayerActionCardShareOffered, sharedByPlayer: RoleKey, sharedWithPlayer: RoleKey, roundIdx: number): void {
+    this.update((player) => {
+      player.conditions.shareRecords.push({
+        action,
+        roundIdx,
+        sharedByPlayer,
+        sharedWithPlayer,
+      });
+    });
+
+    this.resolvePendingAction(action, {
+      type: NotificationType.CARD_SHARED,
+      sharingPlayerId: action.offeredPlayerId,
+      cardShared: sharedWithPlayer,
+    });
   }
 
   public snapshot(): Player | undefined {

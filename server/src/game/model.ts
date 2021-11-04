@@ -276,35 +276,8 @@ export class GameManager {
     const sharerManager = this.managePlayer(cardShareAction.sharerId);
     const shareeManager = this.managePlayer(cardShareAction.offeredPlayerId);
 
-    sharerManager.update((player) => {
-      player.conditions.shareRecords.push({
-        action: cardShareAction,
-        roundIdx,
-        sharedByPlayer: sharerCard,
-        sharedWithPlayer: shareeCard,
-      });
-    });
-
-    sharerManager.resolvePendingAction(cardShareAction, {
-      type: NotificationType.CARD_SHARED,
-      sharingPlayerId: cardShareAction.offeredPlayerId,
-      cardShared: shareeCard
-    });
-
-    shareeManager.update(player => {
-      player.conditions.shareRecords.push({
-        action: cardShareAction,
-        roundIdx,
-        sharedByPlayer: shareeCard,
-        sharedWithPlayer: sharerCard
-      })
-    })
-
-    shareeManager.resolvePendingAction(cardShareAction, {
-      type: NotificationType.CARD_SHARED,
-      sharingPlayerId: cardShareAction.sharerId,
-      cardShared: sharerCard,
-    });
+    sharerManager.shareCard(cardShareAction, sharerCard, shareeCard, roundIdx);
+    shareeManager.shareCard(cardShareAction, shareeCard, sharerCard, roundIdx);
   }
 
   public set(game: Game): void {
