@@ -160,7 +160,7 @@ export class GameManager {
           roomAllocation[playerId] = RoomName.B;
         }
 
-        game.rounds[0].playerAllocation = roomAllocation;
+        game.rounds[1].playerAllocation = roomAllocation;
       });
     });
   }

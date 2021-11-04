@@ -124,9 +124,19 @@ export const selectPlayerIdsInEachRoom = createSelector(
   )
 );
 
+export const selectCurrentRoundHostageTotal = createSelector(
+  selectCurrentGameRound,
+  (round) => round?.hostageCount
+)
+
 export const selectCurrentRoundRooms = createSelector(
   selectCurrentGameRound,
   (round) => round?.rooms
+)
+
+export const selectCurrentRoundRoomHostages = createSelector(
+  selectCurrentRoundRooms,
+  (rooms) => mapValues(rooms, room => room.hostages)
 )
 
 export const selectCurrentRoomLeaderRecords = createSelector(

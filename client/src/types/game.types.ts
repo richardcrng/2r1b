@@ -118,15 +118,17 @@ export interface Round {
   // actions: PlayerAction[];
   number: number;
   status: RoundStatus;
+  hostageCount: number;
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
   playerAllocation: PlayerRoomAllocation;
 }
 
-export const createRound = (timerSeconds: number, number: number): Round => ({
+export const createRound = (timerSeconds: number, number: number, hostageCount = 1): Round => ({
   // actions: [],
   number,
   status: RoundStatus.PENDING,
+  hostageCount,
   timerSeconds,
   rooms: {
     [RoomName.A]: { leadersRecord: [], hostages: [] },

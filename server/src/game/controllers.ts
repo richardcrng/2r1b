@@ -46,7 +46,7 @@ export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] =
 
 export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER] = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
-  const targetRoom = gameManager.currentRound().round.rooms[roomName];
+  const targetRoom = gameManager.currentRound().rooms[roomName];
 
   if (targetRoom.leadersRecord.length === 0) {
     gameManager.addLeaderRecord(roomName, {
@@ -201,8 +201,8 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
   gameManager.assignInitialRooms();
   gameManager.update(game => {
     game.status = GameStatus.ONGOING;
-    game.rounds[0].status = RoundStatus.ONGOING;
-    game.currentTimerSeconds = game.rounds[0].timerSeconds;
+    game.rounds[1].status = RoundStatus.ONGOING;
+    game.currentTimerSeconds = game.rounds[1].timerSeconds;
   });
   gameManager.startTimer();
   gameManager.pushPlayersNotification((player) => ({
