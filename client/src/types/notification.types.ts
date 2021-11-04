@@ -1,8 +1,10 @@
 import { Player } from "./game.types";
 
 export enum NotificationType {
+  CARD_SHARED = 'card-shared',
+  COLOR_SHARED = 'color-shared',
   GENERAL = "general",
-  PLAYER_JOINED = 'player_joined'
+  PLAYER_JOINED = 'player-joined',
 }
 
 export type PlayerNotificationFn = (player: Player) => PlayerNotification

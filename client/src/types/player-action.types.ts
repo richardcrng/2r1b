@@ -1,11 +1,11 @@
 import { RoomName } from "./game.types";
+import { RoleKey, TeamColor } from "./role.types";
 
 export enum PlayerActionType {
   ABDICATION_OFFERED = 'abdication-offered',
   CARD_SHARE_OFFERED = 'card-share-offered',
   COLOR_SHARE_OFFERED = 'color-share-offered',
-  PRIVATE_REVEAL_OFFERED = 'private-reveal',
-  PUBLIC_REVEAL_OFFERED = 'public-reveal',
+  SHARE_RESULT_RECEIVED = 'share-result-received',
 }
 
 export interface PlayerActionBase {
@@ -24,17 +24,17 @@ export function isPlayerAbdicationAction(action: PlayerAction): action is Player
   return action.type === PlayerActionType.ABDICATION_OFFERED
 }
 
-export interface PlayerActionPublicRevealOffered extends PlayerActionBase {
-  type: PlayerActionType.PUBLIC_REVEAL_OFFERED;
-  revealerId: string;
+export interface PlayerActionShareResultReceived extends PlayerActionBase {
+  type: PlayerActionType.SHARE_RESULT_RECEIVED;
+  record: PlayerShareRecord;
 }
 
-export type PlayerActionShareType =
+export type PlayerActionShareOfferedType =
   | PlayerActionType.CARD_SHARE_OFFERED
-  | PlayerActionType.COLOR_SHARE_OFFERED;
+  | PlayerActionType.COLOR_SHARE_OFFERED
 
 export interface PlayerActionShareOfferedBase extends PlayerActionBase {
-  type: PlayerActionShareType;
+  type: PlayerActionShareOfferedType;
   sharerId: string;
   offeredPlayerId: string;
 }
@@ -42,6 +42,40 @@ export interface PlayerActionShareOfferedBase extends PlayerActionBase {
 export type PlayerActionShareOffered =
   | PlayerActionCardShareOffered
   | PlayerActionColorShareOffered;
+
+export interface PlayerShareRecordBase {
+  roundIdx: number;
+  offerAction: PlayerActionShareOffered;
+  playerIdSharedWith: string;
+  sharedByPlayer: TeamColor | RoleKey;
+  sharedWithPlayer: TeamColor | RoleKey;
+}
+
+export function isPlayerCardShareRecord(
+  shareRecord: PlayerShareRecord
+): shareRecord is PlayerCardShareRecord {
+  return isPlayerCardShareAction(shareRecord.offerAction);
+}
+
+export function isPlayerColorShareRecord(
+  shareRecord: PlayerShareRecord
+): shareRecord is PlayerColorShareRecord {
+  return isPlayerColorShareAction(shareRecord.offerAction);
+}
+
+export interface PlayerCardShareRecord extends PlayerShareRecordBase {
+  offerAction: PlayerActionCardShareOffered;
+  sharedByPlayer: RoleKey;
+  sharedWithPlayer: RoleKey;
+}
+
+export interface PlayerColorShareRecord extends PlayerShareRecordBase {
+  offerAction: PlayerActionColorShareOffered;
+  sharedByPlayer: TeamColor;
+  sharedWithPlayer: TeamColor;
+}
+
+export type PlayerShareRecord = PlayerCardShareRecord | PlayerColorShareRecord;
 
 export function isPlayerShareAction(
   action: PlayerAction
@@ -72,4 +106,4 @@ export function isPlayerColorShareAction(
   return action.type === PlayerActionType.COLOR_SHARE_OFFERED;
 }
 
-export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionShareOffered
+export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionShareOffered | PlayerActionShareResultReceived

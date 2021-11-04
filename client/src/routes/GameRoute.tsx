@@ -41,6 +41,9 @@ function GameRoute() {
                 socketId: socket.id,
                 name,
                 gameId,
+                conditions: {
+                  shareRecords: []
+                },
                 pendingActions: {}
               });
             } else {
@@ -48,6 +51,10 @@ function GameRoute() {
               socket.emit(ClientEvent.JOIN_GAME, gameId, {
                 socketId: socket.id,
                 name,
+                gameId,
+                conditions: {
+                  shareRecords: []
+                },
                 pendingActions: {}
               });
             }

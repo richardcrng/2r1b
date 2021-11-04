@@ -3,7 +3,8 @@ import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
 import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { PlayerAction } from "../../../client/src/types/player-action.types";
+import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionType, PlayerShareRecord } from "../../../client/src/types/player-action.types";
+import { RoleKey, TeamColor } from "../../../client/src/types/role.types";
 
 export class PlayerManager {
   constructor(
@@ -89,10 +90,13 @@ export class PlayerManager {
     });
   }
 
-  public resolvePendingAction(playerAction: PlayerAction, playerNotification?: PlayerNotification): void {
-    this.update(player => {
+  public resolvePendingAction(
+    playerAction: PlayerAction,
+    playerNotification?: PlayerNotification
+  ): void {
+    this.update((player) => {
       delete player.pendingActions[playerAction.id];
-    })
+    });
 
     this.gameManager.io.emit(
       ServerEvent.ACTION_RESOLVED,
@@ -101,16 +105,82 @@ export class PlayerManager {
     );
 
     if (playerNotification) {
-      this.pushNotification(playerNotification)
+      this.pushNotification(playerNotification);
     }
   }
 
   public roomName(): RoomName {
-    return this.gameManager.currentRound().round.playerAllocation[this.socketId]
+    return this.gameManager.currentRound().round.playerAllocation[
+      this.socketId
+    ];
   }
 
   public set(player: Player): void {
     this._set(player);
+  }
+
+  public shareCard(
+    newActionId: string,
+    offerActionToResolve: PlayerActionCardShareOffered,
+    sharedByPlayer: RoleKey,
+    sharedWithPlayer: RoleKey,
+    roundIdx: number
+  ): void {
+    const playerIdSharedWith = [
+      offerActionToResolve.sharerId,
+      offerActionToResolve.offeredPlayerId,
+    ].find(id => this.socketId !== id)!;
+
+    const record: PlayerShareRecord = {
+      offerAction: offerActionToResolve,
+      playerIdSharedWith,
+      roundIdx,
+      sharedByPlayer,
+      sharedWithPlayer,
+    };
+
+    this.update((player) => player.conditions.shareRecords.push(record));
+
+    this.resolvePendingAction(offerActionToResolve);
+
+    this.pushPendingAction({
+      id: newActionId,
+      room: this.roomName(),
+      type: PlayerActionType.SHARE_RESULT_RECEIVED,
+      record,
+    });
+  }
+
+  public shareColor(
+    newActionId: string,
+    offerActionToResolve: PlayerActionColorShareOffered,
+    sharedByPlayer: TeamColor,
+    sharedWithPlayer: TeamColor,
+    roundIdx: number
+  ): void {
+    const playerIdSharedWith = [
+      offerActionToResolve.sharerId,
+      offerActionToResolve.offeredPlayerId,
+    ].find((id) => this.socketId !== id)!;
+
+    const record: PlayerShareRecord = {
+      offerAction: offerActionToResolve,
+      playerIdSharedWith,
+      roundIdx,
+      sharedByPlayer,
+      sharedWithPlayer,
+    };
+
+    this.update((player) => player.conditions.shareRecords.push(record));
+
+    this.resolvePendingAction(offerActionToResolve);
+
+    this.pushPendingAction({
+      id: newActionId,
+      room: this.roomName(),
+      type: PlayerActionType.SHARE_RESULT_RECEIVED,
+      record,
+    });
   }
 
   public snapshot(): Player | undefined {

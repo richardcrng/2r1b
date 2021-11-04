@@ -1,14 +1,15 @@
 import { chunk, cloneDeep, last, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
-import { GameNotification, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
+import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
 import { generateRandomGameId, getColors } from "../utils";
-import { DEFAULT_STARTING_ROLES_COUNT } from "../../../client/src/utils/role-utils";
+import { DEFAULT_STARTING_ROLES_COUNT, getRoleColor } from "../../../client/src/utils/role-utils";
+import { PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionShareOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -48,6 +49,9 @@ export class GameManager {
           isHost: true,
           gameId,
           colors: getColors(5),
+          conditions: {
+            shareRecords: [],
+          },
           pendingActions: {},
         },
       },
@@ -57,7 +61,7 @@ export class GameManager {
     };
     const gameManager = new GameManager(gameId);
     gameManager.set(game);
-    return gameManager
+    return gameManager;
   }
 
   _broadcast(): void {
@@ -260,6 +264,64 @@ export class GameManager {
     const playersToNotify = Object.values(this.players()).filter(where);
     for (let player of playersToNotify) {
       this.managePlayer(player.socketId).pushNotification(notification);
+    }
+  }
+
+  public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
+    const { idx: roundIdx } = this.currentRound();
+    const resultId = `${Date.now()}-${PlayerActionType.SHARE_RESULT_RECEIVED}-${Math.random().toString(5).slice(2)}`;
+
+    this.managePlayer(cardShareAction.sharerId).shareCard(
+      resultId,
+      cardShareAction,
+      sharerCard,
+      shareeCard,
+      roundIdx
+    );
+
+    this.managePlayer(cardShareAction.offeredPlayerId).shareCard(
+      resultId,
+      cardShareAction,
+      shareeCard,
+      sharerCard,
+      roundIdx
+    );
+  }
+
+  public resolveColorShare(colorShareAction: PlayerActionColorShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
+    const sharerColor = getRoleColor(sharerCard);
+    const shareeColor = getRoleColor(shareeCard);
+
+    const { idx: roundIdx } = this.currentRound();
+    const resultId = `${Date.now()}-${
+      PlayerActionType.SHARE_RESULT_RECEIVED
+    }-${Math.random().toString(5).slice(2)}`;
+    
+    this.managePlayer(colorShareAction.sharerId).shareColor(
+      resultId,
+      colorShareAction,
+      sharerColor,
+      shareeColor,
+      roundIdx
+    );
+
+    this.managePlayer(colorShareAction.offeredPlayerId).shareColor(
+      resultId,
+      colorShareAction,
+      shareeColor,
+      sharerColor,
+      roundIdx
+    );
+  }
+
+  public resolveShare(shareAction: PlayerActionShareOffered): void {
+    const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role!;
+    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId)
+      .role!;
+    if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
+      this.resolveCardShare(shareAction, sharerCard, shareeCard);
+    } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
+      this.resolveColorShare(shareAction, sharerCard, shareeCard);
     }
   }
 

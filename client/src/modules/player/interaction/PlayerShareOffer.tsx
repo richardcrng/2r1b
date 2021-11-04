@@ -2,14 +2,14 @@ import { Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import PlayerDropdown from "../dropdown/PlayerDropdown";
 import { useState } from "react";
 import { Button } from "semantic-ui-react";
-import { PlayerActionShareOffered, PlayerActionShareType, PlayerActionType } from "../../../types/player-action.types";
+import { PlayerActionShareOffered, PlayerActionShareOfferedType, PlayerActionType } from "../../../types/player-action.types";
 
 interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>;
   currentRoom: RoomName;
   currentOffer?: PlayerActionShareOffered;
-  onOfferShare(currentRoom: RoomName, playerId: string, shareType: PlayerActionShareType): void;
+  onOfferShare(currentRoom: RoomName, playerId: string, shareType: PlayerActionShareOfferedType): void;
   onPlayerSelect?(playerId: string): void;
   selectedPlayerId?: string;
 }
