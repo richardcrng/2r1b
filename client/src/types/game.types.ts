@@ -148,7 +148,7 @@ export const createRound = (timerSeconds: number, number: number, hostageCount =
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
-  1: createRound(30, 1),
+  1: createRound(180, 1),
   2: createRound(120, 2),
   3: createRound(60, 3)
 });
