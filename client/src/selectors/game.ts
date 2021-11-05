@@ -134,6 +134,16 @@ export const selectCurrentRoundRooms = createSelector(
   (round) => round?.rooms
 )
 
+export const selectRoomsReadinessToExchange = createSelector(
+  selectCurrentRoundRooms,
+  (rooms) => mapValues(rooms, room => room.isReadyToExchange)
+)
+
+export const selectIsHostageExchangeReady = createSelector(
+  selectRoomsReadinessToExchange,
+  (readiness) => Object.values(readiness).every(bool => bool)
+);
+
 export const selectCurrentRoundRoomHostages = createSelector(
   selectCurrentRoundRooms,
   (rooms) => mapValues(rooms, room => room.hostages)

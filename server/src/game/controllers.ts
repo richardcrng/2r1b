@@ -222,7 +222,7 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
     game.rounds[1].status = RoundStatus.ONGOING;
     game.currentTimerSeconds = game.rounds[1].timerSeconds;
   });
-  gameManager.startTimer();
+  gameManager.startRoundTimer();
   gameManager.pushPlayersNotification((player) => ({
     type: NotificationType.GENERAL,
     message: `⏳ Head to Room ${gameManager.getCurrentRoomFor(
@@ -235,9 +235,16 @@ export const submitHostages: ClientEventListeners[ClientEvent.SUBMIT_HOSTAGES] =
   gameId,
   roomName
 ) => {
-  new GameManager(gameId).updateCurrentRound(round => {
+  const gameManager = new GameManager(gameId)
+  gameManager.updateCurrentRound(round => {
     round.rooms[roomName].isReadyToExchange = true;
   })
+
+  const currentRound = gameManager.currentRound();
+
+  if (Object.values(currentRound.rooms).every(roomRound => roomRound.isReadyToExchange)) {
+    gameManager.exchangeHostages();
+  }
 }
 
 export const terminateShare: ClientEventListeners[ClientEvent.TERMINATE_SHARE] = (gameId, shareResultAction) => {

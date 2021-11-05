@@ -97,8 +97,8 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
         ) : (
           <p>
             {isReadyToExchange
-              ? `Waiting for ${leaderName} to select and submit hostages`
-              : `Waiting for the other room to select and submit their hostage${maybeS}`}
+              ? `Waiting for the other room to select and submit their hostage${maybeS}`
+              : `Waiting for ${leaderName} to select and submit hostages`}
           </p>
         )}
         <hr />

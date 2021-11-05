@@ -2,7 +2,7 @@ import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
+import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, otherRoom, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
@@ -224,6 +224,50 @@ export class GameManager {
     }
   }
 
+  public exchangeHostages(): void {
+    const finishingRound = this.currentRound();
+
+    const nextRoundAllocation = { ...finishingRound.playerAllocation };
+
+    const hostageRecord: Record<string, true> = {};
+
+    for (let roundRoom of Object.values(finishingRound.rooms)) {
+      for (let hostageId of roundRoom.hostages) {
+        nextRoundAllocation[hostageId] = otherRoom(nextRoundAllocation[hostageId]);
+        hostageRecord[hostageId] = true;
+      }
+    }
+
+    this.pushPlayersNotification((player) => {
+      if (hostageRecord[player.socketId]) {
+        return {
+          type: NotificationType.GENERAL,
+          message: "You have been exchanged as a hostage - please head to the other room"
+        }
+      } else {
+        return {
+          type: NotificationType.GENERAL,
+          message: "The hostages are swapping rooms now"
+        }
+      }
+    })
+
+    this.update(game => {
+      game.rounds[finishingRound.number].status = RoundStatus.COMPLETE;
+      const nextRound = game.rounds[finishingRound.number + 1];
+      if (nextRound) {
+        nextRound.status === RoundStatus.ONGOING;
+        nextRound.playerAllocation = nextRoundAllocation;
+      } else {
+        game.status = GameStatus.COMPLETE
+      }
+    })
+
+    if (this.currentRound()) {
+      this.startRoundTimer();
+    }
+  }
+
   public getCurrentRoomFor(playerId: string): RoomName {
     return this.managePlayer(playerId).roomName();
   }
@@ -407,8 +451,9 @@ export class GameManager {
     }
   }
 
-  public async startTimer(): Promise<void> {
+  public async startRoundTimer(): Promise<void> {
     this._withPointer(async (pointer) => {
+      pointer.currentTimerSeconds = this.currentRound().timerSeconds;
       while (pointer.currentTimerSeconds && pointer.currentTimerSeconds > 0) {
         await sleep(1000);
         this.update((gameState) => {
