@@ -327,7 +327,7 @@ export const selectOfficeHolderTreaterRole = createSelector(
     isRoleInPlay("DOCTOR_BLUE") ? "DOCTOR_BLUE" : "NURSE_BLUE"
 );
 
-export const selectIsExplosiveArmed = createSelector(
+export const selectIsExplosiveArmedIfApplicable = createSelector(
   selectDidRolesCardShare,
   selectExplosivesRole,
   selectExplosivesArmerRole,
@@ -336,7 +336,7 @@ export const selectIsExplosiveArmed = createSelector(
     isRoleInPlay(explosivesArmerRole) ? didShare(explosivesArmerRole, explosivesRole) : true
 );
 
-export const selectIsOfficeHolderTreated = createSelector(
+export const selectIsOfficeHolderTreatedIfApplicable = createSelector(
   selectDidRolesCardShare,
   selectOfficeHolderRole,
   selectOfficeHolderTreaterRole,
@@ -345,6 +345,18 @@ export const selectIsOfficeHolderTreated = createSelector(
     ? didShare(treaterRole, officeHolderRole)
     : true
 );
+
+export const selectIsExplosivesInSameFinalRoomAsOfficeHolder = createSelector(
+  selectExplosivesHolder,
+  selectOfficeHolder,
+  selectFinalGameRound,
+  (explosivesHolder, officeHolder, finalGameRound) => {
+    const roomAllocation = finalGameRound!.playerAllocation;
+    const explosivesRoom = roomAllocation[explosivesHolder!.socketId];
+    const officeHolderRoom = roomAllocation[officeHolder!.socketId];
+    return explosivesRoom === officeHolderRoom
+  }
+)
 
 export const selectIsGameEndgameComplete = createSelector(
   selectIsGamblerPredictionNeeded,
