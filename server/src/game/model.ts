@@ -189,14 +189,12 @@ export class GameManager {
   }
 
   public cancelAllUnresolvedActions(): void {
-    this.update(game => {
-      for (let playerId in game.players) {
-        const pendingActions = Object.values(
-          game.players[playerId].pendingActions
-        )
-        for (let action of pendingActions) {
-          this.managePlayer(playerId).resolvePendingAction(action);
-        }
+    this.manageEachPlayer(playerManager => {
+      const pendingActions = Object.values(
+        playerManager._pointer()?.pendingActions ?? {}
+      );
+      for (let action of pendingActions) {
+        playerManager.resolvePendingAction(action);
       }
     })
   }
@@ -240,6 +238,13 @@ export class GameManager {
       return player;
     } else {
       throw new Error(`Couldn't find player with id ${playerId}`);
+    }
+  }
+
+  public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {
+    for (let playerId in this.players()) {
+      const playerManager = this.managePlayer(playerId);
+      cb(playerManager);
     }
   }
 
@@ -415,6 +420,12 @@ export class GameManager {
     this.update((game) => {
       mutativeCb(game.rounds[this.currentRound().number]);
     });
+  }
+
+  public updateEachPlayer(mutativeCb: (player: Player) => void): void {
+    for (let playerId in this.players()) {
+      this.managePlayer(playerId).update(mutativeCb);
+    }
   }
 
   public updatePlayer(playerId: string, mutativeCb: (player: Player) => void) {
