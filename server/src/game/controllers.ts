@@ -124,6 +124,13 @@ export const deselectHostage: ClientEventListeners[ClientEvent.DESELECT_HOSTAGE]
   });
 };
 
+export const handleGamblerPrediction: ClientEventListeners[ClientEvent.GAMBLER_PREDICT] = (gameId, prediction) => {
+  const gameManager = new GameManager(gameId);
+  gameManager.update(game => {
+    game.endgame.gamblerPrediction = prediction
+  })
+}
+
 export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROLE] = (
   gameId: string,
   role: RoleKey,

@@ -5,6 +5,7 @@ import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/
 import { mapValues, last } from 'lodash';
 
 export const selectGamePlayers = (game: Game) => game.players;
+export const selectGameEndgameState = (game: Game) => game.endgame;
 export const selectGameRolesInPlayCount = (game: Game): RolesCount => game.rolesCount;
 export const selectGameRounds = (game: Game) => game.rounds
 
@@ -199,4 +200,15 @@ export const selectOrderedVotesForPlayers = createSelector(
 export const selectNonZeroOrderedVotesForPlayers = createSelector(
   selectOrderedVotesForPlayers,
   (voteEntries) => voteEntries.filter(([_, playerVotes]) => playerVotes.length > 0)
+)
+
+export const selectIsGamblerPredictionNeeded = createSelector(
+  selectGameRolesInPlayCount,
+  selectGameEndgameState,
+  (roles, endgame) => roles.GAMBLER_GREY === 1 && !endgame.gamblerPrediction
+)
+
+export const selectIsGameEndgameComplete = createSelector(
+  selectIsGamblerPredictionNeeded,
+  (isGamblerPredictionNeeded) => !isGamblerPredictionNeeded
 )

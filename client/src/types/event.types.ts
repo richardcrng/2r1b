@@ -1,6 +1,6 @@
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
-import { Card, Game, Player, RoomName, RoomRound } from "./game.types";
+import { Card, GamblerPrediction, Game, Player, RoomName, RoomRound } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
 import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered, PlayerActionShareResultReceived } from "./player-action.types";
@@ -25,6 +25,7 @@ export enum ClientEvent {
   DECLINE_ABDICATION = 'decline-abdication',
   DECLINE_SHARE = 'decline-share',
   DESELECT_HOSTAGE = 'deselect-hostage',
+  GAMBLER_PREDICT = 'gambler-predict',
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
@@ -106,6 +107,8 @@ export type ClientEventListeners = {
     playerId: string,
     roomName: RoomName
   ) => void;
+
+  [ClientEvent.GAMBLER_PREDICT]: (gameId: string, prediction: GamblerPrediction) => void;
 
   [ClientEvent.GET_GAME]: (gameId: string) => void;
 

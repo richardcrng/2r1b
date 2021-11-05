@@ -79,6 +79,9 @@ function GameRoute() {
                 leaderId
               );
             }}
+            onGamblerPrediction={(prediction) => {
+              socket.emit(ClientEvent.GAMBLER_PREDICT, game.data!.id, prediction);
+            }}
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}

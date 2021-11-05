@@ -1,5 +1,5 @@
 import { PlayerAction, PlayerShareRecord } from "./player-action.types";
-import { RoleKey } from "./role.types";
+import { RoleKey, TeamColor } from "./role.types";
 
 export enum GameStatus {
   LOBBY = "LOBBY",
@@ -159,6 +159,12 @@ export type PlayerRoomAllocation = Record<string, RoomName>;
 
 export type RolesCount = Record<RoleKey, number>
 
+export type GamblerPrediction = TeamColor.BLUE | TeamColor.RED | "neither";
+
+export interface GameEndgame {
+  gamblerPrediction?: GamblerPrediction;
+}
+
 export interface Game {
   id: string;
   actions: PlayerAction[];
@@ -166,6 +172,7 @@ export interface Game {
     [playerSocketId: string]: Player;
   };
   currentTimerSeconds?: number;
+  endgame: GameEndgame;
   rounds: Record<number, Round>;
   rolesCount: RolesCount;
   buriedRole?: RoleKey;

@@ -4,7 +4,7 @@ import {
   ServerEvent,
   ServerSocket,
 } from "../../client/src/types/event.types";
-import { incrementRoleInGame, startGame, appointLeader, proposeRoomLeader, offerAbdication, acceptAbdication, declineAbdication, withdrawAbdicationOffer, offerShare, withdrawShareOffer, declineShare, acceptShare, terminateShare, deselectHostage, selectHostage, submitHostages } from "./game/controllers";
+import { incrementRoleInGame, startGame, appointLeader, proposeRoomLeader, offerAbdication, acceptAbdication, declineAbdication, withdrawAbdicationOffer, offerShare, withdrawShareOffer, declineShare, acceptShare, terminateShare, deselectHostage, selectHostage, submitHostages, handleGamblerPrediction } from "./game/controllers";
 import { joinPlayerToGame, updatePlayer } from "./player/controllers";
 import { GameManager } from "./game/model";
 
@@ -21,6 +21,7 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.DECLINE_ABDICATION]: declineAbdication,
     [ClientEvent.DECLINE_SHARE]: declineShare,
     [ClientEvent.DESELECT_HOSTAGE]: deselectHostage,
+    [ClientEvent.GAMBLER_PREDICT]: handleGamblerPrediction,
     [ClientEvent.GET_GAME]: (gameId) => {
       const game = new GameManager(gameId)._pointer();
       game

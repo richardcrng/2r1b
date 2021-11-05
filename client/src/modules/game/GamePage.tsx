@@ -1,13 +1,15 @@
 import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders, selectGamePlayersWithRooms } from "../../selectors/game";
-import { Game, GameStatus, Player, RoomName } from "../../types/game.types";
+import { GamblerPrediction, Game, GameStatus, Player, RoomName } from "../../types/game.types";
 import { PlayerActionAbdicationOffered, PlayerActionShareOfferedType } from "../../types/player-action.types";
 import { RoleKey } from "../../types/role.types";
+import GameEndgame from "./endgame/GameEndgame";
 import GameLobby from "./lobby/GameLobby";
 import GameOngoing from "./ongoing/GameOngoing";
 
 interface Props {
   game: Game;
   onAppointLeader(appointedLeaderId: string, currentRoom: RoomName): void;
+  onGamblerPrediction(prediction: GamblerPrediction): void;
   onGameStart(): void;
   onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
   onHostageSubmit(roomName: RoomName): void;
@@ -30,6 +32,7 @@ interface Props {
 function GamePage({
   game,
   onAppointLeader,
+  onGamblerPrediction,
   onGameStart,
   onHostageSelect,
   onHostageSubmit,
@@ -61,7 +64,7 @@ function GamePage({
   } else if (game.status === GameStatus.ONGOING) {
     return <p>Waiting for room allocation...</p>;
   } else if (game.status === GameStatus.ENDGAME) {
-    return <p>The game is in endgame</p>
+    return <GameEndgame {...{ game, onGamblerPrediction, player }} />
   } else if (game.status === GameStatus.COMPLETE) {
     return <p>Game is complete!</p>
   } else {

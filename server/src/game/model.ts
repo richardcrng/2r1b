@@ -303,6 +303,12 @@ export class GameManager {
       const gamblerPlayer = Object.values(snapshot.players).find(
         (player) => player.role === "GAMBLER_GREY"
       )!;
+      this.pushPlayersPendingAction({
+        id: 'gambler-prediction-endgame',
+        type: PlayerActionType.GAMBLER_PREDICTION,
+        room: this.getCurrentRoomFor(gamblerPlayer.socketId),
+        gamblerPlayerId: gamblerPlayer.socketId
+      })
     }
   }
 
