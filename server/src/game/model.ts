@@ -256,7 +256,7 @@ export class GameManager {
       game.rounds[finishingRound.number].status = RoundStatus.COMPLETE;
       const nextRound = game.rounds[finishingRound.number + 1];
       if (nextRound) {
-        nextRound.status === RoundStatus.ONGOING;
+        nextRound.status = RoundStatus.ONGOING;
         nextRound.playerAllocation = nextRoundAllocation;
       } else {
         game.status = GameStatus.COMPLETE
