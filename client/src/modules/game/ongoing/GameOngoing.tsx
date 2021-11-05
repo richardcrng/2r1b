@@ -21,6 +21,7 @@ interface Props {
   players: Record<string, PlayerWithRoom>;
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
   onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
+  onHostageSubmit(roomName: RoomName): void;
   onOfferAbdication(roomName: RoomName, proposedLeaderId?: string): void;
   onOfferShare(roomName: RoomName, playerId: string, shareType: PlayerActionShareOfferedType): void
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
@@ -36,6 +37,7 @@ function GameOngoing({
   game,
   onAppointLeader,
   onHostageSelect,
+  onHostageSubmit,
   onOfferAbdication,
   onOfferShare,
   onWithdrawAbdicationOffer,
@@ -70,6 +72,7 @@ function GameOngoing({
         leaderName={currentLeader!.name!}
         isLeader={player.socketId === currentLeader!.socketId}
         onHostageSelect={onHostageSelect}
+        onHostageSubmit={onHostageSubmit}
         player={player}
         players={players}
         roomName={currentRoom}

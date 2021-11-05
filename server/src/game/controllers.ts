@@ -204,7 +204,6 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
 }
 
 export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (gameId, playerId, roomName) => {
-  console.log('selecting hostage', playerId)
   new GameManager(gameId).updateCurrentRound(round => {
     if (!round.rooms[roomName].hostages.includes(playerId)) {
       round.rooms[roomName].hostages.push(playerId);

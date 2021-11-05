@@ -40,13 +40,14 @@ interface Props {
   leaderName: string;
   isLeader: boolean;
   onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
+  onHostageSubmit(roomName: RoomName): void;
   player: Player;
   players: Record<string, Player>;
   roomName: RoomName;
   round: Round;
 }
 
-function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSelect, player, players, roomName, round }: Props) {
+function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSelect, onHostageSubmit, player, players, roomName, round }: Props) {
   
   const currentHostages = selectCurrentRoundRoomHostages(game)[roomName];
   const hostageTotal = selectCurrentRoundHostageTotal(game)!;
@@ -127,7 +128,12 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
         {isLeader && (
           <>
             {isReadyToExchange && <p>Waiting for the other room to select and submit their hostage{maybeS}</p>}
-            <Button disabled={!isRightHostageCount || isReadyToExchange} color="black" fluid>
+            <Button
+              disabled={!isRightHostageCount || isReadyToExchange}
+              color="black"
+              fluid
+              onClick={() => onHostageSubmit(roomName)}
+            >
               Submit hostages
             </Button>
           </>

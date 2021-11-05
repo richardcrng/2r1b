@@ -95,6 +95,9 @@ function GameRoute() {
                 socket.emit(ClientEvent.SELECT_HOSTAGE, game.data!.id, playerId, roomName)
               }
             }}
+            onHostageSubmit={(roomName) => {
+              socket.emit(ClientEvent.SUBMIT_HOSTAGES, game.data!.id, roomName)
+            }}
             onOfferAbdication={(roomName, proposedLeaderId) => {
               socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
             }}
