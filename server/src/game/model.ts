@@ -101,6 +101,15 @@ export class GameManager {
     });
   }
 
+  public announceNewRound(): void {
+    this.pushPlayersNotification((player) => ({
+      type: NotificationType.GENERAL,
+      message: `⏳ Head to Room ${this.getCurrentRoomFor(
+        player.socketId
+      )} - the round has started!`,
+    }));
+  }
+
   public appointLeader(
     roomName: RoomName,
     leaderId: string,
@@ -247,7 +256,7 @@ export class GameManager {
       } else {
         return {
           type: NotificationType.GENERAL,
-          message: "The hostages are swapping rooms now"
+          message: "Hostages have been told to swap rooms"
         }
       }
     })
@@ -452,6 +461,7 @@ export class GameManager {
   }
 
   public async startRoundTimer(): Promise<void> {
+    this.announceNewRound();
     this._withPointer(async (pointer) => {
       pointer.currentTimerSeconds = this.currentRound().timerSeconds;
       while (pointer.currentTimerSeconds && pointer.currentTimerSeconds > 0) {

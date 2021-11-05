@@ -223,12 +223,6 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
     game.currentTimerSeconds = game.rounds[1].timerSeconds;
   });
   gameManager.startRoundTimer();
-  gameManager.pushPlayersNotification((player) => ({
-    type: NotificationType.GENERAL,
-    message: `⏳ Head to Room ${gameManager.getCurrentRoomFor(
-      player.socketId
-    )} - the round has started!`,
-  }));
 };
 
 export const submitHostages: ClientEventListeners[ClientEvent.SUBMIT_HOSTAGES] = (
