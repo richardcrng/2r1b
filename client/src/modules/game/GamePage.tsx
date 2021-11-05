@@ -56,10 +56,16 @@ function GamePage({
 
   if (game.status === GameStatus.LOBBY) {
     return <GameLobby {...{ game, onGameStart, onRoleIncrement, players, player }} />;
-  } else if (currentRoom) {
+  } else if (game.status === GameStatus.ONGOING && currentRoom) {
     return <GameOngoing {...{ currentLeader, currentRoom, game, player, players: playersWithRooms, onAppointLeader, onHostageSelect, onHostageSubmit, onOfferAbdication, onOfferShare, onProposeLeader, onWithdrawAbdicationOffer }} />;
+  } else if (game.status === GameStatus.ONGOING) {
+    return <p>Waiting for room allocation...</p>;
+  } else if (game.status === GameStatus.ENDGAME) {
+    return <p>The game is in endgame</p>
+  } else if (game.status === GameStatus.COMPLETE) {
+    return <p>Game is complete!</p>
   } else {
-    return <p>Waiting for room allocation...</p>
+    return <p>Something weird has happened</p>
   }
 }
 

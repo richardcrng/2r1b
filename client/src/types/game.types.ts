@@ -4,6 +4,7 @@ import { RoleKey } from "./role.types";
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
+  ENDGAME = 'ENDGAME',
   COMPLETE = "COMPLETE",
 }
 export enum RoundStatus {
@@ -148,9 +149,9 @@ export const createRound = (timerSeconds: number, number: number, hostageCount =
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
-  1: createRound(180, 1),
-  2: createRound(120, 2),
-  3: createRound(60, 3)
+  1: createRound(15, 1),
+  2: createRound(15, 2),
+  3: createRound(15, 3)
 });
 
 export type PlayerRoomAllocation = Record<string, RoomName>;

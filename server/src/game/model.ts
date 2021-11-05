@@ -266,14 +266,11 @@ export class GameManager {
       if (nextRound) {
         nextRound.status = RoundStatus.ONGOING;
         nextRound.playerAllocation = nextRoundAllocation;
+        this.startRoundTimer();
       } else {
-        game.status = GameStatus.COMPLETE
+        game.status = GameStatus.ENDGAME;
       }
     })
-
-    if (this.currentRound()) {
-      this.startRoundTimer();
-    }
   }
 
   public getCurrentRoomFor(playerId: string): RoomName {
