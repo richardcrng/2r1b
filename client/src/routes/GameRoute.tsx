@@ -122,6 +122,12 @@ function GameRoute() {
                 leaderId
               );
             }}
+            onResultsReveal={() => {
+              socket.emit(
+                ClientEvent.REVEAL_RESULTS,
+                game.data!.id
+              )
+            }}
             onRoleIncrement={(roleKey, increment) => {
               socket.emit(
                 ClientEvent.INCREMENT_ROLE,

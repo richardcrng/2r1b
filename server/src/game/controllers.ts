@@ -210,6 +210,12 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
   }
 }
 
+export const revealResults: ClientEventListeners[ClientEvent.REVEAL_RESULTS] = (gameId) => {
+  new GameManager(gameId).update(game => {
+    game.status = GameStatus.RESULTS
+  })
+}
+
 export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (gameId, playerId, roomName) => {
   new GameManager(gameId).updateCurrentRound(round => {
     if (!round.rooms[roomName].hostages.includes(playerId)) {

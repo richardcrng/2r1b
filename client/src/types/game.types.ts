@@ -5,6 +5,7 @@ export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
   ENDGAME = 'ENDGAME',
+  RESULTS = 'RESULTS',
   COMPLETE = "COMPLETE",
 }
 export enum RoundStatus {

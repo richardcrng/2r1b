@@ -18,7 +18,7 @@ function GameEndgameGambler({ onGamblerPrediction, player }: Props) {
 
   return (
     <Container className="active-contents">
-      <h1>End game</h1>
+      <h1>All rounds are over</h1>
       <h2>Gambler Prediction</h2>
       {player.role === "GAMBLER_GREY" ? (
         <>

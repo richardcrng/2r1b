@@ -23,6 +23,7 @@ interface Props {
     proposedLeaderId: string | undefined,
     currentRoom: RoomName
   ): void;
+  onResultsReveal(): void;
   onRoleIncrement: (roleKey: RoleKey, increment: number) => void;
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
   players: Player[];
@@ -39,6 +40,7 @@ function GamePage({
   onOfferAbdication,
   onOfferShare,
   onProposeLeader,
+  onResultsReveal,
   onRoleIncrement,
   onWithdrawAbdicationOffer,
   players,
@@ -64,7 +66,9 @@ function GamePage({
   } else if (game.status === GameStatus.ONGOING) {
     return <p>Waiting for room allocation...</p>;
   } else if (game.status === GameStatus.ENDGAME) {
-    return <GameEndgame {...{ game, onGamblerPrediction, player }} />
+    return <GameEndgame {...{ game, onGamblerPrediction, onResultsReveal, player }} />
+  } else if (game.status === GameStatus.RESULTS) {
+    return <p>Viewing results</p>
   } else if (game.status === GameStatus.COMPLETE) {
     return <p>Game is complete!</p>
   } else {
