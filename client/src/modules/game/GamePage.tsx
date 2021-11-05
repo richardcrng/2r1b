@@ -5,6 +5,7 @@ import { RoleKey } from "../../types/role.types";
 import GameEndgame from "./endgame/GameEndgame";
 import GameLobby from "./lobby/GameLobby";
 import GameOngoing from "./ongoing/GameOngoing";
+import GameResults from "./results/GameResults";
 
 interface Props {
   game: Game;
@@ -68,7 +69,7 @@ function GamePage({
   } else if (game.status === GameStatus.ENDGAME) {
     return <GameEndgame {...{ game, onGamblerPrediction, onResultsReveal, player }} />
   } else if (game.status === GameStatus.RESULTS) {
-    return <p>Viewing results</p>
+    return <GameResults {...{ game }} />
   } else if (game.status === GameStatus.COMPLETE) {
     return <p>Game is complete!</p>
   } else {

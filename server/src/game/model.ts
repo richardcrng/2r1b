@@ -1,9 +1,9 @@
 import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
-import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
+import { selectDictionaryOfVotesForPlayers, selectIsExplosiveArmedIfApplicable, selectIsExplosivesInSameFinalRoomAsOfficeHolder, selectIsOfficeHolderTreatedIfApplicable } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, otherRoom, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
-import { RoleKey } from "../../../client/src/types/role.types";
+import { RoleKey, TeamColor } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
@@ -297,19 +297,18 @@ export class GameManager {
     }
   }
 
-  public handleEndgame(): void {
-    const snapshot = this.snapshot();
-    if (snapshot?.rolesCount.GAMBLER_GREY) {
-      const gamblerPlayer = Object.values(snapshot.players).find(
-        (player) => player.role === "GAMBLER_GREY"
-      )!;
-      this.pushPlayersPendingAction({
-        id: 'gambler-prediction-endgame',
-        type: PlayerActionType.GAMBLER_PREDICTION,
-        room: this.getCurrentRoomFor(gamblerPlayer.socketId),
-        gamblerPlayerId: gamblerPlayer.socketId
-      })
-    }
+  public checkBlueAndRedWinConditions(): void {
+    const snapshot = this.snapshot()!;
+    const isExplosivesInSameRoomAsOfficeHolder = selectIsExplosivesInSameFinalRoomAsOfficeHolder(snapshot);
+    const isOfficeHolderTreated = selectIsOfficeHolderTreatedIfApplicable(snapshot);
+    const isExplosiveArmed = selectIsExplosiveArmedIfApplicable(snapshot);
+
+    this.update(game => {
+      const isBlueWin =
+        isOfficeHolderTreated && !isExplosivesInSameRoomAsOfficeHolder;
+      const isRedWin = isExplosiveArmed && isExplosivesInSameRoomAsOfficeHolder;
+      game.endgame.winningColor = isBlueWin ? TeamColor.BLUE : isRedWin ? TeamColor.RED : 'neither'
+    })
   }
 
   public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {

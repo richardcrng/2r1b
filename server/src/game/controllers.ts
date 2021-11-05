@@ -211,9 +211,11 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
 }
 
 export const revealResults: ClientEventListeners[ClientEvent.REVEAL_RESULTS] = (gameId) => {
-  new GameManager(gameId).update(game => {
+  const gameManager = new GameManager(gameId);
+  gameManager.checkBlueAndRedWinConditions();
+  gameManager.update(game => {
     game.status = GameStatus.RESULTS
-  })
+  });
 }
 
 export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (gameId, playerId, roomName) => {

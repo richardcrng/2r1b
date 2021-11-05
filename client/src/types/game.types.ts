@@ -160,10 +160,12 @@ export type PlayerRoomAllocation = Record<string, RoomName>;
 
 export type RolesCount = Record<RoleKey, number>
 
-export type GamblerPrediction = TeamColor.BLUE | TeamColor.RED | "neither";
+export type WinningColor = TeamColor.BLUE | TeamColor.RED | "neither"
+export type GamblerPrediction = WinningColor;
 
 export interface GameEndgame {
   gamblerPrediction?: GamblerPrediction;
+  winningColor?: WinningColor;
 }
 
 export interface Game {
