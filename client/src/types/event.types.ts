@@ -52,7 +52,6 @@ export enum ServerEvent {
   GAME_NOTIFICATION = "game-notification",
   GAME_OVER = 'game-over',
   GAME_UPDATED = "game-updated",
-  HOSTAGES_EXCHANGED = 'hostages-exchanged',
   PLAYER_GOTTEN = "player-gotten",
   PLAYER_NOTIFICATION = 'player-notification',
   PLAYER_NOT_FOUND = "player-not-found",
@@ -202,7 +201,6 @@ export type ServerEventListeners = {
   ) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
-  [ServerEvent.HOSTAGES_EXCHANGED]: (gameId: string, roomRound: RoomRound) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOTIFICATION]: (
