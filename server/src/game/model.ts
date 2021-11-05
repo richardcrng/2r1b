@@ -102,12 +102,10 @@ export class GameManager {
   }
 
   public announceNewRound(): void {
-    this.pushPlayersNotification((player) => ({
+    this.pushPlayersNotification({
       type: NotificationType.GENERAL,
-      message: `⏳ Head to Room ${this.getCurrentRoomFor(
-        player.socketId
-      )} - the round has started!`,
-    }));
+      message: `⏳ A new round has started!`,
+    });
   }
 
   public appointLeader(
@@ -251,8 +249,9 @@ export class GameManager {
       if (hostageRecord[player.socketId]) {
         return {
           type: NotificationType.GENERAL,
-          message: "You have been exchanged as a hostage - please head to the other room"
-        }
+          message:
+            "🚪 Please swap rooms - you have been exchanged as a hostage",
+        };
       } else {
         return {
           type: NotificationType.GENERAL,

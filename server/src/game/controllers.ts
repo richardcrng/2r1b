@@ -222,6 +222,12 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
     game.rounds[1].status = RoundStatus.ONGOING;
     game.currentTimerSeconds = game.rounds[1].timerSeconds;
   });
+  gameManager.pushPlayersNotification((player) => ({
+    type: NotificationType.GENERAL,
+    message: `🚪 Head to Room ${gameManager.getCurrentRoomFor(
+      player.socketId
+    )}`,
+  }));
   gameManager.startRoundTimer();
 };
 
