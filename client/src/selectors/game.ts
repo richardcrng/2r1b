@@ -315,36 +315,35 @@ export const selectDidTinkererCardShareWithBomber = createSelector(
   (didRolesCardShare) => didRolesCardShare('TINKERER_RED', 'BOMBER_RED')
 )
 
+export const selectExplosivesArmerRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey =>
+    isRoleInPlay("ENGINEER_RED") ? "ENGINEER_RED" : "TINKERER_RED"
+);
+
+export const selectOfficeHolderTreaterRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey =>
+    isRoleInPlay("DOCTOR_BLUE") ? "DOCTOR_BLUE" : "NURSE_BLUE"
+);
+
 export const selectIsExplosiveArmed = createSelector(
   selectDidRolesCardShare,
+  selectExplosivesRole,
+  selectExplosivesArmerRole,
   selectIsRoleInPlay,
-  (didShare, isRoleInPlay) => {
-    const explosivesHolder: RoleKey = isRoleInPlay('BOMBER_RED') ? 'BOMBER_RED' : 'MARTYR_RED';
-    if (isRoleInPlay('ENGINEER_RED')) {
-      return didShare('ENGINEER_RED', explosivesHolder)
-    } else if (isRoleInPlay('TINKERER_RED')) {
-      return didShare('TINKERER_RED', explosivesHolder)
-    } else {
-      return true
-    }
-  }
-)
+  (didShare, explosivesRole, explosivesArmerRole, isRoleInPlay) =>
+    isRoleInPlay(explosivesArmerRole) ? didShare(explosivesArmerRole, explosivesRole) : true
+);
 
 export const selectIsOfficeHolderTreated = createSelector(
   selectDidRolesCardShare,
+  selectOfficeHolderRole,
+  selectOfficeHolderTreaterRole,
   selectIsRoleInPlay,
-  (didShare, isRoleInPlay) => {
-    const officeHolder: RoleKey = isRoleInPlay("PRESIDENT_BLUE")
-      ? "PRESIDENT_BLUE"
-      : "VICE_PRESIDENT_BLUE";
-    if (isRoleInPlay("DOCTOR_BLUE")) {
-      return didShare("DOCTOR_BLUE", officeHolder);
-    } else if (isRoleInPlay("NURSE_BLUE")) {
-      return didShare("NURSE_BLUE", officeHolder);
-    } else {
-      return true;
-    }
-  }
+  (didShare, officeHolderRole, treaterRole, isRoleInPlay) => isRoleInPlay(treaterRole)
+    ? didShare(treaterRole, officeHolderRole)
+    : true
 );
 
 export const selectIsGameEndgameComplete = createSelector(
