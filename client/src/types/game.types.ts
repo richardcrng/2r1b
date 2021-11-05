@@ -8,6 +8,7 @@ export enum GameStatus {
 }
 export enum RoundStatus {
   ONGOING = 'ongoing',
+  HOSTAGE_SELECTION = 'hostage-selection',
   COMPLETE = 'complete',
   PENDING = 'pending'
 }
@@ -76,6 +77,7 @@ export interface Turn {
 export enum LeaderRecordMethod {
   APPOINTMENT = "appointment",
   ABDICATION = "abdication",
+  RANDOMISATION = 'randomisation',
   USURPATION = "usurpation"
 }
 
@@ -94,6 +96,11 @@ export interface LeaderAppointment extends LeaderRecordBase {
   appointerId: string;
 }
 
+export interface LeaderRandomisation extends LeaderRecordBase {
+  method: LeaderRecordMethod.RANDOMISATION,
+  leaderId: string;
+}
+
 export interface LeaderUsurpation extends LeaderRecordBase {
   method: LeaderRecordMethod.USURPATION;
   votes: {
@@ -101,11 +108,13 @@ export interface LeaderUsurpation extends LeaderRecordBase {
   }
 }
 
-export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderUsurpation;
+export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderRandomisation | LeaderUsurpation;
 
 export interface RoomRound {
-  leadersRecord: LeaderRecord[];
+  name: RoomName;
   hostages: string[];
+  isReadyToExchange: boolean;
+  leadersRecord: LeaderRecord[];
 }
 
 export enum RoomName {
@@ -113,30 +122,36 @@ export enum RoomName {
   B = "2"
 }
 
+export const otherRoom = (roomName: RoomName): RoomName => roomName === RoomName.A ? RoomName.B : RoomName.A
+
 export interface Round {
   // actions: PlayerAction[];
+  number: number;
   status: RoundStatus;
+  hostageCount: number;
   timerSeconds: number;
   rooms: Record<RoomName, RoomRound>;
   playerAllocation: PlayerRoomAllocation;
 }
 
-export const createRound = (timerSeconds: number): Round => ({
+export const createRound = (timerSeconds: number, number: number, hostageCount = 1): Round => ({
   // actions: [],
+  number,
   status: RoundStatus.PENDING,
+  hostageCount,
   timerSeconds,
   rooms: {
-    [RoomName.A]: { leadersRecord: [], hostages: [] },
-    [RoomName.B]: { leadersRecord: [], hostages: [] },
+    [RoomName.A]: { name: RoomName.A, leadersRecord: [], hostages: [], isReadyToExchange: false },
+    [RoomName.B]: { name: RoomName.B, leadersRecord: [], hostages: [], isReadyToExchange: false },
   },
   playerAllocation: {}
 });
 
-export const createStartingRounds = () => [
-  createRound(180),
-  createRound(120),
-  createRound(60),
-];
+export const createStartingRounds = (): Record<number, Round> => ({
+  1: createRound(180, 1),
+  2: createRound(120, 2),
+  3: createRound(60, 3)
+});
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
 
@@ -150,7 +165,7 @@ export interface Game {
     [playerSocketId: string]: Player;
   };
   currentTimerSeconds?: number;
-  rounds: Round[];
+  rounds: Record<number, Round>;
   rolesCount: RolesCount;
   buriedRole?: RoleKey;
   status: GameStatus;

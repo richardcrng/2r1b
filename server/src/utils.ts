@@ -43,7 +43,10 @@ export const createDummyPlayer = ({
     name,
     isHost,
     role,
-    pendingActions
+    pendingActions,
+    conditions: {
+      shareRecords: []
+    }
   }
 }
 

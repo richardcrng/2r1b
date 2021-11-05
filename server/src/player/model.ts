@@ -110,7 +110,7 @@ export class PlayerManager {
   }
 
   public roomName(): RoomName {
-    return this.gameManager.currentRound().round.playerAllocation[
+    return this.gameManager.currentRound().playerAllocation[
       this.socketId
     ];
   }
@@ -124,7 +124,7 @@ export class PlayerManager {
     offerActionToResolve: PlayerActionCardShareOffered,
     sharedByPlayer: RoleKey,
     sharedWithPlayer: RoleKey,
-    roundIdx: number
+    roundNumber: number
   ): void {
     const playerIdSharedWith = [
       offerActionToResolve.sharerId,
@@ -134,7 +134,7 @@ export class PlayerManager {
     const record: PlayerShareRecord = {
       offerAction: offerActionToResolve,
       playerIdSharedWith,
-      roundIdx,
+      roundNumber,
       sharedByPlayer,
       sharedWithPlayer,
     };
@@ -156,7 +156,7 @@ export class PlayerManager {
     offerActionToResolve: PlayerActionColorShareOffered,
     sharedByPlayer: TeamColor,
     sharedWithPlayer: TeamColor,
-    roundIdx: number
+    roundNumber: number
   ): void {
     const playerIdSharedWith = [
       offerActionToResolve.sharerId,
@@ -166,7 +166,7 @@ export class PlayerManager {
     const record: PlayerShareRecord = {
       offerAction: offerActionToResolve,
       playerIdSharedWith,
-      roundIdx,
+      roundNumber,
       sharedByPlayer,
       sharedWithPlayer,
     };

@@ -1,6 +1,6 @@
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
-import { Card, Game, Player, RoomName } from "./game.types";
+import { Card, Game, Player, RoomName, RoomRound } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from './notification.types';
 import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered, PlayerActionShareResultReceived } from "./player-action.types";
@@ -24,6 +24,7 @@ export enum ClientEvent {
   CREATE_GAME = "create-game",
   DECLINE_ABDICATION = 'decline-abdication',
   DECLINE_SHARE = 'decline-share',
+  DESELECT_HOSTAGE = 'deselect-hostage',
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = 'increment-role',
@@ -31,7 +32,9 @@ export enum ClientEvent {
   OFFER_ABDICATION = 'offer-abdication',
   OFFER_SHARE = 'offer-share',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
+  SELECT_HOSTAGE = 'select-hostage',
   START_GAME = "start-game",
+  SUBMIT_HOSTAGES = 'submit-hostages',
   TERMINATE_SHARE = 'terminate-share',
   UPDATE_PLAYER = "update-player",
   WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer',
@@ -49,6 +52,7 @@ export enum ServerEvent {
   GAME_NOTIFICATION = "game-notification",
   GAME_OVER = 'game-over',
   GAME_UPDATED = "game-updated",
+  HOSTAGES_EXCHANGED = 'hostages-exchanged',
   PLAYER_GOTTEN = "player-gotten",
   PLAYER_NOTIFICATION = 'player-notification',
   PLAYER_NOT_FOUND = "player-not-found",
@@ -98,6 +102,12 @@ export type ClientEventListeners = {
     action: PlayerActionShareOffered
   ) => void;
 
+  [ClientEvent.DESELECT_HOSTAGE]: (
+    gameId: string,
+    playerId: string,
+    roomName: RoomName
+  ) => void;
+
   [ClientEvent.GET_GAME]: (gameId: string) => void;
 
   [ClientEvent.GET_PLAYER]: (
@@ -133,9 +143,20 @@ export type ClientEventListeners = {
     proposedLeaderId?: string
   ) => void;
 
+  [ClientEvent.SELECT_HOSTAGE]: (
+    gameId: string,
+    playerId: string,
+    roomName: RoomName
+  ) => void;
+
   [ClientEvent.START_GAME]: (gameId: string) => void;
 
-  [ClientEvent.TERMINATE_SHARE]: (gameId: string, action: PlayerActionShareResultReceived) => void;
+  [ClientEvent.SUBMIT_HOSTAGES]: (gameId: string, roomName: RoomName) => void;
+
+  [ClientEvent.TERMINATE_SHARE]: (
+    gameId: string,
+    action: PlayerActionShareResultReceived
+  ) => void;
 
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
   [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (
@@ -181,6 +202,7 @@ export type ServerEventListeners = {
   ) => void;
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
+  [ServerEvent.HOSTAGES_EXCHANGED]: (gameId: string, roomRound: RoomRound) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOTIFICATION]: (

@@ -46,7 +46,7 @@ export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] =
 
 export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER] = (gameId: string, roomName: RoomName, appointerId: string, appointedLeaderId: string): void => {
   const gameManager = new GameManager(gameId);
-  const targetRoom = gameManager.currentRound().round.rooms[roomName];
+  const targetRoom = gameManager.currentRound().rooms[roomName];
 
   if (targetRoom.leadersRecord.length === 0) {
     gameManager.addLeaderRecord(roomName, {
@@ -111,6 +111,16 @@ export const declineShare: ClientEventListeners[ClientEvent.DECLINE_SHARE] = (
   gameManager.managePlayer(offeredPlayerId).resolvePendingAction(action, {
     type: NotificationType.GENERAL,
     message: `You have declined ${sharerName}'s ${shareType} share offer`,
+  });
+};
+
+export const deselectHostage: ClientEventListeners[ClientEvent.DESELECT_HOSTAGE] = (
+  gameId,
+  playerId,
+  roomName
+) => {
+  new GameManager(gameId).updateCurrentRound((round) => {
+    round.rooms[roomName].hostages = round.rooms[roomName].hostages.filter(id => id !== playerId);
   });
 };
 
@@ -193,6 +203,14 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
   }
 }
 
+export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (gameId, playerId, roomName) => {
+  new GameManager(gameId).updateCurrentRound(round => {
+    if (!round.rooms[roomName].hostages.includes(playerId)) {
+      round.rooms[roomName].hostages.push(playerId);
+    };
+  })
+}
+
 export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
   gameId: string,
 ): void => {
@@ -201,17 +219,33 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
   gameManager.assignInitialRooms();
   gameManager.update(game => {
     game.status = GameStatus.ONGOING;
-    game.rounds[0].status = RoundStatus.ONGOING;
-    game.currentTimerSeconds = game.rounds[0].timerSeconds;
+    game.rounds[1].status = RoundStatus.ONGOING;
+    game.currentTimerSeconds = game.rounds[1].timerSeconds;
   });
-  gameManager.startTimer();
   gameManager.pushPlayersNotification((player) => ({
     type: NotificationType.GENERAL,
-    message: `⏳ Head to Room ${gameManager.getCurrentRoomFor(
+    message: `🚪 Head to Room ${gameManager.getCurrentRoomFor(
       player.socketId
-    )} - the round has started!`,
+    )}`,
   }));
+  gameManager.startRoundTimer();
 };
+
+export const submitHostages: ClientEventListeners[ClientEvent.SUBMIT_HOSTAGES] = (
+  gameId,
+  roomName
+) => {
+  const gameManager = new GameManager(gameId)
+  gameManager.updateCurrentRound(round => {
+    round.rooms[roomName].isReadyToExchange = true;
+  })
+
+  const currentRound = gameManager.currentRound();
+
+  if (Object.values(currentRound.rooms).every(roomRound => roomRound.isReadyToExchange)) {
+    gameManager.exchangeHostages();
+  }
+}
 
 export const terminateShare: ClientEventListeners[ClientEvent.TERMINATE_SHARE] = (gameId, shareResultAction) => {
   const gameManager = new GameManager(gameId);

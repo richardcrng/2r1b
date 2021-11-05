@@ -90,7 +90,7 @@ export const selectRolesInSetupAlphabetised = createSelector(
 
 export const selectCurrentGameRound = createSelector(
   selectGameRounds,
-  (rounds) => rounds.find(round => round.status === RoundStatus.ONGOING)
+  (rounds) => Object.values(rounds).find(round => [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status))
 )
 
 export const selectCurrentGameRoomAllocation = createSelector(
@@ -124,9 +124,29 @@ export const selectPlayerIdsInEachRoom = createSelector(
   )
 );
 
+export const selectCurrentRoundHostageTotal = createSelector(
+  selectCurrentGameRound,
+  (round) => round?.hostageCount
+)
+
 export const selectCurrentRoundRooms = createSelector(
   selectCurrentGameRound,
   (round) => round?.rooms
+)
+
+export const selectRoomsReadinessToExchange = createSelector(
+  selectCurrentRoundRooms,
+  (rooms) => mapValues(rooms, room => room.isReadyToExchange)
+)
+
+export const selectIsHostageExchangeReady = createSelector(
+  selectRoomsReadinessToExchange,
+  (readiness) => Object.values(readiness).every(bool => bool)
+);
+
+export const selectCurrentRoundRoomHostages = createSelector(
+  selectCurrentRoundRooms,
+  (rooms) => mapValues(rooms, room => room.hostages)
 )
 
 export const selectCurrentRoomLeaderRecords = createSelector(

@@ -1,8 +1,8 @@
-import { chunk, cloneDeep, last, shuffle } from "lodash";
+import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
+import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, otherRoom, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
@@ -101,12 +101,19 @@ export class GameManager {
     });
   }
 
+  public announceNewRound(): void {
+    this.pushPlayersNotification({
+      type: NotificationType.GENERAL,
+      message: `⏳ A new round has started!`,
+    });
+  }
+
   public appointLeader(
     roomName: RoomName,
     leaderId: string,
     appointerId: string
   ): void {
-    const { round } = this.currentRound();
+    const round = this.currentRound();
     if (round) {
       const targetRoom = round.rooms[roomName];
       if (targetRoom.leadersRecord.length === 0) {
@@ -115,6 +122,29 @@ export class GameManager {
           leaderId,
           appointerId,
         });
+      }
+    }
+  }
+
+  public appointRandomLeadersIfUnfilled(): void {
+    for (let roomName of Object.values(RoomName)) {
+      if (!this.currentLeaderRecord(roomName)) {
+        const newLeader = sample(Object.values(this.playersInRoom(roomName)))!;
+        this.updateCurrentRound((round) => {
+          round.rooms[roomName].leadersRecord.push({
+            method: LeaderRecordMethod.RANDOMISATION,
+            leaderId: newLeader.socketId,
+          });
+        });
+
+        this.pushPlayerNotificationToRoom(roomName, (player) => ({
+          type: NotificationType.GENERAL,
+          message: `Since no leader existed, ${
+            newLeader.socketId === player.socketId
+              ? "you were"
+              : `${newLeader.name} was`
+          } picked at random to be leader`,
+        }));
       }
     }
   }
@@ -160,25 +190,36 @@ export class GameManager {
           roomAllocation[playerId] = RoomName.B;
         }
 
-        game.rounds[0].playerAllocation = roomAllocation;
+        game.rounds[1].playerAllocation = roomAllocation;
       });
     });
+  }
+
+  public cancelAllUnresolvedActions(): void {
+    this.manageEachPlayer(playerManager => {
+      const pendingActions = Object.values(
+        playerManager._pointer()?.pendingActions ?? {}
+      );
+      for (let action of pendingActions) {
+        playerManager.resolvePendingAction(action);
+      }
+    })
   }
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
     const operation = this._withPointer((pointer) =>
       last(
-        pointer.rounds[this.currentRound().idx].rooms[roomName].leadersRecord
+        pointer.rounds[this.currentRound().number].rooms[roomName].leadersRecord
       )
     );
     return operation.status === "success" ? operation.result : undefined;
   }
 
-  public currentRound(): { round: Round; idx: number } {
+  public currentRound(): Round {
     const operation = this._withPointer((pointer) => {
-      for (let [idx, round] of Object.entries(pointer.rounds)) {
-        if (round.status === RoundStatus.ONGOING) {
-          return { round, idx: parseInt(idx) };
+      for (let round of Object.values(pointer.rounds)) {
+        if ([RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status)) {
+          return round;
         }
       }
     });
@@ -187,6 +228,51 @@ export class GameManager {
       return operation.result;
     } else {
       throw new Error("No round found");
+    }
+  }
+
+  public exchangeHostages(): void {
+    const finishingRound = this.currentRound();
+
+    const nextRoundAllocation = { ...finishingRound.playerAllocation };
+
+    const hostageRecord: Record<string, true> = {};
+
+    for (let roundRoom of Object.values(finishingRound.rooms)) {
+      for (let hostageId of roundRoom.hostages) {
+        nextRoundAllocation[hostageId] = otherRoom(nextRoundAllocation[hostageId]);
+        hostageRecord[hostageId] = true;
+      }
+    }
+
+    this.pushPlayersNotification((player) => {
+      if (hostageRecord[player.socketId]) {
+        return {
+          type: NotificationType.GENERAL,
+          message:
+            "🚪 Please swap rooms - you have been exchanged as a hostage",
+        };
+      } else {
+        return {
+          type: NotificationType.GENERAL,
+          message: "Hostages have been told to swap rooms"
+        }
+      }
+    })
+
+    this.update(game => {
+      game.rounds[finishingRound.number].status = RoundStatus.COMPLETE;
+      const nextRound = game.rounds[finishingRound.number + 1];
+      if (nextRound) {
+        nextRound.status = RoundStatus.ONGOING;
+        nextRound.playerAllocation = nextRoundAllocation;
+      } else {
+        game.status = GameStatus.COMPLETE
+      }
+    })
+
+    if (this.currentRound()) {
+      this.startRoundTimer();
     }
   }
 
@@ -207,11 +293,34 @@ export class GameManager {
     }
   }
 
+  public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {
+    for (let playerId in this.players()) {
+      const playerManager = this.managePlayer(playerId);
+      cb(playerManager);
+    }
+  }
+
   public managePlayer(
     playerId: string,
     aliasIds: string[] = []
   ): PlayerManager {
     return new PlayerManager(this, playerId, aliasIds);
+  }
+
+  public moveRoundToHostageSelection(): void {
+    this.cancelAllUnresolvedActions();
+    this.resetAllVotes();
+
+    this.pushGameNotificationToAll({
+      type: NotificationType.GENERAL,
+      message: "Round time is up - hostages must be selected",
+    });
+
+    this.appointRandomLeadersIfUnfilled();
+
+    this.updateCurrentRound((round) => {
+      round.status = RoundStatus.HOSTAGE_SELECTION;
+    });
   }
 
   public players(): Readonly<Record<string, Player>> {
@@ -224,7 +333,7 @@ export class GameManager {
   }
 
   public playersInRoom(roomName: RoomName): Readonly<Record<string, Player>> {
-    const { playerAllocation } = this.currentRound().round;
+    const { playerAllocation } = this.currentRound();
     return Object.values(this.players()).reduce(
       (acc, curr) =>
         playerAllocation[curr.socketId] === roomName
@@ -267,8 +376,16 @@ export class GameManager {
     }
   }
 
+  public resetAllVotes(): void {
+    this.manageEachPlayer(playerManager => {
+      playerManager.update(player => {
+        delete player.leaderVote
+      })
+    })
+  }
+
   public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
-    const { idx: roundIdx } = this.currentRound();
+    const { number: roundNumber } = this.currentRound();
     const resultId = `${Date.now()}-${PlayerActionType.SHARE_RESULT_RECEIVED}-${Math.random().toString(5).slice(2)}`;
 
     this.managePlayer(cardShareAction.sharerId).shareCard(
@@ -276,7 +393,7 @@ export class GameManager {
       cardShareAction,
       sharerCard,
       shareeCard,
-      roundIdx
+      roundNumber
     );
 
     this.managePlayer(cardShareAction.offeredPlayerId).shareCard(
@@ -284,7 +401,7 @@ export class GameManager {
       cardShareAction,
       shareeCard,
       sharerCard,
-      roundIdx
+      roundNumber
     );
   }
 
@@ -292,7 +409,7 @@ export class GameManager {
     const sharerColor = getRoleColor(sharerCard);
     const shareeColor = getRoleColor(shareeCard);
 
-    const { idx: roundIdx } = this.currentRound();
+    const { number: roundNumber } = this.currentRound();
     const resultId = `${Date.now()}-${
       PlayerActionType.SHARE_RESULT_RECEIVED
     }-${Math.random().toString(5).slice(2)}`;
@@ -302,7 +419,7 @@ export class GameManager {
       colorShareAction,
       sharerColor,
       shareeColor,
-      roundIdx
+      roundNumber
     );
 
     this.managePlayer(colorShareAction.offeredPlayerId).shareColor(
@@ -310,7 +427,7 @@ export class GameManager {
       colorShareAction,
       shareeColor,
       sharerColor,
-      roundIdx
+      roundNumber
     );
   }
 
@@ -342,8 +459,10 @@ export class GameManager {
     }
   }
 
-  public async startTimer(): Promise<void> {
+  public async startRoundTimer(): Promise<void> {
+    this.announceNewRound();
     this._withPointer(async (pointer) => {
+      pointer.currentTimerSeconds = this.currentRound().timerSeconds;
       while (pointer.currentTimerSeconds && pointer.currentTimerSeconds > 0) {
         await sleep(1000);
         this.update((gameState) => {
@@ -352,6 +471,7 @@ export class GameManager {
           }
         });
       }
+      this.moveRoundToHostageSelection();
     });
   }
 
@@ -361,8 +481,14 @@ export class GameManager {
 
   public updateCurrentRound(mutativeCb: (round: Round) => void): void {
     this.update((game) => {
-      mutativeCb(game.rounds[this.currentRound().idx]);
+      mutativeCb(game.rounds[this.currentRound().number]);
     });
+  }
+
+  public updateEachPlayer(mutativeCb: (player: Player) => void): void {
+    for (let playerId in this.players()) {
+      this.managePlayer(playerId).update(mutativeCb);
+    }
   }
 
   public updatePlayer(playerId: string, mutativeCb: (player: Player) => void) {
