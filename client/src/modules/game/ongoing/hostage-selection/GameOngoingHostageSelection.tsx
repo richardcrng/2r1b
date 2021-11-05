@@ -71,12 +71,12 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
           <>
             <p>
               As Room Leader, you must choose the hostage
-              {maybeS}.
+              {maybeS} (but cannot pick yourself).
             </p>
             <PlayerDropdown
-              filter={(player) =>
-                round.playerAllocation[player.socketId] === roomName &&
-                !currentHostages.includes(player.socketId)
+              filter={(p) => player.socketId !== p.socketId &&
+                round.playerAllocation[p.socketId] === roomName &&
+                !currentHostages.includes(p.socketId)
               }
               onPlayerSelect={setSelectedPlayerId}
               players={players}
