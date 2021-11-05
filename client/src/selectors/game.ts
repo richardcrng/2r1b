@@ -1,13 +1,15 @@
 import { createSelector } from 'reselect';
-import { Game, LeaderVote, PlayerWithRoom, RolesCount, RoomName, RoundStatus } from "../types/game.types";
+import { Game, LeaderVote, Player, PlayerWithRoom, RolesCount, RoomName, RoundStatus } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 import { mapValues, last } from 'lodash';
+import { PlayerActionType } from '../types/player-action.types';
 
 export const selectGamePlayers = (game: Game) => game.players;
 export const selectGameEndgameState = (game: Game) => game.endgame;
 export const selectGameRolesInPlayCount = (game: Game): RolesCount => game.rolesCount;
 export const selectGameRounds = (game: Game) => game.rounds
+export const selectBuriedRole = (game: Game) => game.buriedRole;
 
 export const selectTotalCountOfGameRoles = createSelector(
   selectGameRolesInPlayCount,
@@ -92,6 +94,11 @@ export const selectRolesInSetupAlphabetised = createSelector(
 export const selectCurrentGameRound = createSelector(
   selectGameRounds,
   (rounds) => Object.values(rounds).find(round => [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status))
+)
+
+export const selectFinalGameRound = createSelector(
+  selectGameRounds,
+  (rounds) => last(Object.values(rounds))
 )
 
 export const selectCurrentGameRoomAllocation = createSelector(
@@ -202,11 +209,120 @@ export const selectNonZeroOrderedVotesForPlayers = createSelector(
   (voteEntries) => voteEntries.filter(([_, playerVotes]) => playerVotes.length > 0)
 )
 
-export const selectIsGamblerPredictionNeeded = createSelector(
+export const selectIsRoleInSetup = createSelector(
   selectGameRolesInPlayCount,
-  selectGameEndgameState,
-  (roles, endgame) => roles.GAMBLER_GREY === 1 && !endgame.gamblerPrediction
+  (roles) => (roleKey: RoleKey): boolean => !!roles[roleKey]
 )
+
+export const selectIsRoleInPlay = createSelector(
+  selectIsRoleInSetup,
+  selectBuriedRole,
+  (isRoleInPlay, buriedRole) => (role: RoleKey): boolean => isRoleInPlay(role) && buriedRole !== role
+);
+
+export const selectFindPlayerWithRole = createSelector(
+  selectGamePlayers,
+  (players) => (roleKey: RoleKey): Player | undefined => Object.values(players).find(player => player.role === roleKey)
+)
+
+export const selectPresident = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole('PRESIDENT_BLUE')
+)
+
+export const selectBomber = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole("BOMBER_RED")
+);
+
+export const selectEngineer = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole("ENGINEER_RED")
+);
+
+export const selectDoctor = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole("DOCTOR_BLUE")
+);
+
+export const selectIsGamblerInPlay = createSelector(
+  selectIsRoleInPlay,
+  (isRoleDealtOut) => isRoleDealtOut('GAMBLER_GREY')
+)
+
+export const selectIsGamblerPredictionNeeded = createSelector(
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  (isRoleDealtOut, endgame) => isRoleDealtOut("GAMBLER_GREY") && !endgame.gamblerPrediction
+)
+
+export const selectDidRolesCardShare = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => (roleOne: RoleKey, roleTwo: RoleKey): boolean => {
+    const didTwoCardShareWithOne = !!findPlayerWithRole(roleOne)?.conditions.shareRecords.find(record => record.offerAction.type === PlayerActionType.CARD_SHARE_OFFERED && record.sharedWithPlayer === roleTwo)
+    const didOneCardShareWithTwo = !!findPlayerWithRole(
+      roleTwo
+    )?.conditions.shareRecords.find(
+      (record) =>
+        record.offerAction.type === PlayerActionType.CARD_SHARE_OFFERED &&
+        record.sharedWithPlayer === roleOne
+    );
+
+    return didOneCardShareWithTwo && didTwoCardShareWithOne
+  }
+)
+
+export const selectDidDoctorCardShareWithPresident = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare("DOCTOR_BLUE", "PRESIDENT_BLUE")
+);
+
+export const selectDidNurseCardShareWithPresident = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare("NURSE_BLUE", "PRESIDENT_BLUE")
+);
+
+export const selectDidEngineerCardShareWithBomber = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare('ENGINEER_RED', 'BOMBER_RED')
+)
+
+export const selectDidTinkererCardShareWithBomber = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare('TINKERER_RED', 'BOMBER_RED')
+)
+
+export const selectIsExplosiveArmed = createSelector(
+  selectDidRolesCardShare,
+  selectIsRoleInPlay,
+  (didShare, isRoleInPlay) => {
+    const explosivesHolder: RoleKey = isRoleInPlay('BOMBER_RED') ? 'BOMBER_RED' : 'MARTYR_RED';
+    if (isRoleInPlay('ENGINEER_RED')) {
+      return didShare('ENGINEER_RED', explosivesHolder)
+    } else if (isRoleInPlay('TINKERER_RED')) {
+      return didShare('TINKERER_RED', explosivesHolder)
+    } else {
+      return true
+    }
+  }
+)
+
+export const selectIsOfficeHolderTreated = createSelector(
+  selectDidRolesCardShare,
+  selectIsRoleInPlay,
+  (didShare, isRoleInPlay) => {
+    const officeHolder: RoleKey = isRoleInPlay("PRESIDENT_BLUE")
+      ? "PRESIDENT_BLUE"
+      : "VICE_PRESIDENT_BLUE";
+    if (isRoleInPlay("DOCTOR_BLUE")) {
+      return didShare("DOCTOR_BLUE", officeHolder);
+    } else if (isRoleInPlay("NURSE_BLUE")) {
+      return didShare("NURSE_BLUE", officeHolder);
+    } else {
+      return true;
+    }
+  }
+);
 
 export const selectIsGameEndgameComplete = createSelector(
   selectIsGamblerPredictionNeeded,

@@ -42,6 +42,7 @@ export class GameManager {
     const game: Game = {
       id: gameId,
       actions: [],
+      endgame: {},
       players: {
         [socketId]: {
           name: playerName,
