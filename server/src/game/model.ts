@@ -257,6 +257,7 @@ export class GameManager {
 
   public moveRoundToHostageSelection(): void {
     this.cancelAllUnresolvedActions();
+    this.resetAllVotes();
 
     this.pushGameNotificationToAll({
       type: NotificationType.GENERAL,
@@ -321,6 +322,14 @@ export class GameManager {
     for (let player of playersToNotify) {
       this.managePlayer(player.socketId).pushNotification(notification);
     }
+  }
+
+  public resetAllVotes(): void {
+    this.manageEachPlayer(playerManager => {
+      playerManager.update(player => {
+        delete player.leaderVote
+      })
+    })
   }
 
   public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
