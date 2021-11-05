@@ -245,6 +245,29 @@ export const selectDoctor = createSelector(
   (findPlayerWithRole) => findPlayerWithRole("DOCTOR_BLUE")
 );
 
+export const selectExplosivesRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey => isRoleInPlay('BOMBER_RED') ? 'BOMBER_RED' : 'MARTYR_RED'
+)
+
+export const selectOfficeHolderRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey =>
+    isRoleInPlay("PRESIDENT_BLUE") ? "PRESIDENT_BLUE" : "VICE_PRESIDENT_BLUE"
+);
+
+export const selectExplosivesHolder = createSelector(
+  selectExplosivesRole,
+  selectFindPlayerWithRole,
+  (explosivesRole, findPlayerWithRole) => findPlayerWithRole(explosivesRole)
+);
+
+export const selectOfficeHolder = createSelector(
+  selectOfficeHolderRole,
+  selectFindPlayerWithRole,
+  (officeHolderRole, findPlayerWithRole) => findPlayerWithRole(officeHolderRole)
+)
+
 export const selectIsGamblerInPlay = createSelector(
   selectIsRoleInPlay,
   (isRoleDealtOut) => isRoleDealtOut('GAMBLER_GREY')
