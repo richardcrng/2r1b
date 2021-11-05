@@ -191,7 +191,12 @@ export class GameManager {
   public cancelAllUnresolvedActions(): void {
     this.update(game => {
       for (let playerId in game.players) {
-        game.players[playerId].pendingActions = {};
+        const pendingActions = Object.values(
+          game.players[playerId].pendingActions
+        )
+        for (let action of pendingActions) {
+          this.managePlayer(playerId).resolvePendingAction(action);
+        }
       }
     })
   }
