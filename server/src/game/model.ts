@@ -119,6 +119,29 @@ export class GameManager {
     }
   }
 
+  public appointRandomLeadersIfUnfilled(): void {
+    for (let roomName of Object.values(RoomName)) {
+      if (!this.currentLeaderRecord(roomName)) {
+        const newLeader = sample(Object.values(this.playersInRoom(roomName)))!;
+        this.updateCurrentRound((round) => {
+          round.rooms[roomName].leadersRecord.push({
+            method: LeaderRecordMethod.RANDOMISATION,
+            leaderId: newLeader.socketId,
+          });
+        });
+
+        this.pushPlayerNotificationToRoom(roomName, (player) => ({
+          type: NotificationType.GENERAL,
+          message: `Since no leader existed, ${
+            newLeader.socketId === player.socketId
+              ? "you were"
+              : `${newLeader.name} was`
+          } picked at random to be leader`,
+        }));
+      }
+    }
+  }
+
   public assignInitialRoles(): void {
     this._withPointer((pointer) => {
       const rolesCount = pointer.rolesCount;
@@ -163,6 +186,14 @@ export class GameManager {
         game.rounds[1].playerAllocation = roomAllocation;
       });
     });
+  }
+
+  public cancelAllUnresolvedActions(): void {
+    this.update(game => {
+      for (let playerId in game.players) {
+        game.players[playerId].pendingActions = {};
+      }
+    })
   }
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
@@ -212,6 +243,21 @@ export class GameManager {
     aliasIds: string[] = []
   ): PlayerManager {
     return new PlayerManager(this, playerId, aliasIds);
+  }
+
+  public moveRoundToHostageSelection(): void {
+    this.cancelAllUnresolvedActions();
+
+    this.pushGameNotificationToAll({
+      type: NotificationType.GENERAL,
+      message: "Round time is up - hostages must be selected",
+    });
+
+    this.appointRandomLeadersIfUnfilled();
+
+    this.updateCurrentRound((round) => {
+      round.status = RoundStatus.HOSTAGE_SELECTION;
+    });
   }
 
   public players(): Readonly<Record<string, Player>> {
@@ -352,31 +398,7 @@ export class GameManager {
           }
         });
       }
-
-      this.pushGameNotificationToAll({
-        type: NotificationType.GENERAL,
-        message: 'Round time is up - hostages must be selected'
-      })
-
-      for (let roomName of Object.values(RoomName)) {
-        if (!this.currentLeaderRecord(roomName)) {
-          const newLeader = sample(Object.values(this.playersInRoom(roomName)))!;
-          this.updateCurrentRound(round => {
-            round.rooms[roomName].leadersRecord.push({
-              method: LeaderRecordMethod.RANDOMISATION,
-              leaderId: newLeader.socketId
-            })
-          })
-          this.pushPlayerNotificationToRoom(roomName, (player) => ({
-            type: NotificationType.GENERAL,
-            message: `Since no leader existed, ${newLeader.socketId === player.socketId ? "you were" : `${newLeader.name} was`} picked at random to be leader`
-          }))
-        }
-      }
-
-      this.updateCurrentRound(round => {
-        round.status = RoundStatus.HOSTAGE_SELECTION;
-      })
+      this.moveRoundToHostageSelection();
     });
   }
 
