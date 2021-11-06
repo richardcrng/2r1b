@@ -99,7 +99,7 @@ export const selectRoleEntriesInPlay = createSelector(
   (roleEntries, buriedRole) =>
     roleEntries.map(
       ([role, count]): [PlayerRole, number] => buriedRole === role.key ? [role, count - 1] : [role, count]
-    ).filter(([_, count]) => count === 0)
+    ).filter(([_, count]) => count !== 0)
 );
 
 export const selectIsGreyRoleInPlay = createSelector(

@@ -1,6 +1,6 @@
 import { Button } from 'semantic-ui-react';
 import styled from 'styled-components'
-import { selectIsGreyRoleInPlay, selectTeamWinCheckResult } from '../../../selectors/game';
+import { selectIsGreyRoleInPlay, selectRoleEntriesInPlay, selectTeamWinCheckResult } from '../../../selectors/game';
 import { Game, Player } from "../../../types/game.types";
 
 const Container = styled.div`
@@ -30,6 +30,8 @@ interface Props {
 function GameResults({ game, onGameReset, player }: Props) {
 
   const teamResult = selectTeamWinCheckResult(game);
+  const thing = selectRoleEntriesInPlay(game);
+  console.log(thing)
   const isGreyInPlay = selectIsGreyRoleInPlay(game);
 
   return (
