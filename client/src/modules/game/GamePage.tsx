@@ -12,6 +12,7 @@ interface Props {
   onAppointLeader(appointedLeaderId: string, currentRoom: RoomName): void;
   onGamblerPrediction(prediction: GamblerPrediction): void;
   onGameStart(): void;
+  onGameReset(): void;
   onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
   onHostageSubmit(roomName: RoomName): void;
   onOfferAbdication: (roomName: RoomName, proposedLeaderId: string) => void;
@@ -35,6 +36,7 @@ function GamePage({
   game,
   onAppointLeader,
   onGamblerPrediction,
+  onGameReset,
   onGameStart,
   onHostageSelect,
   onHostageSubmit,
@@ -69,7 +71,7 @@ function GamePage({
   } else if (game.status === GameStatus.ENDGAME) {
     return <GameEndgame {...{ game, onGamblerPrediction, onResultsReveal, player }} />
   } else if (game.status === GameStatus.RESULTS) {
-    return <GameResults {...{ game }} />
+    return <GameResults {...{ game, onGameReset, player }} />
   } else if (game.status === GameStatus.COMPLETE) {
     return <p>Game is complete!</p>
   } else {

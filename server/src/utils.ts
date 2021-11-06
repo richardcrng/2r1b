@@ -5,7 +5,6 @@ import { DEFAULT_STARTING_ROLES_COUNT } from "../../client/src/utils/role-utils"
 export const createDummyGame = ({
   id = generateRandomGameId(),
   players = {},
-  actions = [],
   rounds = createStartingRounds(),
   rolesCount = DEFAULT_STARTING_ROLES_COUNT,
   status = GameStatus.LOBBY
@@ -14,7 +13,6 @@ export const createDummyGame = ({
     id,
     players: mapValues(players, (player) => ({ ...player, gameId: id })),
     endgame: {},
-    actions,
     rounds,
     rolesCount,
     status

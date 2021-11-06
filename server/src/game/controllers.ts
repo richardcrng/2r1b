@@ -210,6 +210,11 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
   }
 }
 
+export const resetGame: ClientEventListeners[ClientEvent.RESET_GAME] = (gameId) => {
+  const gameManager = new GameManager(gameId);
+  gameManager.resetGame();
+}
+
 export const revealResults: ClientEventListeners[ClientEvent.REVEAL_RESULTS] = (gameId) => {
   const gameManager = new GameManager(gameId);
   gameManager.update(game => {

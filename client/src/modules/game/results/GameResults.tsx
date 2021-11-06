@@ -1,6 +1,7 @@
+import { Button } from 'semantic-ui-react';
 import styled from 'styled-components'
 import { selectIsGreyRoleInPlay, selectTeamWinCheckResult } from '../../../selectors/game';
-import { Game } from "../../../types/game.types";
+import { Game, Player } from "../../../types/game.types";
 
 const Container = styled.div`
   display: grid;
@@ -16,11 +17,17 @@ const Main = styled.div`
   grid-area: main;
 `
 
+const Actions = styled.div`
+  grid-area: actions;
+`;
+
 interface Props {
   game: Game;
+  onGameReset(): void;
+  player: Player;
 }
 
-function GameResults({ game }: Props) {
+function GameResults({ game, onGameReset, player }: Props) {
 
   const teamResult = selectTeamWinCheckResult(game);
   const isGreyInPlay = selectIsGreyRoleInPlay(game);
@@ -37,6 +44,17 @@ function GameResults({ game }: Props) {
           </>
         )}
       </Main>
+      <Actions>
+        {player.isHost && (
+          <Button
+            color='red'
+            fluid
+            onClick={onGameReset}
+          >
+            Restart game
+          </Button>
+        )}
+      </Actions>
     </Container>
   );
 }
