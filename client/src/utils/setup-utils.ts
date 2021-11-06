@@ -1,6 +1,6 @@
 import { RolesCount } from "../types/game.types";
 import { RoleKey, TeamColor } from "../types/role.types";
-import { getRoleColor, getRoleDefinition, getRoleRestrictions } from "./role-utils";
+import { getRoleColor, getRoleDefinition, getRoleName, getRoleRestrictions } from "./role-utils";
 
 const MINIMUM_PLAYERS_NEEDED = 6;
 const MINIMUM_PLAYERS_RECOMMENDED = 10;
@@ -30,7 +30,7 @@ export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number)
   const roleKeys = Object.keys(rolesCount) as RoleKey[];
   const totalRolesCount = Object.values(rolesCount).reduce((acc, curr) => acc + curr, 0);
 
-  const alerts = roleKeys.reduce(
+  const roleAlerts = roleKeys.reduce(
     (acc, currRoleKey) => [
       ...acc,
       ...checkOwnPlayerCountRoleRestrictions(nPlayers, currRoleKey),
@@ -38,11 +38,33 @@ export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number)
     [] as SetupAlert[]
   );
 
-  return [
+  const alerts = [
     ...checkPlayerCount(nPlayers),
     ...checkPlayerCountAgainstRoleCount(nPlayers, totalRolesCount),
-    ...alerts
+    ...roleAlerts
   ]
+
+  if (rolesCount["VICE_PRESIDENT_BLUE"] === 0) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `If a role will be buried, you must include the ${getRoleName(
+        "VICE_PRESIDENT_BLUE"
+      )} role`,
+      source: SetupAlertSource.ROLE_SETUP,
+    });
+  }
+
+  if (rolesCount["MARTYR_RED"] === 0) {
+    alerts.push({
+      severity: SetupAlertSeverity.ERROR,
+      message: `If a role will be buried, you must include the ${getRoleName(
+        "MARTYR_RED"
+      )} role`,
+      source: SetupAlertSource.ROLE_SETUP,
+    });
+  }
+
+  return alerts
 };
 
 export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
