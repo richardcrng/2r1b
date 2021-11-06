@@ -1,7 +1,8 @@
 import { Button } from 'semantic-ui-react';
 import styled from 'styled-components'
-import { selectIsGreyRoleInPlay, selectRoleEntriesInPlay, selectTeamWinCheckResult } from '../../../selectors/game';
+import { selectFindPlayerWithRole, selectGreyPlayerResults, selectTeamWinCheckResult } from '../../../selectors/game';
 import { Game, Player } from "../../../types/game.types";
+import { getRoleName } from '../../../utils/role-utils';
 
 const Container = styled.div`
   display: grid;
@@ -30,9 +31,8 @@ interface Props {
 function GameResults({ game, onGameReset, player }: Props) {
 
   const teamResult = selectTeamWinCheckResult(game);
-  const thing = selectRoleEntriesInPlay(game);
-  console.log(thing)
-  const isGreyInPlay = selectIsGreyRoleInPlay(game);
+  const greyResults = selectGreyPlayerResults(game);
+  const findPlayerWithRole = selectFindPlayerWithRole(game);
 
   return (
     <Container className="active-contents">
@@ -40,9 +40,19 @@ function GameResults({ game, onGameReset, player }: Props) {
         <h1>Results</h1>
         <h2>Main team win: {teamResult.winningColor}</h2>
         <p>{teamResult.reason}</p>
-        {isGreyInPlay && (
+        {greyResults.length > 0 && (
           <>
-            <h2>Other results</h2>
+            <h2>Grey players</h2>
+            <ol>
+              {greyResults.map((result) => (
+                <li key={result.role}>
+                  <p>
+                    <strong>{getRoleName(result.role)} {result.isWin ? "win" : 'loss'} ({findPlayerWithRole(result.role)?.name}): </strong>
+                    {result.reason}
+                  </p>
+                </li>
+              ))}
+            </ol>
           </>
         )}
       </Main>

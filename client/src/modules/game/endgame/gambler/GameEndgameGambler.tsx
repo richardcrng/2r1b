@@ -44,6 +44,7 @@ function GameEndgameGambler({ onGamblerPrediction, player }: Props) {
           <Button
             color='black'
             disabled={!prediction}
+            fluid
             onClick={() => onGamblerPrediction(prediction!)}
           >
             Submit prediction
