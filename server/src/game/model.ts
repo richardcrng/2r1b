@@ -297,18 +297,8 @@ export class GameManager {
     }
   }
 
-  public checkBlueAndRedWinConditions(): void {
-    const snapshot = this.snapshot()!;
-    const isExplosivesInSameRoomAsOfficeHolder = selectIsExplosivesInSameFinalRoomAsOfficeHolder(snapshot);
-    const isOfficeHolderTreated = selectIsOfficeHolderTreatedIfApplicable(snapshot);
-    const isExplosiveArmed = selectIsExplosiveArmedIfApplicable(snapshot);
+  public checkBlueWin(): void {
 
-    this.update(game => {
-      const isBlueWin =
-        isOfficeHolderTreated && !isExplosivesInSameRoomAsOfficeHolder;
-      const isRedWin = isExplosiveArmed && isExplosivesInSameRoomAsOfficeHolder;
-      game.endgame.winningColor = isBlueWin ? TeamColor.BLUE : isRedWin ? TeamColor.RED : 'neither'
-    })
   }
 
   public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {

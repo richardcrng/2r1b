@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { selectTeamWinCheckResult } from '../../../selectors/game';
 import { Game } from "../../../types/game.types";
 
 const Container = styled.div`
@@ -21,11 +22,15 @@ interface Props {
 
 function GameResults({ game }: Props) {
 
+  const teamResult = selectTeamWinCheckResult(game);
+
   return (
     <Container className="active-contents">
       <Main>
         <h1>Results</h1>
-        <p>Winning team: {game.endgame.winningColor}</p>
+        <h2>Main team win: {teamResult.winningColor}</h2>
+        <p>{teamResult.reason}</p>
+        
       </Main>
     </Container>
   );

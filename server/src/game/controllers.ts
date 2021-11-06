@@ -212,7 +212,6 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
 
 export const revealResults: ClientEventListeners[ClientEvent.REVEAL_RESULTS] = (gameId) => {
   const gameManager = new GameManager(gameId);
-  gameManager.checkBlueAndRedWinConditions();
   gameManager.update(game => {
     game.status = GameStatus.RESULTS
   });

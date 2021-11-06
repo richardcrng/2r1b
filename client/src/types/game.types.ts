@@ -163,9 +163,14 @@ export type RolesCount = Record<RoleKey, number>
 export type WinningColor = TeamColor.BLUE | TeamColor.RED | "neither"
 export type GamblerPrediction = WinningColor;
 
+
 export interface GameEndgame {
   gamblerPrediction?: GamblerPrediction;
-  winningColor?: WinningColor;
+}
+
+export interface TeamResult {
+  winningColor: WinningColor;
+  reason: string;
 }
 
 export interface Game {
