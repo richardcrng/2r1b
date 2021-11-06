@@ -124,6 +124,13 @@ export const deselectHostage: ClientEventListeners[ClientEvent.DESELECT_HOSTAGE]
   });
 };
 
+export const handleGamblerPrediction: ClientEventListeners[ClientEvent.GAMBLER_PREDICT] = (gameId, prediction) => {
+  const gameManager = new GameManager(gameId);
+  gameManager.update(game => {
+    game.endgame.gamblerPrediction = prediction
+  })
+}
+
 export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROLE] = (
   gameId: string,
   role: RoleKey,
@@ -201,6 +208,13 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
       usurpLeader(gameId, roomName, proposedLeaderId, currentLeader, votesForLeader.map(vote => vote.voterId));
     }
   }
+}
+
+export const revealResults: ClientEventListeners[ClientEvent.REVEAL_RESULTS] = (gameId) => {
+  const gameManager = new GameManager(gameId);
+  gameManager.update(game => {
+    game.status = GameStatus.RESULTS
+  });
 }
 
 export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (gameId, playerId, roomName) => {

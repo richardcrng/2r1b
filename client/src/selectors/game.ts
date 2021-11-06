@@ -1,15 +1,19 @@
 import { createSelector } from 'reselect';
-import { Game, LeaderVote, PlayerWithRoom, RolesCount, RoomName, RoundStatus } from "../types/game.types";
-import { ALL_ROLES, PlayerRole, RoleKey } from '../types/role.types';
+import { Game, LeaderVote, Player, PlayerWithRoom, RolesCount, RoomName, RoundStatus, TeamResult } from "../types/game.types";
+import { ALL_ROLES, PlayerRole, RoleKey, TeamColor } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 import { mapValues, last } from 'lodash';
+import { PlayerActionType } from '../types/player-action.types';
+import { getRoleName } from '../utils/role-utils';
 
 export const selectGamePlayers = (game: Game) => game.players;
-export const selectGameRolesInPlayCount = (game: Game): RolesCount => game.rolesCount;
+export const selectGameEndgameState = (game: Game) => game.endgame;
+export const selectGameRolesInSetupCount = (game: Game): RolesCount => game.rolesCount;
 export const selectGameRounds = (game: Game) => game.rounds
+export const selectBuriedRole = (game: Game) => game.buriedRole;
 
 export const selectTotalCountOfGameRoles = createSelector(
-  selectGameRolesInPlayCount,
+  selectGameRolesInSetupCount,
   (rolesCount) => Object.values(rolesCount).reduce((acc, val) => acc + val, 0)
 )
 
@@ -29,7 +33,7 @@ export const selectGamePlayerCount = createSelector(
 )
 
 export const selectGameSetupAlerts = createSelector(
-  selectGameRolesInPlayCount,
+  selectGameRolesInSetupCount,
   selectGamePlayerCount,
   (rolesCount, nPlayers) => alertsFromSetup(rolesCount, nPlayers)
 )
@@ -68,18 +72,18 @@ export const selectGameLobbyReadiness = createSelector(
     : { isReady: false, reason: "Minimum 6 players needed" } 
 )
 
-export const selectGameRoleEntries = createSelector(
-  selectGameRolesInPlayCount,
+export const selectRoleKeyEntriesInSetup = createSelector(
+  selectGameRolesInSetupCount,
   (rolesCount) => Object.entries(rolesCount) as [RoleKey, number][]
 )
 
-export const selectGameRoleEntriesInGame = createSelector(
-  selectGameRoleEntries,
+export const selectRoleKeyEntriesInSetupInSetup = createSelector(
+  selectRoleKeyEntriesInSetup,
   (entries) => entries.filter(([_, count]) => count > 0)
 );
 
 export const selectRolesInSetup = createSelector(
-  selectGameRoleEntriesInGame,
+  selectRoleKeyEntriesInSetupInSetup,
   (entries) => entries.map(([roleKey, roleCount]) => [ALL_ROLES[roleKey], roleCount]) as [PlayerRole, number][]
 )
 
@@ -88,9 +92,29 @@ export const selectRolesInSetupAlphabetised = createSelector(
   (roleEntries) => [...roleEntries].sort((a, b) => a[0].roleName < b[0].roleName ? -1 : 0)
 )
 
+
+export const selectRoleEntriesInPlay = createSelector(
+  selectRolesInSetup,
+  selectBuriedRole,
+  (roleEntries, buriedRole) =>
+    roleEntries.map(
+      ([role, count]): [PlayerRole, number] => buriedRole === role.key ? [role, count - 1] : [role, count]
+    ).filter(([_, count]) => count === 0)
+);
+
+export const selectIsGreyRoleInPlay = createSelector(
+  selectRoleEntriesInPlay,
+  (entries) => entries.some(([role]) => role.color === TeamColor.GREY)
+)
+
 export const selectCurrentGameRound = createSelector(
   selectGameRounds,
   (rounds) => Object.values(rounds).find(round => [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status))
+)
+
+export const selectFinalGameRound = createSelector(
+  selectGameRounds,
+  (rounds) => last(Object.values(rounds))
 )
 
 export const selectCurrentGameRoomAllocation = createSelector(
@@ -199,4 +223,301 @@ export const selectOrderedVotesForPlayers = createSelector(
 export const selectNonZeroOrderedVotesForPlayers = createSelector(
   selectOrderedVotesForPlayers,
   (voteEntries) => voteEntries.filter(([_, playerVotes]) => playerVotes.length > 0)
+)
+
+export const selectIsRoleInSetup = createSelector(
+  selectGameRolesInSetupCount,
+  (roles) => (roleKey: RoleKey): boolean => !!roles[roleKey]
+)
+
+export const selectIsRoleInPlay = createSelector(
+  selectIsRoleInSetup,
+  selectBuriedRole,
+  (isRoleInPlay, buriedRole) => (role: RoleKey): boolean => isRoleInPlay(role) && buriedRole !== role
+);
+
+export const selectFindPlayerWithRole = createSelector(
+  selectGamePlayers,
+  (players) => (roleKey: RoleKey): Player | undefined => Object.values(players).find(player => player.role === roleKey)
+)
+
+export const selectPresident = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole('PRESIDENT_BLUE')
+)
+
+export const selectBomber = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole("BOMBER_RED")
+);
+
+export const selectEngineer = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole("ENGINEER_RED")
+);
+
+export const selectDoctor = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => findPlayerWithRole("DOCTOR_BLUE")
+);
+
+export const selectExplosivesRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey => isRoleInPlay('BOMBER_RED') ? 'BOMBER_RED' : 'MARTYR_RED'
+)
+
+export const selectOfficeHolderRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey =>
+    isRoleInPlay("PRESIDENT_BLUE") ? "PRESIDENT_BLUE" : "VICE_PRESIDENT_BLUE"
+);
+
+export const selectExplosivesArmerRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey =>
+    isRoleInPlay("ENGINEER_RED") ? "ENGINEER_RED" : "TINKERER_RED"
+);
+
+export const selectOfficeHolderTreaterRole = createSelector(
+  selectIsRoleInPlay,
+  (isRoleInPlay): RoleKey =>
+    isRoleInPlay("DOCTOR_BLUE") ? "DOCTOR_BLUE" : "NURSE_BLUE"
+);
+
+
+export const selectDescribeOfficeHolder = createSelector(
+  selectOfficeHolderRole,
+  (officeHolderRole) => officeHolderRole === 'PRESIDENT_BLUE' ? getRoleName(officeHolderRole) : `${getRoleName(officeHolderRole)} (filling in for the President)`
+)
+
+export const selectDescribeExplosivesHolder = createSelector(
+  selectExplosivesRole,
+  (explosivesRole) =>
+    explosivesRole === "BOMBER_RED"
+      ? getRoleName(explosivesRole)
+      : `${getRoleName(explosivesRole)} (filling in for the Bomber)`
+);
+
+export const selectDescribeTreater = createSelector(
+  selectOfficeHolderTreaterRole,
+  (treaterRole) =>
+    treaterRole === "DOCTOR_BLUE"
+      ? getRoleName(treaterRole)
+      : `${getRoleName(treaterRole)} (filling in for the Doctor)`
+);
+
+export const selectDescribeArmer = createSelector(
+  selectExplosivesArmerRole,
+  (armerRole) =>
+    armerRole === "ENGINEER_RED"
+      ? getRoleName(armerRole)
+      : `${getRoleName(armerRole)} (filling in for the Engineer)`
+);
+
+
+export const selectExplosivesHolder = createSelector(
+  selectExplosivesRole,
+  selectFindPlayerWithRole,
+  (explosivesRole, findPlayerWithRole) => findPlayerWithRole(explosivesRole)
+);
+
+export const selectOfficeHolder = createSelector(
+  selectOfficeHolderRole,
+  selectFindPlayerWithRole,
+  (officeHolderRole, findPlayerWithRole) => findPlayerWithRole(officeHolderRole)
+)
+
+export const selectIsPrivateEyeIdentificationNeeded = createSelector(
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  (isRoleInPlay, endgame) => isRoleInPlay("PRIVATE_EYE_GREY") && !endgame.privateEyePrediction
+)
+
+export const selectIsGamblerPredictionNeeded = createSelector(
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  (isRoleInPlay, endgame) => isRoleInPlay("GAMBLER_GREY") && !endgame.gamblerPrediction
+)
+
+export const selectDidRolesCardShare = createSelector(
+  selectFindPlayerWithRole,
+  (findPlayerWithRole) => (roleOne: RoleKey, roleTwo: RoleKey): boolean => {
+    const didTwoCardShareWithOne = !!findPlayerWithRole(roleOne)?.conditions.shareRecords.find(record => record.offerAction.type === PlayerActionType.CARD_SHARE_OFFERED && record.sharedWithPlayer === roleTwo)
+    const didOneCardShareWithTwo = !!findPlayerWithRole(
+      roleTwo
+    )?.conditions.shareRecords.find(
+      (record) =>
+        record.offerAction.type === PlayerActionType.CARD_SHARE_OFFERED &&
+        record.sharedWithPlayer === roleOne
+    );
+
+    return didOneCardShareWithTwo && didTwoCardShareWithOne
+  }
+)
+
+export const selectDidDoctorCardShareWithPresident = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare("DOCTOR_BLUE", "PRESIDENT_BLUE")
+);
+
+export const selectDidNurseCardShareWithPresident = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare("NURSE_BLUE", "PRESIDENT_BLUE")
+);
+
+export const selectDidEngineerCardShareWithBomber = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare('ENGINEER_RED', 'BOMBER_RED')
+)
+
+export const selectDidTinkererCardShareWithBomber = createSelector(
+  selectDidRolesCardShare,
+  (didRolesCardShare) => didRolesCardShare('TINKERER_RED', 'BOMBER_RED')
+)
+
+export const selectIsExplosiveArmedIfApplicable = createSelector(
+  selectDidRolesCardShare,
+  selectExplosivesRole,
+  selectExplosivesArmerRole,
+  selectIsRoleInPlay,
+  (didShare, explosivesRole, explosivesArmerRole, isRoleInPlay) =>
+    isRoleInPlay(explosivesArmerRole) ? didShare(explosivesArmerRole, explosivesRole) : true
+);
+
+export const selectIsOfficeHolderTreatedIfApplicable = createSelector(
+  selectDidRolesCardShare,
+  selectOfficeHolderRole,
+  selectOfficeHolderTreaterRole,
+  selectIsRoleInPlay,
+  (didShare, officeHolderRole, treaterRole, isRoleInPlay) => isRoleInPlay(treaterRole)
+    ? didShare(treaterRole, officeHolderRole)
+    : true
+);
+
+export const selectIsExplosivesInSameFinalRoomAsOfficeHolder = createSelector(
+  selectExplosivesHolder,
+  selectOfficeHolder,
+  selectFinalGameRound,
+  (explosivesHolder, officeHolder, finalGameRound) => {
+    const roomAllocation = finalGameRound!.playerAllocation;
+    const explosivesRoom = roomAllocation[explosivesHolder!.socketId];
+    const officeHolderRoom = roomAllocation[officeHolder!.socketId];
+    return explosivesRoom === officeHolderRoom
+  }
+)
+
+export const selectTeamWinCheckResult = createSelector(
+  selectIsOfficeHolderTreatedIfApplicable,
+  selectIsExplosiveArmedIfApplicable,
+  selectIsExplosivesInSameFinalRoomAsOfficeHolder,
+  selectIsRoleInSetup,
+  selectDescribeOfficeHolder,
+  selectDescribeExplosivesHolder,
+  selectDescribeTreater,
+  selectDescribeArmer,
+  (isTreated, isArmed, isSameRoom, isRoleInSetup, officeHolder, explosivesHolder, treater, armer): TeamResult => {
+    const isDoctorInvolved = isRoleInSetup("DOCTOR_BLUE");
+    const isEngineerInvolved = isRoleInSetup("ENGINEER_RED");
+
+    
+    // DOCTOR AND ENGINEER DUAL CASE
+    if (isDoctorInvolved && isEngineerInvolved) {
+      if (isSameRoom) {
+        if (isArmed) {
+          return {
+            winningColor: TeamColor.RED,
+            reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}, whose explosives were successfully armed by the ${armer}.`
+          }
+        } else if (isTreated) {
+          return {
+            winningColor: TeamColor.BLUE,
+            reason: `The ${officeHolder} survived! Their medical condition was treated by the ${treater}, and whilst they ended up in the same room as the ${explosivesHolder}, the explosives were not armed by the ${armer}.`
+          } 
+        } else {
+          return {
+            winningColor: 'neither',
+            reason: `The ${officeHolder} died... but peacefully! Their fatal medical condition was not treated by the ${treater}; and no explosion happened, since the ${explosivesHolder}'s explosives were not armed by the ${armer}.`
+          }
+        }
+      } else if (isTreated) {
+        return {
+          winningColor: TeamColor.BLUE,
+          reason: `The ${officeHolder} survived! Their medical condition was treated by the ${treater}, and they were kept apart from the ${explosivesHolder}.`
+        }
+      } else if (isArmed) {
+        return {
+          winningColor: TeamColor.RED,
+          reason: `The ${officeHolder} died... and chaos errupted! Their fatal medical condition was not treated by the ${treater}, and the ${explosivesHolder}'s explosives were successfully armed by the ${armer}.`,
+        };
+      } else {
+        return {
+          winningColor: "neither",
+          reason: `The ${officeHolder} died... but peacefully! Their fatal medical condition was not treated by the ${treater}; and no explosion happened, since the ${explosivesHolder}'s explosives were not armed by the ${armer}.`,
+        };
+      }
+    }
+
+    // DOCTOR CASE
+    if (isDoctorInvolved /* && !isEngineerInvolved - implicit */) {
+      if (isSameRoom) {
+        return {
+          winningColor: TeamColor.RED,
+          reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}.`
+        }
+      } else if (!isTreated) {
+        return {
+          winningColor: TeamColor.RED,
+          reason: `The ${officeHolder} died! Their fatal medical condition was not treated by the ${treater}.`
+        }
+      } else {
+        return {
+          winningColor: TeamColor.BLUE,
+          reason: `The ${officeHolder} survived! Their medical condition was successfully treated by the ${treater}, and they were kept apart from the ${explosivesHolder}.`
+        }
+      }
+    }
+
+
+    // ENGINEER CASE
+    if (isEngineerInvolved /* && !isDoctorInvolved - implicit */) {
+      if (isSameRoom && isArmed) {
+        return {
+          winningColor: TeamColor.RED,
+          reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}, whose explosives were successfully armed by the ${armer}.`,
+        };
+      } else if (isSameRoom) {
+        return {
+          winningColor: TeamColor.BLUE,
+          reason: `The ${officeHolder} survived! Although they ended up in the same room as the ${explosivesHolder}, the explosives had not been armed by the ${armer}.`
+        }
+      } else {
+        return {
+          winningColor: TeamColor.BLUE,
+          reason: `The ${officeHolder} survived! They were kept apart from the ${explosivesHolder}, whose explosives ${isArmed ? `had been successfully armed by the ${armer}` : `had not been armed by the ${armer} in any case`}.`,
+        };
+      }
+    }
+
+    // VANILLA CASE
+    if (isSameRoom) {
+      return {
+        winningColor: TeamColor.RED,
+        reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}.`,
+      }
+    } else {
+      return {
+        winningColor: TeamColor.BLUE,
+        reason: `The ${officeHolder} was survived! They were kept apart from the ${explosivesHolder}.`,
+      }
+    }
+  }
+)
+
+export const selectIsGameEndgameComplete = createSelector(
+  selectIsPrivateEyeIdentificationNeeded,
+  selectIsGamblerPredictionNeeded,
+  (isPrivateEyeIdentificationNeeded, isGamblerPredictionNeeded) => [
+    isPrivateEyeIdentificationNeeded,
+    isGamblerPredictionNeeded
+  ].some(bool => bool)
 )

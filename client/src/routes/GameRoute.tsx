@@ -79,6 +79,9 @@ function GameRoute() {
                 leaderId
               );
             }}
+            onGamblerPrediction={(prediction) => {
+              socket.emit(ClientEvent.GAMBLER_PREDICT, game.data!.id, prediction);
+            }}
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
@@ -118,6 +121,12 @@ function GameRoute() {
                 player.data!.socketId,
                 leaderId
               );
+            }}
+            onResultsReveal={() => {
+              socket.emit(
+                ClientEvent.REVEAL_RESULTS,
+                game.data!.id
+              )
             }}
             onRoleIncrement={(roleKey, increment) => {
               socket.emit(

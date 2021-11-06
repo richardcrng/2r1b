@@ -1,9 +1,11 @@
 import { PlayerAction, PlayerShareRecord } from "./player-action.types";
-import { RoleKey } from "./role.types";
+import { RoleKey, TeamColor } from "./role.types";
 
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
+  ENDGAME = 'ENDGAME',
+  RESULTS = 'RESULTS',
   COMPLETE = "COMPLETE",
 }
 export enum RoundStatus {
@@ -148,15 +150,29 @@ export const createRound = (timerSeconds: number, number: number, hostageCount =
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
-  1: createRound(180, 1),
-  2: createRound(120, 2),
-  3: createRound(60, 3)
+  1: createRound(15, 1),
+  2: createRound(15, 2),
+  3: createRound(15, 3)
 });
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
 
 
 export type RolesCount = Record<RoleKey, number>
+
+export type WinningColor = TeamColor.BLUE | TeamColor.RED | "neither"
+export type GamblerPrediction = WinningColor;
+
+
+export interface GameEndgame {
+  gamblerPrediction?: GamblerPrediction;
+  privateEyePrediction?: RoleKey;
+}
+
+export interface TeamResult {
+  winningColor: WinningColor;
+  reason: string;
+}
 
 export interface Game {
   id: string;
@@ -165,6 +181,7 @@ export interface Game {
     [playerSocketId: string]: Player;
   };
   currentTimerSeconds?: number;
+  endgame: GameEndgame;
   rounds: Record<number, Round>;
   rolesCount: RolesCount;
   buriedRole?: RoleKey;

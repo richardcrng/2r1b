@@ -1,15 +1,15 @@
 import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
-import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
+import { selectDictionaryOfVotesForPlayers, selectIsExplosiveArmedIfApplicable, selectIsExplosivesInSameFinalRoomAsOfficeHolder, selectIsOfficeHolderTreatedIfApplicable } from "../../../client/src/selectors/game";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, otherRoom, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
-import { RoleKey } from "../../../client/src/types/role.types";
+import { RoleKey, TeamColor } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
 import { generateRandomGameId, getColors } from "../utils";
 import { DEFAULT_STARTING_ROLES_COUNT, getRoleColor } from "../../../client/src/utils/role-utils";
-import { PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionShareOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
+import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionFn, PlayerActionShareOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
@@ -42,6 +42,7 @@ export class GameManager {
     const game: Game = {
       id: gameId,
       actions: [],
+      endgame: {},
       players: {
         [socketId]: {
           name: playerName,
@@ -196,14 +197,14 @@ export class GameManager {
   }
 
   public cancelAllUnresolvedActions(): void {
-    this.manageEachPlayer(playerManager => {
+    this.manageEachPlayer((playerManager) => {
       const pendingActions = Object.values(
         playerManager._pointer()?.pendingActions ?? {}
       );
       for (let action of pendingActions) {
         playerManager.resolvePendingAction(action);
       }
-    })
+    });
   }
 
   public currentLeaderRecord(roomName: RoomName): LeaderRecord | undefined {
@@ -218,7 +219,11 @@ export class GameManager {
   public currentRound(): Round {
     const operation = this._withPointer((pointer) => {
       for (let round of Object.values(pointer.rounds)) {
-        if ([RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status)) {
+        if (
+          [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(
+            round.status
+          )
+        ) {
           return round;
         }
       }
@@ -240,7 +245,9 @@ export class GameManager {
 
     for (let roundRoom of Object.values(finishingRound.rooms)) {
       for (let hostageId of roundRoom.hostages) {
-        nextRoundAllocation[hostageId] = otherRoom(nextRoundAllocation[hostageId]);
+        nextRoundAllocation[hostageId] = otherRoom(
+          nextRoundAllocation[hostageId]
+        );
         hostageRecord[hostageId] = true;
       }
     }
@@ -255,25 +262,22 @@ export class GameManager {
       } else {
         return {
           type: NotificationType.GENERAL,
-          message: "Hostages have been told to swap rooms"
-        }
+          message: "Hostages have been told to swap rooms",
+        };
       }
-    })
+    });
 
-    this.update(game => {
+    this.update((game) => {
       game.rounds[finishingRound.number].status = RoundStatus.COMPLETE;
       const nextRound = game.rounds[finishingRound.number + 1];
       if (nextRound) {
         nextRound.status = RoundStatus.ONGOING;
         nextRound.playerAllocation = nextRoundAllocation;
+        this.startRoundTimer();
       } else {
-        game.status = GameStatus.COMPLETE
+        game.status = GameStatus.ENDGAME;
       }
-    })
-
-    if (this.currentRound()) {
-      this.startRoundTimer();
-    }
+    });
   }
 
   public getCurrentRoomFor(playerId: string): RoomName {
@@ -291,6 +295,10 @@ export class GameManager {
     } else {
       throw new Error(`Couldn't find player with id ${playerId}`);
     }
+  }
+
+  public checkBlueWin(): void {
+
   }
 
   public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {
@@ -366,6 +374,13 @@ export class GameManager {
     this.managePlayer(playerId).pushNotification(notification);
   }
 
+  public pushPlayerPendingActionById(
+    playerId: string,
+    action: PlayerAction | PlayerActionFn
+  ): void {
+    this.managePlayer(playerId).pushPendingAction(action);
+  }
+
   public pushPlayersNotification(
     notification: PlayerNotification | PlayerNotificationFn,
     where: (player: Player) => boolean = () => true
@@ -376,17 +391,33 @@ export class GameManager {
     }
   }
 
-  public resetAllVotes(): void {
-    this.manageEachPlayer(playerManager => {
-      playerManager.update(player => {
-        delete player.leaderVote
-      })
-    })
+  public pushPlayersPendingAction(
+    action: PlayerAction | PlayerActionFn,
+    where: (player: Player) => boolean = () => true
+  ): void {
+    const playersToNotify = Object.values(this.players()).filter(where);
+    for (let player of playersToNotify) {
+      this.managePlayer(player.socketId).pushPendingAction(action);
+    }
   }
 
-  public resolveCardShare(cardShareAction: PlayerActionCardShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
+  public resetAllVotes(): void {
+    this.manageEachPlayer((playerManager) => {
+      playerManager.update((player) => {
+        delete player.leaderVote;
+      });
+    });
+  }
+
+  public resolveCardShare(
+    cardShareAction: PlayerActionCardShareOffered,
+    sharerCard: RoleKey,
+    shareeCard: RoleKey
+  ): void {
     const { number: roundNumber } = this.currentRound();
-    const resultId = `${Date.now()}-${PlayerActionType.SHARE_RESULT_RECEIVED}-${Math.random().toString(5).slice(2)}`;
+    const resultId = `${Date.now()}-${
+      PlayerActionType.SHARE_RESULT_RECEIVED
+    }-${Math.random().toString(5).slice(2)}`;
 
     this.managePlayer(cardShareAction.sharerId).shareCard(
       resultId,
@@ -405,7 +436,11 @@ export class GameManager {
     );
   }
 
-  public resolveColorShare(colorShareAction: PlayerActionColorShareOffered, sharerCard: RoleKey, shareeCard: RoleKey): void {
+  public resolveColorShare(
+    colorShareAction: PlayerActionColorShareOffered,
+    sharerCard: RoleKey,
+    shareeCard: RoleKey
+  ): void {
     const sharerColor = getRoleColor(sharerCard);
     const shareeColor = getRoleColor(shareeCard);
 
@@ -413,7 +448,7 @@ export class GameManager {
     const resultId = `${Date.now()}-${
       PlayerActionType.SHARE_RESULT_RECEIVED
     }-${Math.random().toString(5).slice(2)}`;
-    
+
     this.managePlayer(colorShareAction.sharerId).shareColor(
       resultId,
       colorShareAction,
@@ -433,8 +468,7 @@ export class GameManager {
 
   public resolveShare(shareAction: PlayerActionShareOffered): void {
     const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role!;
-    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId)
-      .role!;
+    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId).role!;
     if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
       this.resolveCardShare(shareAction, sharerCard, shareeCard);
     } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {

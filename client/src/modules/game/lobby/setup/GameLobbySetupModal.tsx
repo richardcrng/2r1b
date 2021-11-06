@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal } from "semantic-ui-react";
-import { selectGameRolesInPlayCount, selectRolesInSetupAlphabetised } from "../../../../selectors/game";
+import { selectGameRolesInSetupCount, selectRolesInSetupAlphabetised } from "../../../../selectors/game";
 import { Game } from "../../../../types/game.types";
 import { RoleKey } from "../../../../types/role.types";
 import RoleAdder from "../../../role/adder/RoleAdder";
@@ -18,7 +18,7 @@ interface Props {
 
 function GameLobbySetupModal({ game, isEditable, isOpen, onClose, onOpen, onRoleIncrement }: Props) {
   const [selectedRole, setSelectedRole] = useState<RoleKey>();
-  const rolesCount = selectGameRolesInPlayCount(game);
+  const rolesCount = selectGameRolesInSetupCount(game);
   const rolesInSetup = selectRolesInSetupAlphabetised(game);
 
   return (

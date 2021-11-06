@@ -1,10 +1,11 @@
-import { RoomName } from "./game.types";
+import { Player, RoomName } from "./game.types";
 import { RoleKey, TeamColor } from "./role.types";
 
 export enum PlayerActionType {
   ABDICATION_OFFERED = 'abdication-offered',
   CARD_SHARE_OFFERED = 'card-share-offered',
   COLOR_SHARE_OFFERED = 'color-share-offered',
+  GAMBLER_PREDICTION = 'gambler-prediction',
   SHARE_RESULT_RECEIVED = 'share-result-received',
 }
 
@@ -15,13 +16,23 @@ export interface PlayerActionBase {
 }
 
 export interface PlayerActionAbdicationOffered extends PlayerActionBase {
-  type: PlayerActionType.ABDICATION_OFFERED,
+  type: PlayerActionType.ABDICATION_OFFERED;
   abdicatingLeaderId: string;
   proposedNewLeaderId: string;
 }
 
 export function isPlayerAbdicationAction(action: PlayerAction): action is PlayerActionAbdicationOffered {
   return action.type === PlayerActionType.ABDICATION_OFFERED
+}
+
+export interface PlayerActionGamblerPrediction extends PlayerActionBase {
+  type: PlayerActionType.GAMBLER_PREDICTION;
+  gamblerPlayerId: string;
+  predictedWinner?: TeamColor.BLUE | TeamColor.RED | "neither";
+}
+
+export function isGamblerPredictionAction(action: PlayerAction): action is PlayerActionGamblerPrediction {
+  return action.type === PlayerActionType.GAMBLER_PREDICTION;
 }
 
 export interface PlayerActionShareResultReceived extends PlayerActionBase {
@@ -106,4 +117,6 @@ export function isPlayerColorShareAction(
   return action.type === PlayerActionType.COLOR_SHARE_OFFERED;
 }
 
-export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionShareOffered | PlayerActionShareResultReceived
+export type PlayerAction = PlayerActionAbdicationOffered | PlayerActionGamblerPrediction | PlayerActionShareOffered | PlayerActionShareResultReceived
+
+export type PlayerActionFn = (player: Player) => PlayerAction;

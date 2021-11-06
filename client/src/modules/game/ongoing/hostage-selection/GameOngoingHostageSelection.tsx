@@ -62,10 +62,11 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
   return (
     <Container className="active-contents">
       <Main>
-        <h1>Hostage{maybeS} selection</h1>
+        <h1>Situation Room {roomName}</h1>
+        <h2>Hostage{maybeS} selection</h2>
         <p>
-          This round, {hostageTotal} hostage{maybeS} must
-          be sent to the other room.
+          This round, {hostageTotal} hostage{maybeS} must be sent to the other
+          room.
         </p>
         {isLeader ? (
           <>
@@ -74,7 +75,8 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
               {maybeS} (but cannot pick yourself).
             </p>
             <PlayerDropdown
-              filter={(p) => player.socketId !== p.socketId &&
+              filter={(p) =>
+                player.socketId !== p.socketId &&
                 round.playerAllocation[p.socketId] === roomName &&
                 !currentHostages.includes(p.socketId)
               }
@@ -83,9 +85,7 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
             />
             <Button
               disabled={
-                !selectedPlayerId ||
-                isRightHostageCount ||
-                isReadyToExchange
+                !selectedPlayerId || isRightHostageCount || isReadyToExchange
               }
               fluid
               onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
@@ -127,7 +127,12 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
       <Actions>
         {isLeader && (
           <>
-            {isReadyToExchange && <p>Waiting for the other room to select and submit their hostage{maybeS}</p>}
+            {isReadyToExchange && (
+              <p>
+                Waiting for the other room to select and submit their hostage
+                {maybeS}
+              </p>
+            )}
             <Button
               disabled={!isRightHostageCount || isReadyToExchange}
               color="black"
