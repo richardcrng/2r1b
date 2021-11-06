@@ -116,6 +116,9 @@ function GameRoute() {
                 offeredPlayerId
               })
             }}
+            onPrivateEyeRolePrediction={(roleKey) => {
+              socket.emit(ClientEvent.PRIVATE_EYE_PREDICT, game.data!.id, roleKey)
+            }}
             onProposeLeader={(leaderId, currentRoom) => {
               socket.emit(
                 ClientEvent.PROPOSE_ROOM_LEADER,
