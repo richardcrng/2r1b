@@ -291,11 +291,11 @@ export const selectDescribeOfficeHolder = createSelector(
 )
 
 export const selectDescribeExplosivesHolder = createSelector(
-  selectOfficeHolderRole,
-  (officeHolderRole) =>
-    officeHolderRole === "BOMBER_RED"
-      ? getRoleName(officeHolderRole)
-      : `${getRoleName(officeHolderRole)} (filling in for the Bomber)`
+  selectExplosivesRole,
+  (explosivesRole) =>
+    explosivesRole === "BOMBER_RED"
+      ? getRoleName(explosivesRole)
+      : `${getRoleName(explosivesRole)} (filling in for the Bomber)`
 );
 
 export const selectDescribeTreater = createSelector(
@@ -327,15 +327,16 @@ export const selectOfficeHolder = createSelector(
   (officeHolderRole, findPlayerWithRole) => findPlayerWithRole(officeHolderRole)
 )
 
-export const selectIsGamblerInPlay = createSelector(
+export const selectIsPrivateEyeIdentificationNeeded = createSelector(
   selectIsRoleInPlay,
-  (isRoleDealtOut) => isRoleDealtOut('GAMBLER_GREY')
+  selectGameEndgameState,
+  (isRoleInPlay, endgame) => isRoleInPlay("PRIVATE_EYE_GREY") && !endgame.privateEyePrediction
 )
 
 export const selectIsGamblerPredictionNeeded = createSelector(
   selectIsRoleInPlay,
   selectGameEndgameState,
-  (isRoleDealtOut, endgame) => isRoleDealtOut("GAMBLER_GREY") && !endgame.gamblerPrediction
+  (isRoleInPlay, endgame) => isRoleInPlay("GAMBLER_GREY") && !endgame.gamblerPrediction
 )
 
 export const selectDidRolesCardShare = createSelector(
@@ -513,6 +514,10 @@ export const selectTeamWinCheckResult = createSelector(
 )
 
 export const selectIsGameEndgameComplete = createSelector(
+  selectIsPrivateEyeIdentificationNeeded,
   selectIsGamblerPredictionNeeded,
-  (isGamblerPredictionNeeded) => !isGamblerPredictionNeeded
+  (isPrivateEyeIdentificationNeeded, isGamblerPredictionNeeded) => [
+    isPrivateEyeIdentificationNeeded,
+    isGamblerPredictionNeeded
+  ].some(bool => bool)
 )

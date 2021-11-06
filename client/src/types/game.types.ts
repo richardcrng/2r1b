@@ -166,6 +166,7 @@ export type GamblerPrediction = WinningColor;
 
 export interface GameEndgame {
   gamblerPrediction?: GamblerPrediction;
+  privateEyePrediction?: RoleKey;
 }
 
 export interface TeamResult {
