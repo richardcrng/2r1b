@@ -13,6 +13,7 @@ export const createDummyGame = ({
   return {
     id,
     players: mapValues(players, (player) => ({ ...player, gameId: id })),
+    endgame: {},
     actions,
     rounds,
     rolesCount,
