@@ -41,7 +41,6 @@ export class GameManager {
     const gameId = generateRandomGameId();
     const game: Game = {
       id: gameId,
-      actions: [],
       endgame: {},
       players: {
         [socketId]: {
@@ -297,10 +296,6 @@ export class GameManager {
     }
   }
 
-  public checkBlueWin(): void {
-
-  }
-
   public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {
     for (let playerId in this.players()) {
       const playerManager = this.managePlayer(playerId);
@@ -399,6 +394,22 @@ export class GameManager {
     for (let player of playersToNotify) {
       this.managePlayer(player.socketId).pushPendingAction(action);
     }
+  }
+
+  public resetGame(): void {
+    this.update(game => {
+      game.status = GameStatus.LOBBY;
+      game.endgame = {};
+      delete game.buriedRole;
+      game.rounds = createStartingRounds()
+    })
+
+    this.updateEachPlayer(player => {
+      delete player.role;
+      player.conditions = { shareRecords: [] };
+      delete player.leaderVote
+      player.pendingActions = {};
+    })
   }
 
   public resetAllVotes(): void {

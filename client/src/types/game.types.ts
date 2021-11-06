@@ -176,7 +176,6 @@ export interface TeamResult {
 
 export interface Game {
   id: string;
-  actions: PlayerAction[];
   players: {
     [playerSocketId: string]: Player;
   };

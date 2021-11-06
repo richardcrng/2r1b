@@ -33,6 +33,7 @@ export enum ClientEvent {
   OFFER_ABDICATION = 'offer-abdication',
   OFFER_SHARE = 'offer-share',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
+  RESET_GAME = 'reset-game',
   REVEAL_RESULTS = 'reveal-results',
   SELECT_HOSTAGE = 'select-hostage',
   START_GAME = "start-game",
@@ -144,6 +145,10 @@ export type ClientEventListeners = {
     roomName: RoomName,
     proposerId: string,
     proposedLeaderId?: string
+  ) => void;
+
+  [ClientEvent.RESET_GAME]: (
+    gameId: string
   ) => void;
 
   [ClientEvent.REVEAL_RESULTS]: (

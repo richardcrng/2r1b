@@ -82,6 +82,9 @@ function GameRoute() {
             onGamblerPrediction={(prediction) => {
               socket.emit(ClientEvent.GAMBLER_PREDICT, game.data!.id, prediction);
             }}
+            onGameReset={() => {
+              socket.emit(ClientEvent.RESET_GAME, game.data!.id)
+            }}
             onGameStart={() => {
               socket.emit(ClientEvent.START_GAME, game.data!.id);
             }}
