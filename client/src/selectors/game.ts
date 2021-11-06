@@ -4,7 +4,7 @@ import { ALL_ROLES, PlayerRole, RoleKey, TeamColor } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 import { mapValues, last } from 'lodash';
 import { PlayerActionType } from '../types/player-action.types';
-import { getRoleDefinition, getRoleName } from '../utils/role-utils';
+import { getRoleName } from '../utils/role-utils';
 
 export const selectGame = (game: Game) => game;
 export const selectGamePlayers = (game: Game) => game.players;
