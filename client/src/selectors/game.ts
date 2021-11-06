@@ -1,11 +1,12 @@
 import { createSelector } from 'reselect';
-import { Game, LeaderVote, Player, PlayerWithRoom, RolesCount, RoomName, RoundStatus, TeamResult } from "../types/game.types";
+import { Game, LeaderVote, Player, PlayerResult, PlayerWithRoom, RolesCount, RoomName, RoundStatus, TeamResult } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey, TeamColor } from '../types/role.types';
 import { alertsFromSetup, SetupAlertSeverity, SetupAlertSource } from '../utils/setup-utils';
 import { mapValues, last } from 'lodash';
 import { PlayerActionType } from '../types/player-action.types';
 import { getRoleName } from '../utils/role-utils';
 
+export const selectGame = (game: Game) => game;
 export const selectGamePlayers = (game: Game) => game.players;
 export const selectGameEndgameState = (game: Game) => game.endgame;
 export const selectGameRolesInSetupCount = (game: Game): RolesCount => game.rolesCount;
@@ -99,7 +100,7 @@ export const selectRoleEntriesInPlay = createSelector(
   (roleEntries, buriedRole) =>
     roleEntries.map(
       ([role, count]): [PlayerRole, number] => buriedRole === role.key ? [role, count - 1] : [role, count]
-    ).filter(([_, count]) => count === 0)
+    ).filter(([_, count]) => count !== 0)
 );
 
 export const selectIsGreyRoleInPlay = createSelector(
@@ -400,8 +401,8 @@ export const selectIsExplosivesInSameFinalRoomAsOfficeHolder = createSelector(
   selectFinalGameRound,
   (explosivesHolder, officeHolder, finalGameRound) => {
     const roomAllocation = finalGameRound!.playerAllocation;
-    const explosivesRoom = roomAllocation[explosivesHolder!.socketId];
-    const officeHolderRoom = roomAllocation[officeHolder!.socketId];
+    const explosivesRoom = roomAllocation[explosivesHolder?.socketId ?? ""];
+    const officeHolderRoom = roomAllocation[officeHolder?.socketId ?? ""];
     return explosivesRoom === officeHolderRoom
   }
 )
@@ -511,6 +512,56 @@ export const selectTeamWinCheckResult = createSelector(
       }
     }
   }
+)
+
+export const selectIsPrivateEyeIdentificationCorrect = createSelector(
+  selectGameEndgameState,
+  selectBuriedRole,
+  (endgame, buried) => endgame.privateEyePrediction === buried
+)
+
+export const selectIsGamblerPredictionCorrect = createSelector(
+  selectGameEndgameState,
+  selectTeamWinCheckResult,
+  (endgame, teamWin) => endgame.gamblerPrediction === teamWin.winningColor
+);
+
+export const selectGreyPlayerResults = createSelector(
+  selectGame,
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  selectIsPrivateEyeIdentificationCorrect,
+  selectIsGamblerPredictionCorrect,
+  (game, isRoleInPlay, endgame, isPrivateEyeWin, isGamblerWin): PlayerResult[] => {
+    const results: PlayerResult[] = [];
+
+    if (isRoleInPlay('PRIVATE_EYE_GREY')) {
+      const prediction = endgame.privateEyePrediction ? getRoleName(
+        endgame.privateEyePrediction
+      ) : undefined;
+      const actual = game.buriedRole ? getRoleName(game.buriedRole) : undefined;
+      results.push({
+        role: "PRIVATE_EYE_GREY",
+        isWin: isPrivateEyeWin,
+        reason: `${isPrivateEyeWin ? `Correct prediction of ${prediction} as the buried role` : `Incorrect prediction of ${prediction} as the buried role (it was ${actual})`}.`
+      });
+    }
+
+    if (isRoleInPlay("GAMBLER_GREY")) {
+      const prediction = endgame.gamblerPrediction;
+      results.push({
+        role: "GAMBLER_GREY",
+        isWin: isGamblerWin,
+        reason: `${
+          isGamblerWin
+            ? `Correct prediction that ${prediction} team would win`
+            : `Incorrect prediction that ${prediction} team would win`
+        }.`,
+      });
+    }
+
+    return results
+  } 
 )
 
 export const selectIsGameEndgameComplete = createSelector(

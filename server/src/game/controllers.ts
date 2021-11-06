@@ -131,6 +131,12 @@ export const handleGamblerPrediction: ClientEventListeners[ClientEvent.GAMBLER_P
   })
 }
 
+export const handlePrivateEyePrediction: ClientEventListeners[ClientEvent.PRIVATE_EYE_PREDICT] = (gameId, roleKey) => {
+  new GameManager(gameId).update(game => {
+    game.endgame.privateEyePrediction = roleKey
+  })
+}
+
 export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROLE] = (
   gameId: string,
   role: RoleKey,

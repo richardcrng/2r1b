@@ -21,6 +21,7 @@ interface Props {
     offeredPlayerId: string,
     shareType: PlayerActionShareOfferedType
   ): void;
+  onPrivateEyeRolePrediction(roleKey: RoleKey): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,
     currentRoom: RoomName
@@ -42,6 +43,7 @@ function GamePage({
   onHostageSubmit,
   onOfferAbdication,
   onOfferShare,
+  onPrivateEyeRolePrediction,
   onProposeLeader,
   onResultsReveal,
   onRoleIncrement,
@@ -69,7 +71,7 @@ function GamePage({
   } else if (game.status === GameStatus.ONGOING) {
     return <p>Waiting for room allocation...</p>;
   } else if (game.status === GameStatus.ENDGAME) {
-    return <GameEndgame {...{ game, onGamblerPrediction, onResultsReveal, player }} />
+    return <GameEndgame {...{ game, onGamblerPrediction, onPrivateEyeRolePrediction, onResultsReveal, player }} />
   } else if (game.status === GameStatus.RESULTS) {
     return <GameResults {...{ game, onGameReset, player }} />
   } else if (game.status === GameStatus.COMPLETE) {

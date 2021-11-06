@@ -32,6 +32,7 @@ export enum ClientEvent {
   JOIN_GAME = "join",
   OFFER_ABDICATION = 'offer-abdication',
   OFFER_SHARE = 'offer-share',
+  PRIVATE_EYE_PREDICT = 'private-eye-predict',
   PROPOSE_ROOM_LEADER = 'propose-room-leader',
   RESET_GAME = 'reset-game',
   REVEAL_RESULTS = 'reveal-results',
@@ -138,6 +139,11 @@ export type ClientEventListeners = {
   [ClientEvent.OFFER_SHARE]: (
     gameId: string,
     action: PlayerActionShareOffered
+  ) => void;
+
+  [ClientEvent.PRIVATE_EYE_PREDICT]: (
+    gameId: string,
+    rolePrediction: RoleKey
   ) => void;
 
   [ClientEvent.PROPOSE_ROOM_LEADER]: (

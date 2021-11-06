@@ -163,11 +163,17 @@ export class GameManager {
       const playerIds = Object.keys(pointer.players);
       const shuffledRoleKeys = shuffle(keysToShuffle);
 
-      for (let idx = 0; idx < playerIds.length; idx++) {
+      for (let idx = 0; idx < shuffledRoleKeys.length; idx++) {
         const playerId = playerIds[idx];
-        this.updatePlayer(playerId, (player) => {
-          player.role = shuffledRoleKeys[idx];
-        });
+        if (playerId) {
+          this.updatePlayer(playerId, (player) => {
+            player.role = shuffledRoleKeys[idx];
+          });
+        } else {
+          this.update(game => {
+            game.buriedRole = shuffledRoleKeys[idx]
+          })
+        }
       }
     });
   }

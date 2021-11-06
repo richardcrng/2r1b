@@ -1,8 +1,10 @@
 import { Button } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { selectIsGamblerPredictionNeeded } from "../../../selectors/game";
+import { selectGameRolesInSetupCount, selectIsGamblerPredictionNeeded, selectIsPrivateEyeIdentificationNeeded } from "../../../selectors/game";
 import { GamblerPrediction, Game, Player } from "../../../types/game.types";
+import { RoleKey } from '../../../types/role.types';
 import GameEndgameGambler from './gambler/GameEndgameGambler';
+import GameEndgamePrivateEye from './private-eye/GameEndgamePrivateEye';
 
 const Container = styled.div`
   display: grid;
@@ -25,15 +27,25 @@ const Actions = styled.div`
 interface Props {
   game: Game;
   onGamblerPrediction(prediction: GamblerPrediction): void;
+  onPrivateEyeRolePrediction(roleKey: RoleKey): void;
   onResultsReveal(): void;
   player: Player;
 }
 
-function GameEndgame({ game, onGamblerPrediction, onResultsReveal, player }: Props) {
+function GameEndgame({ game, onGamblerPrediction, onPrivateEyeRolePrediction, onResultsReveal, player }: Props) {
 
+  const isPrivateEyeIdentificationNeeded = selectIsPrivateEyeIdentificationNeeded(game);
   const isGamblerPredictionNeeded = selectIsGamblerPredictionNeeded(game);
 
-  if (isGamblerPredictionNeeded) {
+  if (isPrivateEyeIdentificationNeeded) {
+    return (
+      <GameEndgamePrivateEye
+        onPrivateEyeRolePrediction={onPrivateEyeRolePrediction}
+        player={player}
+        rolesCount={selectGameRolesInSetupCount(game)}
+      />
+    )
+  } else if (isGamblerPredictionNeeded) {
     return (
       <GameEndgameGambler {...{ onGamblerPrediction, player }} />
     )
