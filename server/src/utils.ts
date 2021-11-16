@@ -1,5 +1,6 @@
 import { mapValues } from "lodash";
-import { createStartingRounds, Game, GameStatus, Player } from "../../client/src/types/game.types";
+import { createStartingRounds, Game, GameStatus, Player, RolesCount } from "../../client/src/types/game.types";
+import { ALL_ROLES } from "../../client/src/types/role.types";
 import { DEFAULT_STARTING_ROLES_COUNT } from "../../client/src/utils/role-utils";
 
 export const createDummyGame = ({
@@ -8,13 +9,13 @@ export const createDummyGame = ({
   rounds = createStartingRounds(),
   rolesCount = DEFAULT_STARTING_ROLES_COUNT,
   status = GameStatus.LOBBY
-}: Partial<Game> = {}): Game => {
+}: Partial<Omit<Game, 'rolesCount'> & { rolesCount: Partial<RolesCount> }> = {}): Game => {
   return {
     id,
     players: mapValues(players, (player) => ({ ...player, gameId: id })),
     endgame: {},
     rounds,
-    rolesCount,
+    rolesCount: createRolesCount(rolesCount),
     status
   };
 };
@@ -52,6 +53,11 @@ export const createDummyPlayer = ({
 export const generateDummySocketId = (): string => {
   return `-${generateRandomGameId().toLowerCase()}${generateRandomGameId().toLowerCase()}`;
 }
+
+export const createRolesCount = (partialRolesCount: Partial<RolesCount>): RolesCount => ({
+  ...mapValues(ALL_ROLES, () => 0),
+  ...partialRolesCount
+})
 
 export const generateRandomGameId = (): string => {
   const stringOptions = "ABCDEFGHIJLKMNOPQRSTUVWXYZ1234567890";
