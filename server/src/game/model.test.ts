@@ -2,7 +2,6 @@
 import { RolesCount, RoomName } from '../../../client/src/types/game.types';
 import { RoleKey } from '../../../client/src/types/role.types';
 import { createDummyGame, createDummyPlayers } from '../../../client/src/utils/data-utils';
-import { DEFAULT_STARTING_ROLES_COUNT } from '../../../client/src/utils/role-utils';
 import { GameManager } from './model';
 
 describe('assignPlayersToRooms', () => {
@@ -52,10 +51,7 @@ describe('assignInitialRoles', () => {
 
     const testGame = createDummyGame({
       players: createDummyPlayers(8),
-      rolesCount: {
-        ...DEFAULT_STARTING_ROLES_COUNT,
-        ...testRolesCount,
-      },
+      rolesCount: testRolesCount,
     });
     const gameManager = new GameManager(testGame.id, {
       [testGame.id]: testGame,
@@ -92,10 +88,7 @@ describe('assignInitialRoles', () => {
 
     const testGame = createDummyGame({
       players: createDummyPlayers(8),
-      rolesCount: {
-        ...DEFAULT_STARTING_ROLES_COUNT,
-        ...testRolesCount,
-      },
+      rolesCount: testRolesCount,
     });
     const gameManager = new GameManager(testGame.id, {
       [testGame.id]: testGame,
