@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal } from "semantic-ui-react";
-import { selectGameRolesInSetupCount, selectRolesInSetupAlphabetised } from "../../../../selectors/game";
+import { selectGameRolesInSetupCount, selectRolesInSetupAlphabetised } from "../../../../selectors/game-selectors";
 import { Game } from "../../../../types/game.types";
 import { RoleKey } from "../../../../types/role.types";
 import RoleAdder from "../../../role/adder/RoleAdder";

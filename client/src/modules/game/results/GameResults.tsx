@@ -1,6 +1,6 @@
 import { Button } from 'semantic-ui-react';
 import styled from 'styled-components'
-import { selectFindPlayerWithRole, selectGreyPlayerResults, selectTeamWinCheckResult } from '../../../selectors/game';
+import { selectFindPlayerWithRole, selectGreyPlayerResults, selectTeamWinCheckResult } from '../../../selectors/game-selectors';
 import { Game, Player } from "../../../types/game.types";
 import { getRoleName } from '../../../utils/role-utils';
 

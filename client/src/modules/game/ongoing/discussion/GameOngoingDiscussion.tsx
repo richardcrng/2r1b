@@ -9,7 +9,7 @@ import {
 } from "../../../../types/game.types";
 import { getRoleDefinition } from "../../../../utils/role-utils";
 import RoleCard from "../../../role/card/RoleCard";
-import { selectNonZeroOrderedVotesForPlayers } from "../../../../selectors/game";
+import { selectNonZeroOrderedVotesForPlayers } from "../../../../selectors/game-selectors";
 import PlayerLeaderProposal from "../../../player/interaction/PlayerLeaderProposal";
 import GameOngoingVotes from "../votes/GameOngoingVotes";
 import Timer from "../../../../lib/atoms/Timer";

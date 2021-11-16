@@ -165,6 +165,7 @@ export type GamblerPrediction = WinningColor;
 
 
 export interface GameEndgame {
+  finalRooms?: PlayerRoomAllocation;
   gamblerPrediction?: GamblerPrediction;
   privateEyePrediction?: RoleKey;
 }

@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { Game, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
-import { selectGameSetupErrors, selectGameSetupWarnings } from "../../../../selectors/game";
+import { selectGameSetupErrors, selectGameSetupWarnings } from "../../../../selectors/game-selectors";
 import { SetupAlert } from "../../../../utils/setup-utils";
 
 interface Props {

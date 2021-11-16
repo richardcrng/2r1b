@@ -1,6 +1,6 @@
 import { Button } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { selectGameRolesInSetupCount, selectIsGamblerPredictionNeeded, selectIsPrivateEyeIdentificationNeeded } from "../../../selectors/game";
+import { selectGameRolesInSetupCount, selectIsGamblerPredictionNeeded, selectIsPrivateEyeIdentificationNeeded } from "../../../selectors/game-selectors";
 import { GamblerPrediction, Game, Player } from "../../../types/game.types";
 import { RoleKey } from '../../../types/role.types';
 import GameEndgameGambler from './gambler/GameEndgameGambler';

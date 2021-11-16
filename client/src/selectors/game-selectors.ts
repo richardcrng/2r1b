@@ -113,9 +113,9 @@ export const selectCurrentGameRound = createSelector(
   (rounds) => Object.values(rounds).find(round => [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(round.status))
 )
 
-export const selectFinalGameRound = createSelector(
-  selectGameRounds,
-  (rounds) => last(Object.values(rounds))
+export const selectFinalPlayerRooms = createSelector(
+  selectGameEndgameState,
+  (endgame) => endgame.finalRooms
 )
 
 export const selectCurrentGameRoomAllocation = createSelector(
@@ -398,12 +398,11 @@ export const selectIsOfficeHolderTreatedIfApplicable = createSelector(
 export const selectIsExplosivesInSameFinalRoomAsOfficeHolder = createSelector(
   selectExplosivesHolder,
   selectOfficeHolder,
-  selectFinalGameRound,
-  (explosivesHolder, officeHolder, finalGameRound) => {
-    const roomAllocation = finalGameRound!.playerAllocation;
-    const explosivesRoom = roomAllocation[explosivesHolder?.socketId ?? ""];
-    const officeHolderRoom = roomAllocation[officeHolder?.socketId ?? ""];
-    return explosivesRoom === officeHolderRoom
+  selectFinalPlayerRooms,
+  (explosivesHolder, officeHolder, finalPlayerRooms) => {
+    const explosivesRoom = finalPlayerRooms?.[explosivesHolder?.socketId ?? ""];
+    const officeHolderRoom = finalPlayerRooms?.[officeHolder?.socketId ?? ""];
+    return typeof explosivesRoom !== 'undefined' && explosivesRoom === officeHolderRoom
   }
 )
 

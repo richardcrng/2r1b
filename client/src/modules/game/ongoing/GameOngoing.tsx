@@ -1,4 +1,4 @@
-import { selectCurrentGameRound } from '../../../selectors/game';
+import { selectCurrentGameRound } from '../../../selectors/game-selectors';
 import { Game, Player, PlayerWithRoom, RoomName, RoundStatus } from "../../../types/game.types";
 import { PlayerActionAbdicationOffered, PlayerActionShareOfferedType } from '../../../types/player-action.types';
 import usePlayerActions from '../../player/usePlayerActions';
