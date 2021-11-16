@@ -1,4 +1,4 @@
-import { createRolesCount } from "../../../server/src/utils";
+import { createRolesCount } from "./data-utils";
 import { RolesCount } from "../types/game.types";
 import { RoleKey, TeamColor } from "../types/role.types";
 import { getRoleColor, getRoleDefinition, getRoleName, getRoleRestrictions } from "./role-utils";

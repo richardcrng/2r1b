@@ -1,7 +1,7 @@
 import { mapValues } from "lodash";
-import { createStartingRounds, Game, GameStatus, Player, RolesCount } from "../../client/src/types/game.types";
-import { ALL_ROLES } from "../../client/src/types/role.types";
-import { DEFAULT_STARTING_ROLES_COUNT } from "../../client/src/utils/role-utils";
+import { createStartingRounds, Game, GameStatus, Player, RolesCount } from "../types/game.types";
+import { ALL_ROLES } from "../types/role.types";
+import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils";
 
 export const createDummyGame = ({
   id = generateRandomGameId(),

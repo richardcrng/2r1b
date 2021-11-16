@@ -7,7 +7,7 @@ import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
 import { SERVER_IO } from '../server';
-import { generateRandomGameId, getColors } from "../utils";
+import { generateRandomGameId, getColors } from "../../../client/src/utils/data-utils";
 import { DEFAULT_STARTING_ROLES_COUNT, getRoleColor } from "../../../client/src/utils/role-utils";
 import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionFn, PlayerActionShareOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
 

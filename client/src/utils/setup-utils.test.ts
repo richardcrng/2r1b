@@ -1,6 +1,5 @@
-import { createRolesCount } from "../../../server/src/utils"
+import { createRolesCount } from "./data-utils"
 import { RolesCount } from "../types/game.types"
-import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
 import { alertsFromRolesCount, alertsFromSetup, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCount, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
 
 describe("alertsFromSetup", () => {
