@@ -1,3 +1,4 @@
+import { createRolesCount } from "./data-utils";
 import { RolesCount } from "../types/game.types";
 import { RoleKey, TeamColor } from "../types/role.types";
 import { getRoleColor, getRoleDefinition, getRoleName, getRoleRestrictions } from "./role-utils";
@@ -44,24 +45,28 @@ export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number)
     ...roleAlerts
   ]
 
-  if (rolesCount["VICE_PRESIDENT_BLUE"] === 0) {
-    alerts.push({
-      severity: SetupAlertSeverity.ERROR,
-      message: `If a role will be buried, you must include the ${getRoleName(
-        "VICE_PRESIDENT_BLUE"
-      )} role`,
-      source: SetupAlertSource.ROLE_SETUP,
-    });
-  }
+  const isBurying = totalRolesCount === nPlayers + 1;
 
-  if (rolesCount["MARTYR_RED"] === 0) {
-    alerts.push({
-      severity: SetupAlertSeverity.ERROR,
-      message: `If a role will be buried, you must include the ${getRoleName(
-        "MARTYR_RED"
-      )} role`,
-      source: SetupAlertSource.ROLE_SETUP,
-    });
+  if (isBurying) {
+    if (rolesCount["VICE_PRESIDENT_BLUE"] === 0) {
+      alerts.push({
+        severity: SetupAlertSeverity.ERROR,
+        message: `If a role will be buried, you must include the ${getRoleName(
+          "VICE_PRESIDENT_BLUE"
+        )} role`,
+        source: SetupAlertSource.ROLE_SETUP,
+      });
+    }
+
+    if (rolesCount["MARTYR_RED"] === 0) {
+      alerts.push({
+        severity: SetupAlertSeverity.ERROR,
+        message: `If a role will be buried, you must include the ${getRoleName(
+          "MARTYR_RED"
+        )} role`,
+        source: SetupAlertSource.ROLE_SETUP,
+      });
+    }
   }
 
   return alerts
@@ -83,10 +88,11 @@ export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
 }
 
 export const checkOtherRoleCountRestrictions = (
-  rolesCount: RolesCount,
+  partialRolesCount: Partial<RolesCount>,
   roleKey: RoleKey
 ): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
+  const rolesCount = createRolesCount(partialRolesCount)
   const countOfThisRole = rolesCount[roleKey];
   const { recommended, requires } = getRoleRestrictions(roleKey);
   const { color, roleName } = getRoleDefinition(roleKey);
@@ -121,9 +127,10 @@ export const checkOtherRoleCountRestrictions = (
   return alerts;
 };
 
-export const checkOwnRoleCountRestrictions = (rolesCount: RolesCount, roleKey: RoleKey): SetupAlert[] => {
+export const checkOwnRoleCountRestrictions = (partialRolesCount: Partial<RolesCount>, roleKey: RoleKey): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
-  const roleCount = rolesCount[roleKey];
+  const rolesCount = createRolesCount(partialRolesCount)
+  const roleCount = rolesCount[roleKey] ?? 0;
   const { roleMax, roleMin } = getRoleRestrictions(roleKey)
   const { color, roleName } = getRoleDefinition(roleKey)
 
