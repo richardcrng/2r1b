@@ -1,3 +1,4 @@
+import { createRolesCount } from "../../../server/src/utils";
 import { RolesCount } from "../types/game.types";
 import { RoleKey, TeamColor } from "../types/role.types";
 import { getRoleColor, getRoleDefinition, getRoleName, getRoleRestrictions } from "./role-utils";
@@ -87,10 +88,11 @@ export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
 }
 
 export const checkOtherRoleCountRestrictions = (
-  rolesCount: RolesCount,
+  partialRolesCount: Partial<RolesCount>,
   roleKey: RoleKey
 ): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
+  const rolesCount = createRolesCount(partialRolesCount)
   const countOfThisRole = rolesCount[roleKey];
   const { recommended, requires } = getRoleRestrictions(roleKey);
   const { color, roleName } = getRoleDefinition(roleKey);
@@ -125,9 +127,10 @@ export const checkOtherRoleCountRestrictions = (
   return alerts;
 };
 
-export const checkOwnRoleCountRestrictions = (rolesCount: RolesCount, roleKey: RoleKey): SetupAlert[] => {
+export const checkOwnRoleCountRestrictions = (partialRolesCount: Partial<RolesCount>, roleKey: RoleKey): SetupAlert[] => {
   const alerts: SetupAlert[] = [];
-  const roleCount = rolesCount[roleKey];
+  const rolesCount = createRolesCount(partialRolesCount)
+  const roleCount = rolesCount[roleKey] ?? 0;
   const { roleMax, roleMin } = getRoleRestrictions(roleKey)
   const { color, roleName } = getRoleDefinition(roleKey)
 

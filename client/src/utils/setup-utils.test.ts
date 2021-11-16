@@ -108,9 +108,10 @@ describe('alertsFromRolesCount', () => {
     })
 
     const result = alertsFromRolesCount(testRolesCount);
-    expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR);
-    expect(result[0].message).toMatch(/[equal|match]/i)
+    expect(result.some(alert => (
+      alert.severity === SetupAlertSeverity.ERROR &&
+      alert.message.match(/[equal|match]/i)
+    ))).toBe(true)
   })
 
   test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
@@ -134,7 +135,7 @@ describe("checkOtherRoleCountRestrictions", () => {
     describe("Red Team and Blue Team", () => {
       test("Warns that Red Team is recommended with Blue Team", () => {
         const result = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 0 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, TEAM_RED: 1, TEAM_BLUE: 0 },
           "TEAM_RED"
         );
 
@@ -145,7 +146,7 @@ describe("checkOtherRoleCountRestrictions", () => {
 
       test("Warns that Blue Team is recommended with Red Team", () => {
         const result = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 0, TEAM_BLUE: 1 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, TEAM_RED: 0, TEAM_BLUE: 1 },
           "TEAM_BLUE"
         );
 
@@ -156,12 +157,12 @@ describe("checkOtherRoleCountRestrictions", () => {
 
       test("No warning when both present in equal numbers", () => {
         const blueCheck = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 1 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, TEAM_RED: 1, TEAM_BLUE: 1 },
           "TEAM_BLUE"
         );
 
         const redCheck = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 1 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, TEAM_RED: 1, TEAM_BLUE: 1 },
           "TEAM_RED"
         );
 
@@ -171,12 +172,12 @@ describe("checkOtherRoleCountRestrictions", () => {
 
       test("Warning when both present in unequal numbers - asymmetrically", () => {
         const blueCheck = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 2 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, TEAM_RED: 1, TEAM_BLUE: 2 },
           "TEAM_BLUE"
         );
 
         const redCheck = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, TEAM_RED: 1, TEAM_BLUE: 2 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, TEAM_RED: 1, TEAM_BLUE: 2 },
           "TEAM_RED"
         );
 
@@ -188,7 +189,7 @@ describe("checkOtherRoleCountRestrictions", () => {
     describe("Doctor and Engineer", () => {
       test("Warns that Doctor is recommended with Engineer", () => {
         const result = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 0, ENGINEER_RED: 1 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, DOCTOR_BLUE: 0, ENGINEER_RED: 1 },
           "ENGINEER_RED"
         );
 
@@ -199,7 +200,7 @@ describe("checkOtherRoleCountRestrictions", () => {
 
       test("Warns that Engineer is recommended with Doctor", () => {
         const result = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 1, ENGINEER_RED: 0 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, DOCTOR_BLUE: 1, ENGINEER_RED: 0 },
           "DOCTOR_BLUE"
         );
 
@@ -210,12 +211,12 @@ describe("checkOtherRoleCountRestrictions", () => {
 
       test("No warning when both present", () => {
         const doctorCheck = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 1, ENGINEER_RED: 1 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, DOCTOR_BLUE: 1, ENGINEER_RED: 1 },
           "DOCTOR_BLUE"
         );
 
         const engineerCheck = checkOtherRoleCountRestrictions(
-          { ...DEFAULT_STARTING_ROLES_COUNT, DOCTOR_BLUE: 1, ENGINEER_RED: 1 },
+          { PRESIDENT_BLUE: 1, BOMBER_RED: 1, DOCTOR_BLUE: 1, ENGINEER_RED: 1 },
           "DOCTOR_BLUE"
         );
 
@@ -236,7 +237,7 @@ describe('checkOwnPlayerCountRoleRestrictions', () => {
 
 describe('checkOwnRoleCountRestrictions', () => {
   test("Error with less than one President", () => {
-    const result = checkOwnRoleCountRestrictions({ ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 0 }, 'PRESIDENT_BLUE')
+    const result = checkOwnRoleCountRestrictions({ PRESIDENT_BLUE: 0 }, 'PRESIDENT_BLUE')
     
     expect(result).toHaveLength(1);
     expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
@@ -244,7 +245,7 @@ describe('checkOwnRoleCountRestrictions', () => {
 
   test("Error with more than one President", () => {
     const result = checkOwnRoleCountRestrictions(
-      { ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 2 },
+      { PRESIDENT_BLUE: 2 },
       "PRESIDENT_BLUE"
     );
 
@@ -254,7 +255,7 @@ describe('checkOwnRoleCountRestrictions', () => {
 
   test("No error with one President", () => {
     const result = checkOwnRoleCountRestrictions(
-      { ...DEFAULT_STARTING_ROLES_COUNT, PRESIDENT_BLUE: 1 },
+      { PRESIDENT_BLUE: 1 },
       "PRESIDENT_BLUE"
     );
 
