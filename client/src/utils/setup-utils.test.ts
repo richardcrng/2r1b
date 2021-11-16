@@ -4,15 +4,48 @@ import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
 import { alertsFromRolesCount, alertsFromSetup, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCount, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
 
 describe("alertsFromSetup", () => {
-  test("Given that a role will be buried, errors if there is no Vice-President", () => {
-    const result = alertsFromSetup(createRolesCount({
-      TEAM_BLUE: 2,
-      TEAM_RED: 2,
-      PRIVATE_EYE_GREY: 1
-    }), 6)
+  describe("secondary roles", () => {
+      test("Given that a role will not be buried, does not error if there is no Vice-President", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+          }),
+          6
+        );
 
-    expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result.some(result => result.severity === SetupAlertSeverity.ERROR && result.message.match(/vice-president/i))).toBe(true)
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.ERROR &&
+              result.message.match(/buried/i) &&
+              result.message.match(/vice-president/i)
+          )
+        ).toBe(false);
+      });
+
+      test("Given that a role will be buried, errors if there is no Vice-President", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+            PRIVATE_EYE_GREY: 1,
+          }),
+          6
+        );
+
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.ERROR && result.message.match(/buried/i) &&
+              result.message.match(/vice-president/i)
+          )
+        ).toBe(true);
+      });
   })
 })
 
