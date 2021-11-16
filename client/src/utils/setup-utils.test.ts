@@ -1,15 +1,15 @@
+import { createRolesCount } from "../../../server/src/utils"
 import { RolesCount } from "../types/game.types"
 import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils"
 import { alertsFromRolesCount, alertsFromSetup, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCount, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
 
 describe("alertsFromSetup", () => {
   test("Given that a role will be buried, errors if there is no Vice-President", () => {
-    const result = alertsFromSetup({
-      ...DEFAULT_STARTING_ROLES_COUNT,
+    const result = alertsFromSetup(createRolesCount({
       TEAM_BLUE: 2,
       TEAM_RED: 2,
       PRIVATE_EYE_GREY: 1
-    }, 6)
+    }), 6)
 
     expect(result.length).toBeGreaterThanOrEqual(1);
     expect(result.some(result => result.severity === SetupAlertSeverity.ERROR && result.message.match(/vice-president/i))).toBe(true)
@@ -18,12 +18,13 @@ describe("alertsFromSetup", () => {
 
 describe('alertsFromRolesCount', () => {
   test('Given an unbalanced number of Red and Blue roles, errors and says that they must match', () => {
-    const testRolesCount: RolesCount = {
-      ...DEFAULT_STARTING_ROLES_COUNT,
+    const testRolesCount: RolesCount = createRolesCount({
+      PRESIDENT_BLUE: 1,
+      BOMBER_RED: 1,
       TEAM_BLUE: 10,
       TEAM_RED: 10,
       CLOWN_RED: 1
-    }
+    })
 
     const result = alertsFromRolesCount(testRolesCount);
     expect(result).toHaveLength(1);
@@ -32,12 +33,13 @@ describe('alertsFromRolesCount', () => {
   })
 
   test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
-    const testRolesCount: RolesCount = {
-      ...DEFAULT_STARTING_ROLES_COUNT,
+    const testRolesCount: RolesCount = createRolesCount({
+      PRESIDENT_BLUE: 1,
+      BOMBER_RED: 1,
       TEAM_BLUE: 5,
       TEAM_RED: 4,
-      CLOWN_RED: 1 // to balance color numbers
-    }
+      CLOWN_RED: 1, // to balance color numbers
+    });
 
     const result = alertsFromRolesCount(testRolesCount);
 
