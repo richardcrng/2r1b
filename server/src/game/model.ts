@@ -281,6 +281,7 @@ export class GameManager {
         this.startRoundTimer();
       } else {
         game.status = GameStatus.ENDGAME;
+        game.endgame.finalRooms = nextRoundAllocation;
       }
     });
   }
