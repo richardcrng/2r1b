@@ -1,4 +1,4 @@
-import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders, selectGamePlayersWithRooms } from "../../selectors/game";
+import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders, selectGamePlayersWithRooms } from "../../selectors/game-selectors";
 import { GamblerPrediction, Game, GameStatus, Player, RoomName } from "../../types/game.types";
 import { PlayerActionAbdicationOffered, PlayerActionShareOfferedType } from "../../types/player-action.types";
 import { RoleKey } from "../../types/role.types";

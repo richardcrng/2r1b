@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { selectCurrentRoundHostageTotal, selectCurrentRoundRoomHostages } from '../../../../selectors/game';
+import { selectCurrentRoundHostageTotal, selectCurrentRoundRoomHostages } from '../../../../selectors/game-selectors';
 import { Game, Player, RoomName, Round } from '../../../../types/game.types';
 import PlayerDropdown from '../../../player/dropdown/PlayerDropdown';
 

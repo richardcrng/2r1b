@@ -1,5 +1,5 @@
 import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
-import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game";
+import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game-selectors";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
 import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, otherRoom, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
@@ -292,6 +292,10 @@ export class GameManager {
 
   public getPlayer(playerId: string): Player | undefined {
     return this.managePlayer(playerId).snapshot();
+  }
+
+  public getPlayersByRole(roleKey: RoleKey): Player[] {
+    return Object.values(this.players()).filter(player => player.role === roleKey);
   }
 
   public getPlayerOrFail(playerId: string) {
