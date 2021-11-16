@@ -44,24 +44,28 @@ export const alertsFromPlayersCount = (rolesCount: RolesCount, nPlayers: number)
     ...roleAlerts
   ]
 
-  if (rolesCount["VICE_PRESIDENT_BLUE"] === 0) {
-    alerts.push({
-      severity: SetupAlertSeverity.ERROR,
-      message: `If a role will be buried, you must include the ${getRoleName(
-        "VICE_PRESIDENT_BLUE"
-      )} role`,
-      source: SetupAlertSource.ROLE_SETUP,
-    });
-  }
+  const isBurying = totalRolesCount === nPlayers + 1;
 
-  if (rolesCount["MARTYR_RED"] === 0) {
-    alerts.push({
-      severity: SetupAlertSeverity.ERROR,
-      message: `If a role will be buried, you must include the ${getRoleName(
-        "MARTYR_RED"
-      )} role`,
-      source: SetupAlertSource.ROLE_SETUP,
-    });
+  if (isBurying) {
+    if (rolesCount["VICE_PRESIDENT_BLUE"] === 0) {
+      alerts.push({
+        severity: SetupAlertSeverity.ERROR,
+        message: `If a role will be buried, you must include the ${getRoleName(
+          "VICE_PRESIDENT_BLUE"
+        )} role`,
+        source: SetupAlertSource.ROLE_SETUP,
+      });
+    }
+
+    if (rolesCount["MARTYR_RED"] === 0) {
+      alerts.push({
+        severity: SetupAlertSeverity.ERROR,
+        message: `If a role will be buried, you must include the ${getRoleName(
+          "MARTYR_RED"
+        )} role`,
+        source: SetupAlertSource.ROLE_SETUP,
+      });
+    }
   }
 
   return alerts

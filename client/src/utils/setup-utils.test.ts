@@ -5,6 +5,7 @@ import { alertsFromRolesCount, alertsFromSetup, checkOtherRoleCountRestrictions,
 
 describe("alertsFromSetup", () => {
   describe("secondary roles", () => {
+    describe('Vice-President', () => {
       test("Given that a role will not be buried, does not error if there is no Vice-President", () => {
         const result = alertsFromSetup(
           createRolesCount({
@@ -41,11 +42,58 @@ describe("alertsFromSetup", () => {
         expect(
           result.some(
             (result) =>
-              result.severity === SetupAlertSeverity.ERROR && result.message.match(/buried/i) &&
+              result.severity === SetupAlertSeverity.ERROR &&
+              result.message.match(/buried/i) &&
               result.message.match(/vice-president/i)
           )
         ).toBe(true);
       });
+    })
+
+    describe("Martyr", () => {
+      test("Given that a role will not be buried, does not error if there is no Martyr", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+          }),
+          6
+        );
+
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.ERROR &&
+              result.message.match(/buried/i) &&
+              result.message.match(/martyr/i)
+          )
+        ).toBe(false);
+      });
+
+      test("Given that a role will be buried, errors if there is no Martyr", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+            PRIVATE_EYE_GREY: 1,
+          }),
+          6
+        );
+
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.ERROR &&
+              result.message.match(/buried/i) &&
+              result.message.match(/martyr/i)
+          )
+        ).toBe(true);
+      });
+    });
   })
 })
 
