@@ -12,6 +12,7 @@ export interface Game {
   rolesCount: RolesCount;
   buriedRole?: RoleKey;
   status: GameStatus;
+  settings: GameSettings;
 }
 
 export enum GameStatus {
@@ -176,4 +177,8 @@ export interface PlayerResult {
   role: RoleKey;
   isWin: boolean;
   reason: string;
+}
+
+export interface GameSettings {
+  colorSharing?: boolean;
 }
