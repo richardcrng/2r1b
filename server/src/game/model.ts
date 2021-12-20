@@ -127,7 +127,7 @@ export class GameManager {
   }
 
   public appointRandomLeadersIfUnfilled(): void {
-    for (let roomName of Object.values(RoomName)) {
+    for (const roomName of Object.values(RoomName)) {
       if (!this.currentLeaderRecord(roomName)) {
         const newLeader = sample(Object.values(this.playersInRoom(roomName)))!;
         this.updateCurrentRound((round) => {
@@ -188,11 +188,11 @@ export class GameManager {
       this.update((game) => {
         const roomAllocation: PlayerRoomAllocation = {};
 
-        for (let playerId of playersInA) {
+        for (const playerId of playersInA) {
           roomAllocation[playerId] = RoomName.A;
         }
 
-        for (let playerId of playersInB) {
+        for (const playerId of playersInB) {
           roomAllocation[playerId] = RoomName.B;
         }
 
@@ -206,7 +206,7 @@ export class GameManager {
       const pendingActions = Object.values(
         playerManager._pointer()?.pendingActions ?? {}
       );
-      for (let action of pendingActions) {
+      for (const action of pendingActions) {
         playerManager.resolvePendingAction(action);
       }
     });
@@ -223,7 +223,7 @@ export class GameManager {
 
   public currentRound(): Round {
     const operation = this._withPointer((pointer) => {
-      for (let round of Object.values(pointer.rounds)) {
+      for (const round of Object.values(pointer.rounds)) {
         if (
           [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(
             round.status
@@ -248,8 +248,8 @@ export class GameManager {
 
     const hostageRecord: Record<string, true> = {};
 
-    for (let roundRoom of Object.values(finishingRound.rooms)) {
-      for (let hostageId of roundRoom.hostages) {
+    for (const roundRoom of Object.values(finishingRound.rooms)) {
+      for (const hostageId of roundRoom.hostages) {
         nextRoundAllocation[hostageId] = otherRoom(
           nextRoundAllocation[hostageId]
         );
@@ -308,7 +308,7 @@ export class GameManager {
   }
 
   public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {
-    for (let playerId in this.players()) {
+    for (const playerId in this.players()) {
       const playerManager = this.managePlayer(playerId);
       cb(playerManager);
     }
@@ -392,7 +392,7 @@ export class GameManager {
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
-    for (let player of playersToNotify) {
+    for (const player of playersToNotify) {
       this.managePlayer(player.socketId).pushNotification(notification);
     }
   }
@@ -402,7 +402,7 @@ export class GameManager {
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
-    for (let player of playersToNotify) {
+    for (const player of playersToNotify) {
       this.managePlayer(player.socketId).pushPendingAction(action);
     }
   }
@@ -542,7 +542,7 @@ export class GameManager {
   }
 
   public updateEachPlayer(mutativeCb: (player: Player) => void): void {
-    for (let playerId in this.players()) {
+    for (const playerId in this.players()) {
       this.managePlayer(playerId).update(mutativeCb);
     }
   }

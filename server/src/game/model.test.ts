@@ -62,14 +62,14 @@ describe('assignInitialRoles', () => {
     const players = gameManager.players();
 
     expect(Object.keys(players)).toHaveLength(8);
-    for (let playerId in players) {
+    for (const playerId in players) {
       expect(typeof players[playerId].role).toBe('string');
       expect(["PRESIDENT_BLUE", "BOMBER_RED", "DOCTOR_BLUE", "ENGINEER_RED", "TEAM_BLUE", "TEAM_RED"]).toContain(players[playerId].role)
     }
 
     const assignedRoles = Object.values(players).map(({ role }) => role);
 
-    for (let key in testRolesCount) {
+    for (const key in testRolesCount) {
       const roleKey = key as RoleKey
       expect(assignedRoles.filter(role => role === roleKey).length).toBe(testRolesCount[roleKey] as number)
     }
@@ -99,7 +99,7 @@ describe('assignInitialRoles', () => {
     const players = gameManager.players();
     expect(Object.keys(players)).toHaveLength(8);
 
-    for (let playerId in players) {
+    for (const playerId in players) {
       expect(typeof players[playerId].role).toBe("string");
       expect([
         "PRESIDENT_BLUE",
@@ -114,7 +114,7 @@ describe('assignInitialRoles', () => {
 
     const assignedRoles = Object.values(players).map(({ role }) => role);
 
-    for (let key in testRolesCount) {
+    for (const key in testRolesCount) {
       const roleKey = key as RoleKey;
       expect(
         assignedRoles.filter((role) => role === roleKey).length

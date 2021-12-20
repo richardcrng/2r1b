@@ -162,7 +162,7 @@ export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION]
     proposedNewLeaderId
   }
 
-  for (let playerId of [abdicatingLeaderId, proposedNewLeaderId]) {
+  for (const playerId of [abdicatingLeaderId, proposedNewLeaderId]) {
     const playerManager = gameManager.managePlayer(playerId);
     playerManager.update((player) => {
       player.pendingActions[abdicationOffer.id] = abdicationOffer;
@@ -174,7 +174,7 @@ export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION]
 export const offerShare: ClientEventListeners[ClientEvent.OFFER_SHARE] = (gameId, action): void => {
   const gameManager = new GameManager(gameId);
 
-  for (let playerId of [action.sharerId, action.offeredPlayerId]) {
+  for (const playerId of [action.sharerId, action.offeredPlayerId]) {
     const playerManager = gameManager.managePlayer(playerId);
     playerManager.update((player) => {
       player.pendingActions[action.id] = action;
@@ -232,7 +232,7 @@ export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (
   new GameManager(gameId).updateCurrentRound(round => {
     if (!round.rooms[roomName].hostages.includes(playerId)) {
       round.rooms[roomName].hostages.push(playerId);
-    };
+    }
   })
 }
 
@@ -315,7 +315,7 @@ const usurpLeader = (
     votes: Object.fromEntries(voterIds.map((id) => [id, 1])),
   });
 
-  for (let voterId of voterIds) {
+  for (const voterId of voterIds) {
     gameManager.updatePlayer(voterId, (player) => {
       delete player.leaderVote;
     });

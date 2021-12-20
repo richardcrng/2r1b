@@ -53,7 +53,7 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.WITHDRAW_SHARE_OFFER]: withdrawShareOffer,
   };
 
-  for (let [event, listener] of Object.entries(listeners) as [ClientEvent, ClientEventListeners[ClientEvent]][]) {
+  for (const [event, listener] of Object.entries(listeners) as [ClientEvent, ClientEventListeners[ClientEvent]][]) {
     socket.on(event, listener)
   }
 };
