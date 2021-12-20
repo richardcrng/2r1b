@@ -1,8 +1,12 @@
-import { Button } from 'semantic-ui-react';
-import styled from 'styled-components'
-import { selectFindPlayerWithRole, selectGreyPlayerResults, selectTeamWinCheckResult } from '../../../selectors/game-selectors';
+import { Button } from "semantic-ui-react";
+import styled from "styled-components";
+import {
+  selectFindPlayerWithRole,
+  selectGreyPlayerResults,
+  selectTeamWinCheckResult,
+} from "../../../selectors/";
 import { Game, Player } from "../../../types/game.types";
-import { getRoleName } from '../../../utils/role-utils';
+import { getRoleName } from "../../../utils/role-utils";
 
 const Container = styled.div`
   display: grid;
@@ -16,7 +20,7 @@ const Container = styled.div`
 
 const Main = styled.div`
   grid-area: main;
-`
+`;
 
 const Actions = styled.div`
   grid-area: actions;
@@ -29,7 +33,6 @@ interface Props {
 }
 
 function GameResults({ game, onGameReset, player }: Props) {
-
   const teamResult = selectTeamWinCheckResult(game);
   const greyResults = selectGreyPlayerResults(game);
   const findPlayerWithRole = selectFindPlayerWithRole(game);
@@ -47,7 +50,10 @@ function GameResults({ game, onGameReset, player }: Props) {
               {greyResults.map((result) => (
                 <li key={result.role}>
                   <p>
-                    <strong>{getRoleName(result.role)} {result.isWin ? "win" : 'loss'} ({findPlayerWithRole(result.role)?.name}): </strong>
+                    <strong>
+                      {getRoleName(result.role)} {result.isWin ? "win" : "loss"}{" "}
+                      ({findPlayerWithRole(result.role)?.name}):{" "}
+                    </strong>
                     {result.reason}
                   </p>
                 </li>
@@ -58,11 +64,7 @@ function GameResults({ game, onGameReset, player }: Props) {
       </Main>
       <Actions>
         {player.isHost && (
-          <Button
-            color='red'
-            fluid
-            onClick={onGameReset}
-          >
+          <Button color="red" fluid onClick={onGameReset}>
             Restart game
           </Button>
         )}
