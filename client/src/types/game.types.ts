@@ -15,30 +15,6 @@ export enum RoundStatus {
   PENDING = "pending",
 }
 
-export enum CardType {
-  GOLD = "gold",
-  FIRE = "fire",
-  EMPTY = "empty",
-}
-
-export interface Card {
-  /** If not present, then the card has not been dealt (and is stacked) */
-  holdingPlayerId?: string;
-  id: number;
-  isFlipped?: boolean;
-  isStacked?: boolean;
-  type: CardType;
-}
-
-export interface Deck {
-  /** Cards keyed by a unique card id */
-  cards: Record<number, Card>;
-  // /** Array of card ids */
-  // dealt: string[];
-  // /** Array of card ids */
-  // stacked: number[];
-}
-
 export interface LeaderVote {
   voterId: string;
   proposedLeaderId: string;
