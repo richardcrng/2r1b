@@ -7,7 +7,10 @@ import styled from "styled-components";
 import { Game, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
-import { selectGameSetupErrors, selectGameSetupWarnings } from "../../../../selectors/game-selectors";
+import {
+  selectGameSetupErrors,
+  selectGameSetupWarnings,
+} from "../../../../selectors/game-selectors";
 import { SetupAlert } from "../../../../utils/setup-utils";
 
 interface Props {
@@ -39,8 +42,8 @@ const StyledPlayerList = styled(PlayerList)`
   grid-area: players;
   overflow-y: scroll;
   list-style: none;
-  padding-inline-start: 20px
-`
+  padding-inline-start: 20px;
+`;
 
 const ActionArea = styled.div`
   grid-area: actions;
@@ -59,8 +62,13 @@ const PlayerListItemContents = styled.div`
   padding-bottom: 10px;
 `;
 
-function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: Props) {
-
+function GameLobbyHome({
+  game,
+  onGameStart,
+  handleViewSetup,
+  players,
+  player,
+}: Props) {
   const setupErrors = selectGameSetupErrors(game);
   const setupWarnings = selectGameSetupWarnings(game);
 
@@ -93,6 +101,7 @@ function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: 
               ? "yellow"
               : "green"
           }
+          onClick={handleViewSetup}
         >
           <Message.Header>
             {setupErrors.length
@@ -146,7 +155,10 @@ function GameLobbyHome({ game, onGameStart, handleViewSetup, players, player }: 
   );
 }
 
-const setupMessage = (errors: SetupAlert[], warnings: SetupAlert[]): JSX.Element => {
+const setupMessage = (
+  errors: SetupAlert[],
+  warnings: SetupAlert[]
+): JSX.Element => {
   const nErrors = errors.length;
   const nWarnings = warnings.length;
 
@@ -163,12 +175,12 @@ const setupMessage = (errors: SetupAlert[], warnings: SetupAlert[]): JSX.Element
       <>
         {nWarnings} warnings: {warnings[0].message}, and {nWarnings - 1} more
       </>
-    )
+    );
   } else if (nWarnings === 1) {
-    return <>{warnings[0].message}</>
+    return <>{warnings[0].message}</>;
   } else {
-    return <>No setup errors or warnings!</>
+    return <>No setup errors or warnings!</>;
   }
-} 
+};
 
 export default GameLobbyHome;
