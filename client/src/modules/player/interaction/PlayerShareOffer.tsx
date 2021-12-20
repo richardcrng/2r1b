@@ -9,8 +9,7 @@ import {
 } from "../../../types/player-action.types";
 
 interface Props {
-  player: Player;
-  players: Record<string, PlayerWithRoom>;
+  colorSharing: boolean;
   currentRoom: RoomName;
   currentOffer?: PlayerActionShareOffered;
   onOfferShare(
@@ -19,9 +18,12 @@ interface Props {
     shareType: PlayerActionShareOfferedType
   ): void;
   onPlayerSelect?(playerId: string): void;
+  player: Player;
+  players: Record<string, PlayerWithRoom>;
   selectedPlayerId?: string;
 }
 function PlayerShareOffer({
+  colorSharing,
   currentRoom,
   currentOffer,
   onOfferShare,
@@ -78,8 +80,25 @@ function PlayerShareOffer({
           )
         }
       >
-        Offer share
+        Offer card share
       </Button>
+      {colorSharing && (
+        <Button
+          disabled={!!currentOffer?.offeredPlayerId || !selectedPlayerId}
+          fluid
+          secondary
+          onClick={() =>
+            selectedPlayerId &&
+            onOfferShare(
+              currentRoom,
+              selectedPlayerId,
+              PlayerActionType.COLOR_SHARE_OFFERED
+            )
+          }
+        >
+          Offer color share
+        </Button>
+      )}
     </>
   );
 }
