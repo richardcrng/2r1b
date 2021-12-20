@@ -1,5 +1,11 @@
 import { mapValues } from "lodash";
-import { createStartingRounds, Game, GameStatus, Player, RolesCount } from "../types/game.types";
+import {
+  createStartingRounds,
+  Game,
+  GameStatus,
+  Player,
+  RolesCount,
+} from "../types/game.types";
 import { ALL_ROLES } from "../types/role.types";
 import { DEFAULT_STARTING_ROLES_COUNT } from "./role-utils";
 
@@ -8,26 +14,31 @@ export const createDummyGame = ({
   players = {},
   rounds = createStartingRounds(),
   rolesCount = DEFAULT_STARTING_ROLES_COUNT,
-  status = GameStatus.LOBBY
-}: Partial<Omit<Game, 'rolesCount'> & { rolesCount: Partial<RolesCount> }> = {}): Game => {
+  status = GameStatus.LOBBY,
+}: Partial<
+  Omit<Game, "rolesCount"> & { rolesCount: Partial<RolesCount> }
+> = {}): Game => {
   return {
     id,
     players: mapValues(players, (player) => ({ ...player, gameId: id })),
     endgame: {},
     rounds,
     rolesCount: createRolesCount(rolesCount),
-    status
+    status,
   };
 };
 
-export const createDummyPlayers = (n: number, gameId: string = generateRandomGameId()): Record<string, Player> => {
+export const createDummyPlayers = (
+  n: number,
+  gameId: string = generateRandomGameId()
+): Record<string, Player> => {
   const entries: [string, Player][] = Array.from({ length: n }, () => {
     const player = createDummyPlayer({ gameId });
-    return [player.socketId, player]
-  })
+    return [player.socketId, player];
+  });
 
-  return Object.fromEntries(entries)
-}
+  return Object.fromEntries(entries);
+};
 
 export const createDummyPlayer = ({
   socketId = generateDummySocketId(),
@@ -35,7 +46,7 @@ export const createDummyPlayer = ({
   name,
   isHost,
   role,
-  pendingActions = {}
+  pendingActions = {},
 }: Partial<Player> = {}): Player => {
   return {
     socketId,
@@ -45,19 +56,21 @@ export const createDummyPlayer = ({
     role,
     pendingActions,
     conditions: {
-      shareRecords: []
-    }
-  }
-}
+      shareRecords: [],
+    },
+  };
+};
 
 export const generateDummySocketId = (): string => {
   return `-${generateRandomGameId().toLowerCase()}${generateRandomGameId().toLowerCase()}`;
-}
+};
 
-export const createRolesCount = (partialRolesCount: Partial<RolesCount>): RolesCount => ({
+export const createRolesCount = (
+  partialRolesCount: Partial<RolesCount>
+): RolesCount => ({
   ...mapValues(ALL_ROLES, () => 0),
-  ...partialRolesCount
-})
+  ...partialRolesCount,
+});
 
 export const generateRandomGameId = (): string => {
   const stringOptions = "ABCDEFGHIJLKMNOPQRSTUVWXYZ1234567890";
@@ -80,11 +93,11 @@ export function getColor(): string {
 }
 
 export function getColors(n: number): string[] {
-  const colors: string[] = []
+  const colors: string[] = [];
   for (let i = 0; i < n; i++) {
     colors.push(selectColor(Math.floor(Math.random() * 999)));
   }
-  return colors
+  return colors;
 }
 
 function selectColor(number: number): string {

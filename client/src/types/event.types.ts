@@ -2,8 +2,13 @@ import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
 import { Card, GamblerPrediction, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
-import { GameNotification, PlayerNotification } from './notification.types';
-import { PlayerAction, PlayerActionAbdicationOffered, PlayerActionShareOffered, PlayerActionShareResultReceived } from "./player-action.types";
+import { GameNotification, PlayerNotification } from "./notification.types";
+import {
+  PlayerAction,
+  PlayerActionAbdicationOffered,
+  PlayerActionShareOffered,
+  PlayerActionShareResultReceived,
+} from "./player-action.types";
 
 export type ClientSocket = TClientSocket<
   ServerEventListeners,
@@ -18,58 +23,58 @@ export type ServerSocket = TServerSocket<
 export type ServerIO = TServer<ClientEventListeners, ServerEventListeners>;
 
 export enum ClientEvent {
-  ACCEPT_ABDICATION = 'accept-abdication',
-  ACCEPT_SHARE = 'accept-share',
-  APPOINT_ROOM_LEADER = 'appoint-room-leader',
+  ACCEPT_ABDICATION = "accept-abdication",
+  ACCEPT_SHARE = "accept-share",
+  APPOINT_ROOM_LEADER = "appoint-room-leader",
   CREATE_GAME = "create-game",
-  DECLINE_ABDICATION = 'decline-abdication',
-  DECLINE_SHARE = 'decline-share',
-  DESELECT_HOSTAGE = 'deselect-hostage',
-  GAMBLER_PREDICT = 'gambler-predict',
+  DECLINE_ABDICATION = "decline-abdication",
+  DECLINE_SHARE = "decline-share",
+  DESELECT_HOSTAGE = "deselect-hostage",
+  GAMBLER_PREDICT = "gambler-predict",
   GET_GAME = "get-game",
   GET_PLAYER = "get-player",
-  INCREMENT_ROLE = 'increment-role',
+  INCREMENT_ROLE = "increment-role",
   JOIN_GAME = "join",
-  OFFER_ABDICATION = 'offer-abdication',
-  OFFER_SHARE = 'offer-share',
-  PRIVATE_EYE_PREDICT = 'private-eye-predict',
-  PROPOSE_ROOM_LEADER = 'propose-room-leader',
-  RESET_GAME = 'reset-game',
-  REVEAL_RESULTS = 'reveal-results',
-  SELECT_HOSTAGE = 'select-hostage',
+  OFFER_ABDICATION = "offer-abdication",
+  OFFER_SHARE = "offer-share",
+  PRIVATE_EYE_PREDICT = "private-eye-predict",
+  PROPOSE_ROOM_LEADER = "propose-room-leader",
+  RESET_GAME = "reset-game",
+  REVEAL_RESULTS = "reveal-results",
+  SELECT_HOSTAGE = "select-hostage",
   START_GAME = "start-game",
-  SUBMIT_HOSTAGES = 'submit-hostages',
-  TERMINATE_SHARE = 'terminate-share',
+  SUBMIT_HOSTAGES = "submit-hostages",
+  TERMINATE_SHARE = "terminate-share",
   UPDATE_PLAYER = "update-player",
-  WITHDRAW_ABDICATION_OFFER = 'withdraw-abdication-offer',
-  WITHDRAW_SHARE_OFFER = 'withdraw-share-offer'
+  WITHDRAW_ABDICATION_OFFER = "withdraw-abdication-offer",
+  WITHDRAW_SHARE_OFFER = "withdraw-share-offer",
 }
 
 export enum ServerEvent {
-  ACTION_PENDING = 'action-pending',
-  ACTION_RESOLVED = 'action-resolved',
-  CARD_FLIPPED = 'card-picked',
+  ACTION_PENDING = "action-pending",
+  ACTION_RESOLVED = "action-resolved",
+  CARD_FLIPPED = "card-picked",
   GAME_CREATED = "game-created",
   GAME_GOTTEN = "game-gotten",
   GAME_JOINED = "game-joined",
   GAME_NOT_FOUND = "game-not-found",
   GAME_NOTIFICATION = "game-notification",
-  GAME_OVER = 'game-over',
+  GAME_OVER = "game-over",
   GAME_UPDATED = "game-updated",
   PLAYER_GOTTEN = "player-gotten",
-  PLAYER_NOTIFICATION = 'player-notification',
+  PLAYER_NOTIFICATION = "player-notification",
   PLAYER_NOT_FOUND = "player-not-found",
   PLAYER_UPDATED = "player-updated",
   REDIRECT_TO_LOBBY = "redirect-to-lobby",
   RESULTS_SHOWN = "results-shown",
-  ROLE_AND_ROOM_ALLOCATIONS_MADE = 'role-and-room-allocations-made',
-  ROUND_STARTED = 'round-started',
+  ROLE_AND_ROOM_ALLOCATIONS_MADE = "role-and-room-allocations-made",
+  ROUND_STARTED = "round-started",
 }
 
 export enum GameOverReason {
-  ALL_GOLD_FLIPPED = 'The adventurers found all the gold',
-  ALL_FIRE_FLIPPED = 'The adventurers ran into all the fire',
-  ALL_ROUNDS_FINISHED = 'The adventurers lost on time'
+  ALL_GOLD_FLIPPED = "The adventurers found all the gold",
+  ALL_FIRE_FLIPPED = "The adventurers ran into all the fire",
+  ALL_ROUNDS_FINISHED = "The adventurers lost on time",
 }
 
 /**
@@ -111,7 +116,10 @@ export type ClientEventListeners = {
     roomName: RoomName
   ) => void;
 
-  [ClientEvent.GAMBLER_PREDICT]: (gameId: string, prediction: GamblerPrediction) => void;
+  [ClientEvent.GAMBLER_PREDICT]: (
+    gameId: string,
+    prediction: GamblerPrediction
+  ) => void;
 
   [ClientEvent.GET_GAME]: (gameId: string) => void;
 
@@ -153,13 +161,9 @@ export type ClientEventListeners = {
     proposedLeaderId?: string
   ) => void;
 
-  [ClientEvent.RESET_GAME]: (
-    gameId: string
-  ) => void;
+  [ClientEvent.RESET_GAME]: (gameId: string) => void;
 
-  [ClientEvent.REVEAL_RESULTS]: (
-    gameId: string,
-  ) => void;
+  [ClientEvent.REVEAL_RESULTS]: (gameId: string) => void;
 
   [ClientEvent.SELECT_HOSTAGE]: (
     gameId: string,

@@ -5,8 +5,10 @@
     "server"
   ],
   "scripts": {
-    "build": "yarn workspaces run build",
+    "format": "yarn workspaces run format",
+    "format:check": "yarn workspaces run format:check",
     "lint": "yarn workspaces run lint",
+    "build": "yarn workspaces run build",
     "start:client:dev": "yarn workspace @2r1b/client start",
     "start:server": "yarn workspace @2r1b/server start",
     "start:server:compiled": "yarn workspace @2r1b/server start:compiled",

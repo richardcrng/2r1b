@@ -1,7 +1,7 @@
 // import { gameLobbyReadiness } from "../../selectors/game";
 import { Game, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
-import { useState } from 'react';
+import { useState } from "react";
 import { RoleKey } from "../../../types/role.types";
 import GameLobbySetupModal from "./setup/GameLobbySetupModal";
 
@@ -13,13 +13,17 @@ interface Props {
   player: Player;
 }
 
-function GameLobby({ game, onGameStart, onRoleIncrement, players, player }: Props): JSX.Element {
+function GameLobby({
+  game,
+  onGameStart,
+  onRoleIncrement,
+  players,
+  player,
+}: Props): JSX.Element {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const handleOpen = () => setIsModalOpen(true)
-  const handleClose = () => setIsModalOpen(false)
+  const handleOpen = () => setIsModalOpen(true);
+  const handleClose = () => setIsModalOpen(false);
 
   return (
     <>
