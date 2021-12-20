@@ -1,14 +1,15 @@
 // import { gameLobbyReadiness } from "../../selectors/game";
-import { Game, Player } from "../../../types/game.types";
+import { Game, GameSettings, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
 import { useState } from "react";
-import { RoleKey } from "../../../types/role.types";
 import GameLobbySetupModal from "./setup/GameLobbySetupModal";
+import { GameHandlers } from "../GamePage";
 
 interface Props {
   game: Game;
-  onGameStart(): void;
-  onRoleIncrement(roleKey: RoleKey, increment: number): void;
+  onGameStart: GameHandlers["onGameStart"];
+  onRoleIncrement: GameHandlers["onRoleIncrement"];
+  onSettingsUpdate: GameHandlers["onSettingsUpdate"];
   players: Player[];
   player: Player;
 }
@@ -17,6 +18,7 @@ function GameLobby({
   game,
   onGameStart,
   onRoleIncrement,
+  onSettingsUpdate,
   players,
   player,
 }: Props): JSX.Element {
@@ -37,6 +39,7 @@ function GameLobby({
         isOpen={isModalOpen}
         onOpen={handleOpen}
         onClose={handleClose}
+        onSettingsUpdate={onSettingsUpdate}
       />
     </>
   );
