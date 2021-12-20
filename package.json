@@ -17,7 +17,7 @@
     "test:types": "yarn workspace @2r1b/server test:types",
     "test:client:watch": "yarn workspace @2r1b/client test:watch",
     "test:server:watch": "yarn workspace @2r1b/server test:watch",
-    "heroku-postbuild": "yarn build:server",
+    "heroku-postbuild": "yarn workspace @2r1b/server build",
     "prepare": "node ./prepare.js"
   },
   "devDependencies": {
