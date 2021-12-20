@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import { PlayerRole, RoleKey, RoleRanking } from "../../../../types/role.types";
-import { getRoleRanking, getRoleRestrictions } from "../../../../utils/role-utils";
+import {
+  getRoleRanking,
+  getRoleRestrictions,
+} from "../../../../utils/role-utils";
 import { getColors } from "../../card/RoleCard";
 
 const RoleUl = styled.ul`
@@ -19,7 +22,11 @@ interface Props {
   rolesInSetup: [PlayerRole, number][];
 }
 
-function RoleSetupList({ isEditable, onRoleIncrement, rolesInSetup }: Props) {
+function RoleSetupList({
+  isEditable,
+  onRoleIncrement,
+  rolesInSetup,
+}: Props): JSX.Element {
   return (
     <RoleUl>
       {rolesInSetup.map(([role, count]) => {

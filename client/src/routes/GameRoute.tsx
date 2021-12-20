@@ -8,7 +8,7 @@ import { useSocket } from "../socket";
 import { ClientEvent } from "../types/event.types";
 import { GameStatus } from "../types/game.types";
 
-function GameRoute() {
+function GameRoute(): JSX.Element {
   const { gameId } = useParams<{ gameId: string }>();
   const socket = useSocket();
   const socketAliases = useSocketAliases();
@@ -17,11 +17,11 @@ function GameRoute() {
   const player = usePlayer(socket.id, socketAliases);
 
   const takenNames = Object.values(game.data?.players ?? {}).map(
-    (player) => player.name!
+    (player) => player.name ?? player.socketId
   );
 
   if (game.loading) {
-    return <p>Loading...</p>
+    return <p>Loading...</p>;
   } else if (game.error) {
     return <Redirect to="/" />;
   } else if (game.data?.status === GameStatus.ONGOING && !player.data) {
@@ -42,9 +42,9 @@ function GameRoute() {
                 name,
                 gameId,
                 conditions: {
-                  shareRecords: []
+                  shareRecords: [],
                 },
-                pendingActions: {}
+                pendingActions: {},
               });
             } else {
               // player not in game, so join
@@ -53,9 +53,9 @@ function GameRoute() {
                 name,
                 gameId,
                 conditions: {
-                  shareRecords: []
+                  shareRecords: [],
                 },
-                pendingActions: {}
+                pendingActions: {},
               });
             }
           }}
@@ -71,83 +71,119 @@ function GameRoute() {
           <GamePage
             game={game.data}
             onAppointLeader={(leaderId, currentRoom) => {
-              socket.emit(
-                ClientEvent.APPOINT_ROOM_LEADER,
-                game.data!.id,
-                currentRoom,
-                player.data!.socketId,
-                leaderId
-              );
+              game.data &&
+                player.data &&
+                socket.emit(
+                  ClientEvent.APPOINT_ROOM_LEADER,
+                  game.data.id,
+                  currentRoom,
+                  player.data.socketId,
+                  leaderId
+                );
             }}
             onGamblerPrediction={(prediction) => {
-              socket.emit(ClientEvent.GAMBLER_PREDICT, game.data!.id, prediction);
+              game.data &&
+                socket.emit(
+                  ClientEvent.GAMBLER_PREDICT,
+                  game.data.id,
+                  prediction
+                );
             }}
             onGameReset={() => {
-              socket.emit(ClientEvent.RESET_GAME, game.data!.id)
+              game.data && socket.emit(ClientEvent.RESET_GAME, game.data.id);
             }}
             onGameStart={() => {
-              socket.emit(ClientEvent.START_GAME, game.data!.id);
+              game.data && socket.emit(ClientEvent.START_GAME, game.data.id);
             }}
             onHostageSelect={(playerId, roomName, isDeselect = false) => {
               if (isDeselect) {
-                socket.emit(
-                  ClientEvent.DESELECT_HOSTAGE,
-                  game.data!.id,
-                  playerId,
-                  roomName
-                );
-
+                game.data &&
+                  socket.emit(
+                    ClientEvent.DESELECT_HOSTAGE,
+                    game.data.id,
+                    playerId,
+                    roomName
+                  );
               } else {
-                socket.emit(ClientEvent.SELECT_HOSTAGE, game.data!.id, playerId, roomName)
+                game.data &&
+                  socket.emit(
+                    ClientEvent.SELECT_HOSTAGE,
+                    game.data.id,
+                    playerId,
+                    roomName
+                  );
               }
             }}
             onHostageSubmit={(roomName) => {
-              socket.emit(ClientEvent.SUBMIT_HOSTAGES, game.data!.id, roomName)
+              game.data &&
+                socket.emit(
+                  ClientEvent.SUBMIT_HOSTAGES,
+                  game.data.id,
+                  roomName
+                );
             }}
             onOfferAbdication={(roomName, proposedLeaderId) => {
-              socket.emit(ClientEvent.OFFER_ABDICATION, game.data!.id, roomName, player.data!.socketId, proposedLeaderId)
+              game.data &&
+                player.data &&
+                socket.emit(
+                  ClientEvent.OFFER_ABDICATION,
+                  game.data.id,
+                  roomName,
+                  player.data.socketId,
+                  proposedLeaderId
+                );
             }}
             onOfferShare={(room, offeredPlayerId, shareType) => {
-              socket.emit(ClientEvent.OFFER_SHARE, game.data!.id, {
-                id: `${ClientEvent.OFFER_SHARE}-${Date.now()}-${player.data!.socketId}`,
-                type: shareType,
-                room,
-                sharerId: player.data!.socketId,
-                offeredPlayerId
-              })
+              game.data &&
+                player.data &&
+                socket.emit(ClientEvent.OFFER_SHARE, game.data.id, {
+                  id: `${ClientEvent.OFFER_SHARE}-${Date.now()}-${
+                    player.data.socketId
+                  }`,
+                  type: shareType,
+                  room,
+                  sharerId: player.data.socketId,
+                  offeredPlayerId,
+                });
             }}
             onPrivateEyeRolePrediction={(roleKey) => {
-              socket.emit(ClientEvent.PRIVATE_EYE_PREDICT, game.data!.id, roleKey)
+              socket.emit(
+                ClientEvent.PRIVATE_EYE_PREDICT,
+                game.data!.id,
+                roleKey
+              );
             }}
             onProposeLeader={(leaderId, currentRoom) => {
-              socket.emit(
-                ClientEvent.PROPOSE_ROOM_LEADER,
-                game.data!.id,
-                currentRoom,
-                player.data!.socketId,
-                leaderId
-              );
+              game.data &&
+                player.data &&
+                socket.emit(
+                  ClientEvent.PROPOSE_ROOM_LEADER,
+                  game.data.id,
+                  currentRoom,
+                  player.data.socketId,
+                  leaderId
+                );
             }}
             onResultsReveal={() => {
-              socket.emit(
-                ClientEvent.REVEAL_RESULTS,
-                game.data!.id
-              )
+              game.data &&
+                socket.emit(ClientEvent.REVEAL_RESULTS, game.data.id);
             }}
             onRoleIncrement={(roleKey, increment) => {
-              socket.emit(
-                ClientEvent.INCREMENT_ROLE,
-                game.data!.id,
-                roleKey,
-                increment
-              );
+              game.data &&
+                socket.emit(
+                  ClientEvent.INCREMENT_ROLE,
+                  game.data.id,
+                  roleKey,
+                  increment
+                );
             }}
             onWithdrawAbdicationOffer={(action) => {
-              socket.emit(
-                ClientEvent.WITHDRAW_ABDICATION_OFFER,
-                game.data!.id,
-                action
-              )
+              game.data &&
+                socket.emit(
+                  ClientEvent.WITHDRAW_ABDICATION_OFFER,
+                  game.data.id,
+                  action
+                );
             }}
             players={Object.values(game.data.players)}
             player={player.data}

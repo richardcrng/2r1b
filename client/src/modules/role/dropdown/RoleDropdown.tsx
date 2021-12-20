@@ -25,13 +25,17 @@ interface Props {
   selectedRole?: RoleKey;
 }
 
-function RoleDropdown({ filter, onRoleSelect, selectedRole: controlledRoleValue }: Props) {
+function RoleDropdown({
+  filter,
+  onRoleSelect,
+  selectedRole: controlledRoleValue,
+}: Props): JSX.Element {
   const [uncontrolledValue, setUncontrolledValue] = useState<RoleKey>();
   const selectedRole = controlledRoleValue ?? uncontrolledValue;
 
   const optionsToList = filter
     ? ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS.filter(filter)
-    : ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS
+    : ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS;
 
   return (
     <Dropdown

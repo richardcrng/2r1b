@@ -2,14 +2,22 @@ import { Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import PlayerDropdown from "../dropdown/PlayerDropdown";
 import { useState } from "react";
 import { Button } from "semantic-ui-react";
-import { PlayerActionShareOffered, PlayerActionShareOfferedType, PlayerActionType } from "../../../types/player-action.types";
+import {
+  PlayerActionShareOffered,
+  PlayerActionShareOfferedType,
+  PlayerActionType,
+} from "../../../types/player-action.types";
 
 interface Props {
   player: Player;
   players: Record<string, PlayerWithRoom>;
   currentRoom: RoomName;
   currentOffer?: PlayerActionShareOffered;
-  onOfferShare(currentRoom: RoomName, playerId: string, shareType: PlayerActionShareOfferedType): void;
+  onOfferShare(
+    currentRoom: RoomName,
+    playerId: string,
+    shareType: PlayerActionShareOfferedType
+  ): void;
   onPlayerSelect?(playerId: string): void;
   selectedPlayerId?: string;
 }
@@ -21,7 +29,7 @@ function PlayerShareOffer({
   player,
   players,
   selectedPlayerId: controlledPlayerId,
-}: Props) {
+}: Props): JSX.Element {
   const [uncontrolledPlayerId, setUncontrolledPlayerId] = useState<
     string | undefined
   >(currentOffer?.offeredPlayerId);
@@ -34,9 +42,16 @@ function PlayerShareOffer({
   return (
     <>
       <p>You can offer a mutual card share to a player.</p>
-      <p>{currentOffer ? (
-        <>You can't offer to share with anybody until you withdraw your existing offer to {players[currentOffer.offeredPlayerId].name}.</>
-      ) : <>You have no offer pending.</>}</p>
+      <p>
+        {currentOffer ? (
+          <>
+            You can't offer to share with anybody until you withdraw your
+            existing offer to {players[currentOffer.offeredPlayerId].name}.
+          </>
+        ) : (
+          <>You have no offer pending.</>
+        )}
+      </p>
       <PlayerDropdown
         disabled={!!currentOffer?.offeredPlayerId}
         filter={(playerToCheck) =>
@@ -54,7 +69,14 @@ function PlayerShareOffer({
         disabled={!!currentOffer?.offeredPlayerId || !selectedPlayerId}
         fluid
         primary
-        onClick={() => onOfferShare(currentRoom, selectedPlayerId!, PlayerActionType.CARD_SHARE_OFFERED)}
+        onClick={() =>
+          selectedPlayerId &&
+          onOfferShare(
+            currentRoom,
+            selectedPlayerId,
+            PlayerActionType.CARD_SHARE_OFFERED
+          )
+        }
       >
         Offer share
       </Button>
