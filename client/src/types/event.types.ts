@@ -1,6 +1,6 @@
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
-import { Card, GamblerPrediction, Game, Player, RoomName } from "./game.types";
+import { GamblerPrediction, Game, Player, RoomName } from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from "./notification.types";
 import {
@@ -53,7 +53,6 @@ export enum ClientEvent {
 export enum ServerEvent {
   ACTION_PENDING = "action-pending",
   ACTION_RESOLVED = "action-resolved",
-  CARD_FLIPPED = "card-picked",
   GAME_CREATED = "game-created",
   GAME_GOTTEN = "game-gotten",
   GAME_JOINED = "game-joined",
@@ -202,13 +201,6 @@ export type ServerEventListeners = {
   [ServerEvent.ACTION_RESOLVED]: (
     playerId: string,
     action: PlayerAction
-  ) => void;
-  [ServerEvent.CARD_FLIPPED]: (
-    gameId: string,
-    keyholderId: string,
-    targetPlayerId: string,
-    cardIdx: number,
-    card: Card
   ) => void;
   [ServerEvent.GAME_CREATED]: (game: Game) => void;
   [ServerEvent.GAME_OVER]: (
