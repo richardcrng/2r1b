@@ -2,6 +2,7 @@
   "name": "@2r1b/server",
   "version": "0.0.1",
   "description": "Two Rooms and a Boom Socket.io server",
+  "license": "CC-BY-NC-SA-4.0",
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",

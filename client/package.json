@@ -2,6 +2,7 @@
   "name": "@2r1b/client",
   "version": "0.1.0",
   "private": true,
+  "license": "CC-BY-NC-SA-4.0",
   "description": "Two Rooms and a Boom React client",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
