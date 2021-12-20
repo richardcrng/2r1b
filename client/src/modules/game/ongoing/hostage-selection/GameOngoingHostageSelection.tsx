@@ -98,16 +98,12 @@ function GameOngoingHostageSelection({
       <Main>
         <h1>Situation Room {roomName}</h1>
         <h2>Hostage{maybeS} selection</h2>
-        <p>
-          This round, {hostageTotal} hostage{maybeS} must be sent to the other
-          room.
-        </p>
         {isLeader ? (
           <>
             <p>
               As Room Leader, you must <strong>select</strong> and{" "}
-              <strong>submit</strong> the hostage
-              {maybeS} (but cannot pick yourself).
+              <strong>submit</strong> {hostageTotal} hostage
+              {maybeS} this round (but cannot pick yourself).
             </p>
 
             <RoomGuideUl>
@@ -144,15 +140,21 @@ function GameOngoingHostageSelection({
               onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
               primary
             >
-              Add hostage
+              Select hostage
             </Button>
           </>
         ) : (
-          <p>
-            {isReadyToExchange
-              ? `Waiting for the other room to select and submit their hostage${maybeS}`
-              : `Waiting for ${leaderName} to select and submit hostages`}
-          </p>
+          <>
+            <p>
+              This round, {hostageTotal} hostage{maybeS} must be sent to the
+              other room.
+            </p>
+            <p>
+              {isReadyToExchange
+                ? `Waiting for the other room to select and submit their hostage${maybeS}`
+                : `Waiting for ${leaderName} to select and submit hostages`}
+            </p>
+          </>
         )}
         <hr />
         {!isLeader && <h3>Selected hostage{maybeS}</h3>}
