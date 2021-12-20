@@ -6,12 +6,12 @@ interface Props {
   takenNames: string[];
 }
 
-function PlayerNamer({ handleSetName, takenNames }: Props) {
+function PlayerNamer({ handleSetName, takenNames }: Props): JSX.Element {
   const [inputText, setInputText] = useState("");
 
   const handleSetClick = () => {
     if (takenNames.includes(inputText)) {
-      window.alert("Somebody is already using that name")
+      window.alert("Somebody is already using that name");
     } else if (inputText.length > 0) {
       handleSetName(inputText);
     } else {

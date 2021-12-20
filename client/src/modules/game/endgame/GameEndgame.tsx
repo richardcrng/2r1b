@@ -1,10 +1,14 @@
-import { Button } from 'semantic-ui-react';
-import styled from 'styled-components';
-import { selectGameRolesInSetupCount, selectIsGamblerPredictionNeeded, selectIsPrivateEyeIdentificationNeeded } from "../../../selectors/game-selectors";
+import { Button } from "semantic-ui-react";
+import styled from "styled-components";
+import {
+  selectGameRolesInSetupCount,
+  selectIsGamblerPredictionNeeded,
+  selectIsPrivateEyeIdentificationNeeded,
+} from "../../../selectors/game-selectors";
 import { GamblerPrediction, Game, Player } from "../../../types/game.types";
-import { RoleKey } from '../../../types/role.types';
-import GameEndgameGambler from './gambler/GameEndgameGambler';
-import GameEndgamePrivateEye from './private-eye/GameEndgamePrivateEye';
+import { RoleKey } from "../../../types/role.types";
+import GameEndgameGambler from "./gambler/GameEndgameGambler";
+import GameEndgamePrivateEye from "./private-eye/GameEndgamePrivateEye";
 
 const Container = styled.div`
   display: grid;
@@ -18,11 +22,11 @@ const Container = styled.div`
 
 const Main = styled.div`
   grid-area: main;
-`
+`;
 
 const Actions = styled.div`
   grid-area: actions;
-`
+`;
 
 interface Props {
   game: Game;
@@ -32,9 +36,15 @@ interface Props {
   player: Player;
 }
 
-function GameEndgame({ game, onGamblerPrediction, onPrivateEyeRolePrediction, onResultsReveal, player }: Props) {
-
-  const isPrivateEyeIdentificationNeeded = selectIsPrivateEyeIdentificationNeeded(game);
+function GameEndgame({
+  game,
+  onGamblerPrediction,
+  onPrivateEyeRolePrediction,
+  onResultsReveal,
+  player,
+}: Props): JSX.Element {
+  const isPrivateEyeIdentificationNeeded =
+    selectIsPrivateEyeIdentificationNeeded(game);
   const isGamblerPredictionNeeded = selectIsGamblerPredictionNeeded(game);
 
   if (isPrivateEyeIdentificationNeeded) {
@@ -44,15 +54,13 @@ function GameEndgame({ game, onGamblerPrediction, onPrivateEyeRolePrediction, on
         player={player}
         rolesCount={selectGameRolesInSetupCount(game)}
       />
-    )
+    );
   } else if (isGamblerPredictionNeeded) {
-    return (
-      <GameEndgameGambler {...{ onGamblerPrediction, player }} />
-    )
+    return <GameEndgameGambler {...{ onGamblerPrediction, player }} />;
   }
 
   return (
-    <Container className='active-contents'>
+    <Container className="active-contents">
       <Main>
         <h1>All rounds are over</h1>
         {player.isHost ? (
@@ -67,11 +75,13 @@ function GameEndgame({ game, onGamblerPrediction, onPrivateEyeRolePrediction, on
       </Main>
       <Actions>
         {player.isHost && (
-          <Button fluid onClick={onResultsReveal} primary>Reveal results</Button>
+          <Button fluid onClick={onResultsReveal} primary>
+            Reveal results
+          </Button>
         )}
       </Actions>
     </Container>
-  )
+  );
 }
 
 export default GameEndgame;

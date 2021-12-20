@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import { Button } from 'semantic-ui-react';
-import styled from 'styled-components';
-import { Player, RolesCount } from '../../../../types/game.types';
-import { RoleKey } from '../../../../types/role.types';
-import RoleDropdown from '../../../role/dropdown/RoleDropdown';
+import { useState } from "react";
+import { Button } from "semantic-ui-react";
+import styled from "styled-components";
+import { Player, RolesCount } from "../../../../types/game.types";
+import { RoleKey } from "../../../../types/role.types";
+import RoleDropdown from "../../../role/dropdown/RoleDropdown";
 
-const Container = styled.div`
-`;
+const Container = styled.div``;
 
 interface Props {
   onPrivateEyeRolePrediction(rolePrediction: RoleKey): void;
@@ -14,9 +13,12 @@ interface Props {
   rolesCount: RolesCount;
 }
 
-function GameEndgamePrivateEye({ onPrivateEyeRolePrediction, player, rolesCount }: Props) {
-
-  const [prediction, setPrediction] = useState<RoleKey>()
+function GameEndgamePrivateEye({
+  onPrivateEyeRolePrediction,
+  player,
+  rolesCount,
+}: Props): JSX.Element {
+  const [prediction, setPrediction] = useState<RoleKey>();
 
   return (
     <Container className="active-contents">
@@ -25,24 +27,29 @@ function GameEndgamePrivateEye({ onPrivateEyeRolePrediction, player, rolesCount 
       {player.role === "PRIVATE_EYE_GREY" ? (
         <>
           <p>
-            As the Private Eye, you now need to make a prediction as to which role is buried.
+            As the Private Eye, you now need to make a prediction as to which
+            role is buried.
           </p>
           <RoleDropdown
-            filter={({ key }) => rolesCount[key] >= 1 && key !== 'PRIVATE_EYE_GREY'}
+            filter={({ key }) =>
+              rolesCount[key] >= 1 && key !== "PRIVATE_EYE_GREY"
+            }
             onRoleSelect={setPrediction}
             selectedRole={prediction}
           />
           <Button
-            color='black'
+            color="black"
             disabled={!prediction}
-            onClick={() => onPrivateEyeRolePrediction(prediction!)}
+            onClick={() => prediction && onPrivateEyeRolePrediction(prediction)}
           >
             Submit prediction
           </Button>
         </>
       ) : (
         <>
-          <p>The Private Eye is making a prediction as to which role is buried.</p>
+          <p>
+            The Private Eye is making a prediction as to which role is buried.
+          </p>
         </>
       )}
     </Container>

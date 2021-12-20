@@ -68,7 +68,7 @@ function GameLobbyHome({
   handleViewSetup,
   players,
   player,
-}: Props) {
+}: Props): JSX.Element {
   const setupErrors = selectGameSetupErrors(game);
   const setupWarnings = selectGameSetupWarnings(game);
 

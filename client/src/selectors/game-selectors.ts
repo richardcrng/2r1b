@@ -192,7 +192,7 @@ export const selectPlayerIdsInEachRoom = createSelector(
 
 export const selectCurrentRoundHostageTotal = createSelector(
   selectCurrentGameRound,
-  (round) => round?.hostageCount
+  (round) => round?.hostageCount ?? 1
 );
 
 export const selectCurrentRoundRooms = createSelector(
@@ -239,14 +239,14 @@ export const selectDictionaryOfVotesForPlayers = createSelector(
       playerList.map((player) => [player.socketId, []])
     );
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       const currVote = player.leaderVote;
       if (currVote) {
         votes[currVote.proposedLeaderId].push(currVote);
       }
     }
 
-    for (let playerId in votes) {
+    for (const playerId in votes) {
       votes[playerId].sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1));
     }
 
