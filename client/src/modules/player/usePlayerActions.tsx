@@ -111,7 +111,8 @@ function usePlayerActions(game: Game, player: Player): void {
             const toastId = toast(
               <div>
                 <p>
-                  You have offered a {shareType} share with {offeredPlayerName}.
+                  You have offered a <strong>{shareType} share</strong> with{" "}
+                  {offeredPlayerName}.
                 </p>
                 <p>Waiting for them to accept the offer...</p>
                 <Button
@@ -141,8 +142,8 @@ function usePlayerActions(game: Game, player: Player): void {
             const toastId = toast(
               <div>
                 <p>
-                  You have been offered a {shareType} share with{" "}
-                  {game.players[action.sharerId].name}.
+                  You have been offered a <strong>{shareType} share</strong>{" "}
+                  with {game.players[action.sharerId].name}.
                 </p>
                 <Button
                   color="green"
@@ -185,7 +186,7 @@ function usePlayerActions(game: Game, player: Player): void {
           const toastId = toast(
             <div>
               <p>
-                You are card sharing with{" "}
+                You are <strong>card sharing</strong> with{" "}
                 {game.players[shareRecord.playerIdSharedWith].name} - you are
                 seeing their role below, and they are seeing yours.
               </p>
@@ -220,8 +221,8 @@ function usePlayerActions(game: Game, player: Player): void {
           const toastId = toast(
             <div>
               <p>
-                You are color sharing with {otherPlayer.name} - you are seeing
-                their color below, and they are seeing yours.
+                You are <strong>color sharing</strong> with {otherPlayer.name} -
+                you are seeing their color below, and they are seeing yours.
               </p>
               <p style={{ fontWeight: "bold", fontSize: "120%" }}>
                 {otherPlayer.name}'s card color is{" "}
@@ -230,7 +231,7 @@ function usePlayerActions(game: Game, player: Player): void {
                 </strong>
               </p>
               <Button
-                color="red"
+                color="black"
                 fluid
                 onClick={() => {
                   toast.dismiss(toastId);
