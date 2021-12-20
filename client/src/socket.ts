@@ -11,7 +11,7 @@ export const socket: ClientSocket = io(socketUrl);
 
 export const SocketContext = createContext(socket);
 
-export function useSocket() {
+export function useSocket(): ClientSocket {
   const [hasConnected, setHasConnected] = useState(false);
   const socket = useContext(SocketContext);
 

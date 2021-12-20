@@ -3,12 +3,9 @@ import { useHistory } from "react-router";
 import { Button, Icon, Image, Message } from "semantic-ui-react";
 import useSocketListener from "../hooks/useSocketListener";
 import { socketUrl, useSocket } from "../socket";
-import {
-  ClientEvent,
-  ServerEvent,
-} from "../types/event.types";
+import { ClientEvent, ServerEvent } from "../types/event.types";
 
-function IndexRoute() {
+function IndexRoute(): JSX.Element {
   const socket = useSocket();
   const history = useHistory();
 
@@ -21,8 +18,10 @@ function IndexRoute() {
   };
 
   const handleJoinGame = () => {
-    window.alert("This isn't implemented yet - get the join link from your host!")
-  }
+    window.alert(
+      "This isn't implemented yet - get the join link from your host!"
+    );
+  };
 
   const { isLoading } = useQuery("server-ping", () =>
     fetch(`${socketUrl}/ping`).then((res) => res.json())
@@ -54,9 +53,8 @@ function IndexRoute() {
           </>
         ) : (
           <p style={{ margin: "5%" }}>
-            Find your teammates, establish
-            trust, and exchange hostages before time runs out and the bomb
-            explodes!
+            Find your teammates, establish trust, and exchange hostages before
+            time runs out and the bomb explodes!
           </p>
         )}
       </div>
@@ -64,9 +62,7 @@ function IndexRoute() {
         <Button
           fluid
           color="black"
-          onClick={() =>
-            window.open("https://github.com/richardcrng/2r1b")
-          }
+          onClick={() => window.open("https://github.com/richardcrng/2r1b")}
         >
           LEARN
         </Button>

@@ -147,11 +147,12 @@ function GameRoute(): JSX.Element {
                 });
             }}
             onPrivateEyeRolePrediction={(roleKey) => {
-              socket.emit(
-                ClientEvent.PRIVATE_EYE_PREDICT,
-                game.data!.id,
-                roleKey
-              );
+              game.data &&
+                socket.emit(
+                  ClientEvent.PRIVATE_EYE_PREDICT,
+                  game.data.id,
+                  roleKey
+                );
             }}
             onProposeLeader={(leaderId, currentRoom) => {
               game.data &&
