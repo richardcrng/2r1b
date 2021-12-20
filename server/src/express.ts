@@ -5,8 +5,12 @@ const app = express();
 // @ts-ignore
 app.use(cors());
 
-app.get('/ping', (req, res) => {
-  res.json({ status: 'success' })
-})
+app.get("/", (req, res) => {
+  res.send("2R1B backend server is running and ready for connections");
+});
+
+app.get("/ping", (req, res) => {
+  res.json({ status: "success" });
+});
 
 export default app;
