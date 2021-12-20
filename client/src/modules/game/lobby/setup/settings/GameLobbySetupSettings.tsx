@@ -17,7 +17,6 @@ function GameLobbySetupSettings({
     <>
       <Checkbox
         checked={settings.colorSharing}
-        disabled={!isEditable}
         label={{
           children: (
             <>
@@ -27,6 +26,7 @@ function GameLobbySetupSettings({
           ),
         }}
         onChange={() =>
+          isEditable &&
           onSettingsUpdate({ colorSharing: !settings.colorSharing })
         }
         toggle
