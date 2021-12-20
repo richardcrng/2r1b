@@ -610,12 +610,22 @@ export const selectGreyPlayerResults = createSelector(
   selectGameEndgameState,
   selectIsPrivateEyeIdentificationCorrect,
   selectIsGamblerPredictionCorrect,
+  selectFindPlayerWithRole,
+  selectOfficeHolder,
+  selectDescribeOfficeHolder,
+  selectExplosivesHolder,
+  selectDescribeExplosivesHolder,
   (
     game,
     isRoleInPlay,
     endgame,
     isPrivateEyeWin,
-    isGamblerWin
+    isGamblerWin,
+    findPlayerWithRole,
+    officerHolder,
+    describeOfficeHolder,
+    explosivesHolder,
+    describeExplosivesHolder
   ): PlayerResult[] => {
     const results: PlayerResult[] = [];
 
@@ -645,6 +655,34 @@ export const selectGreyPlayerResults = createSelector(
             ? `Correct prediction that ${prediction} team would win`
             : `Incorrect prediction that ${prediction} team would win`
         }.`,
+      });
+    }
+
+    if (isRoleInPlay("INTERN_GREY")) {
+      const intern = findPlayerWithRole("INTERN_GREY")!;
+      const isInternWin =
+        game.endgame.finalRooms![intern.socketId] ===
+        game.endgame.finalRooms![officerHolder!.socketId];
+      results.push({
+        role: "INTERN_GREY",
+        isWin: isInternWin,
+        reason: `Ended in ${
+          isInternWin ? "the same" : "a different"
+        } room to the ${describeOfficeHolder}`,
+      });
+    }
+
+    if (isRoleInPlay("VICTIM_GREY")) {
+      const victim = findPlayerWithRole("VICTIM_GREY")!;
+      const isVictimWin =
+        game.endgame.finalRooms![victim.socketId] ===
+        game.endgame.finalRooms![explosivesHolder!.socketId];
+      results.push({
+        role: "INTERN_GREY",
+        isWin: isVictimWin,
+        reason: `Ended in ${
+          isVictimWin ? "the same" : "a different"
+        } room to the ${describeExplosivesHolder}`,
       });
     }
 
