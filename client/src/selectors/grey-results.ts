@@ -96,6 +96,34 @@ export const selectGreyPlayerResults = createSelector(
       });
     }
 
+    if (isRoleInPlay("RIVAL_GREY")) {
+      const rival = findPlayerWithRole("RIVAL_GREY")!;
+      const isRivalWin =
+        game.endgame.finalRooms![rival.socketId] !==
+        game.endgame.finalRooms![officerHolder!.socketId];
+      results.push({
+        role: "RIVAL_GREY",
+        isWin: isRivalWin,
+        reason: `Ended in ${
+          isRivalWin ? "a different" : "the same"
+        } room to the ${describeOfficeHolder}`,
+      });
+    }
+
+    if (isRoleInPlay("SURVIVOR_GREY")) {
+      const survivor = findPlayerWithRole("SURVIVOR_GREY")!;
+      const isSurvivorWin =
+        game.endgame.finalRooms![survivor.socketId] !==
+        game.endgame.finalRooms![explosivesHolder!.socketId];
+      results.push({
+        role: "SURVIVOR_GREY",
+        isWin: isSurvivorWin,
+        reason: `Ended in ${
+          isSurvivorWin ? " a different" : "the same"
+        } room to the ${describeExplosivesHolder}`,
+      });
+    }
+
     return results;
   }
 );
