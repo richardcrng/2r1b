@@ -122,7 +122,7 @@ describe("alertsFromSetup", () => {
         result.some(
           (result) =>
             result.severity === SetupAlertSeverity.ERROR &&
-            result.message.match(/gambmler/i) &&
+            result.message.match(/gambler/i) &&
             result.message.match(/buried/i)
         )
       ).toBe(true);
@@ -146,7 +146,7 @@ describe("alertsFromSetup", () => {
         result.some(
           (result) =>
             result.severity === SetupAlertSeverity.ERROR &&
-            result.message.match(/gambmler/i) &&
+            result.message.match(/gambler/i) &&
             result.message.match(/buried/i)
         )
       ).toBe(false);
