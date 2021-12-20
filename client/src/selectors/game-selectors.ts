@@ -78,6 +78,12 @@ export const selectGameSetupWarnings = createSelector(
     alerts.filter(({ severity }) => severity === SetupAlertSeverity.WARNING)
 );
 
+export const selectGameSetupErrorsAndWarnings = createSelector(
+  selectGameSetupErrors,
+  selectGameSetupWarnings,
+  (errors, warnings) => ({ errors, warnings })
+);
+
 export interface GameLobbyReadiness {
   isReady: boolean;
   reason?: string;
