@@ -78,6 +78,18 @@ export const WIN_CONDITIONS = {
   [GreyRoleName.PRIVATE_EYE]: (
     <>You win if you make a correct {action("Identification")}.</>
   ),
+  [GreyRoleName.RIVAL]: (
+    <>
+      You win if you are NOT in the same room as the {PRESIDENT} at the end of
+      the game.
+    </>
+  ),
+  [GreyRoleName.SURVIVOR]: (
+    <>
+      You win if you are NOT in the same room as the {BOMBER} at the end of the
+      game.
+    </>
+  ),
   [GreyRoleName.VICTIM]: (
     <>
       You win if you are in the same room as the {BOMBER} at the end of the
@@ -234,6 +246,17 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
       all players reveal their character cards, you must publicly predict the
       identity of the buried card.
     </>
+  ),
+
+  [GreyRoleName.RIVAL]: (
+    <>
+      You're a competitive hotshot jockeying with the {PRESIDENT} - try to avoid
+      them!
+    </>
+  ),
+
+  [GreyRoleName.SURVIVOR]: (
+    <>You're only looking out for yourself - try to avoid the {BOMBER}!</>
   ),
 
   [GreyRoleName.VICTIM]: (
