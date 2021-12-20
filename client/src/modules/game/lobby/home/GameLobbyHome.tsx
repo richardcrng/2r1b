@@ -7,11 +7,8 @@ import styled from "styled-components";
 import { Game, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
-import {
-  selectGameSetupErrors,
-  selectGameSetupWarnings,
-} from "../../../../selectors/game-selectors";
 import { SetupAlert } from "../../../../utils/setup-utils";
+import { selectGameSetupErrorsAndWarnings } from "../../../../selectors";
 
 interface Props {
   game: Game;
@@ -69,10 +66,9 @@ function GameLobbyHome({
   players,
   player,
 }: Props): JSX.Element {
-  const setupErrors = selectGameSetupErrors(game);
-  const setupWarnings = selectGameSetupWarnings(game);
+  const { errors, warnings } = selectGameSetupErrorsAndWarnings(game);
 
-  const isReadyToStartGame = setupErrors.length === 0;
+  const isReadyToStartGame = errors.length === 0;
 
   // eslint-disable-next-line
   const [_, copyToClipboard] = useCopyToClipboard();
@@ -94,25 +90,17 @@ function GameLobbyHome({
           Copy game join link
         </StyledA>
         <Message
-          color={
-            setupErrors.length
-              ? "red"
-              : setupWarnings.length
-              ? "yellow"
-              : "green"
-          }
+          color={errors.length ? "red" : warnings.length ? "yellow" : "green"}
           onClick={handleViewSetup}
         >
           <Message.Header>
-            {setupErrors.length
+            {errors.length
               ? "Hold on!"
-              : setupWarnings.length
+              : warnings.length
               ? "Be careful!"
               : "Looks great!"}
           </Message.Header>
-          <Message.Content>
-            {setupMessage(setupErrors, setupWarnings)}
-          </Message.Content>
+          <Message.Content>{setupMessage(errors, warnings)}</Message.Content>
         </Message>
       </Header>
       <StyledPlayerList

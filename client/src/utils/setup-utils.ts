@@ -1,5 +1,5 @@
 import { createRolesCount } from "./data-utils";
-import { RolesCount } from "../types/game.types";
+import { GameSettings, RolesCount } from "../types/game.types";
 import { RoleKey, TeamColor } from "../types/role.types";
 import {
   getRoleColor,
@@ -29,7 +29,8 @@ export interface SetupAlert {
 
 export const alertsFromSetup = (
   rolesCount: RolesCount,
-  nPlayers: number
+  nPlayers: number,
+  settings: GameSettings = { colorSharing: false }
 ): SetupAlert[] => [
   ...alertsFromPlayersCount(rolesCount, nPlayers),
   ...alertsFromRolesCount(rolesCount),
