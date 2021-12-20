@@ -9,7 +9,7 @@ import {
 } from "../../../types/player-action.types";
 
 interface Props {
-  colorSharing: boolean;
+  colorSharing?: boolean;
   currentRoom: RoomName;
   currentOffer?: PlayerActionShareOffered;
   onOfferShare(
