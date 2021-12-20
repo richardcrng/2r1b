@@ -25,7 +25,7 @@ const ErrorAndWarningList = styled.ul`
   }
 `;
 
-const GameLobbySetupErrors: React.FC<Props> = ({ errors, warnings }) => {
+const GameLobbySetupErrors: React.FC<Props> = ({ errors, warnings }: Props) => {
   if (errors.length || warnings.length) {
     return (
       <details>
