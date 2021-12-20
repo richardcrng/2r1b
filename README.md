@@ -16,7 +16,6 @@ This repo is is a (work-in-progress) web app implementation of it, as a replacem
 _Note: you will still need to be with a group of players in-person._
 
 - [Game rules](RULES.md)
-- [Basic strategy](STRATEGY.md)
 
 ### Acknowledgements
 
