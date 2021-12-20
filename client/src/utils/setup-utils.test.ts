@@ -1,10 +1,19 @@
-import { createRolesCount } from "./data-utils"
-import { RolesCount } from "../types/game.types"
-import { alertsFromRolesCount, alertsFromSetup, checkOtherRoleCountRestrictions, checkOwnPlayerCountRoleRestrictions, checkOwnRoleCountRestrictions, checkPlayerCount, checkPlayerCountAgainstRoleCount, SetupAlertSeverity } from "./setup-utils"
+import { createRolesCount } from "./data-utils";
+import { RolesCount } from "../types/game.types";
+import {
+  alertsFromRolesCount,
+  alertsFromSetup,
+  checkOtherRoleCountRestrictions,
+  checkOwnPlayerCountRoleRestrictions,
+  checkOwnRoleCountRestrictions,
+  checkPlayerCount,
+  checkPlayerCountAgainstRoleCount,
+  SetupAlertSeverity,
+} from "./setup-utils";
 
 describe("alertsFromSetup", () => {
   describe("secondary roles", () => {
-    describe('Vice-President', () => {
+    describe("Vice-President", () => {
       test("Given that a role will not be buried, does not error if there is no Vice-President", () => {
         const result = alertsFromSetup(
           createRolesCount({
@@ -47,7 +56,7 @@ describe("alertsFromSetup", () => {
           )
         ).toBe(true);
       });
-    })
+    });
 
     describe("Martyr", () => {
       test("Given that a role will not be buried, does not error if there is no Martyr", () => {
@@ -93,27 +102,79 @@ describe("alertsFromSetup", () => {
         ).toBe(true);
       });
     });
-  })
-})
+  });
 
-describe('alertsFromRolesCount', () => {
-  test('Given an unbalanced number of Red and Blue roles, errors and says that they must match', () => {
+  describe("Gambler", () => {
+    test("Given that a role will not be buried, errors if there is a Gambler", () => {
+      const result = alertsFromSetup(
+        createRolesCount({
+          PRESIDENT_BLUE: 1,
+          GAMBLER_GREY: 1,
+          TEAM_BLUE: 1,
+          TEAM_RED: 1,
+          MARTYR_RED: 1,
+          VICE_PRESIDENT_BLUE: 1,
+        }),
+        6
+      );
+
+      expect(
+        result.some(
+          (result) =>
+            result.severity === SetupAlertSeverity.ERROR &&
+            result.message.match(/gambmler/i) &&
+            result.message.match(/buried/i)
+        )
+      ).toBe(true);
+    });
+
+    test("Given that a role will be buried, does not error for Gambler", () => {
+      const result = alertsFromSetup(
+        createRolesCount({
+          PRESIDENT_BLUE: 1,
+          GAMBLER_GREY: 1,
+          TEAM_BLUE: 1,
+          TEAM_RED: 1,
+          MARTYR_RED: 1,
+          VICE_PRESIDENT_BLUE: 1,
+          PRIVATE_EYE_GREY: 1,
+        }),
+        6
+      );
+
+      expect(
+        result.some(
+          (result) =>
+            result.severity === SetupAlertSeverity.ERROR &&
+            result.message.match(/gambmler/i) &&
+            result.message.match(/buried/i)
+        )
+      ).toBe(false);
+    });
+  });
+});
+
+describe("alertsFromRolesCount", () => {
+  test("Given an unbalanced number of Red and Blue roles, errors and says that they must match", () => {
     const testRolesCount: RolesCount = createRolesCount({
       PRESIDENT_BLUE: 1,
       BOMBER_RED: 1,
       TEAM_BLUE: 10,
       TEAM_RED: 10,
-      CLOWN_RED: 1
-    })
+      CLOWN_RED: 1,
+    });
 
     const result = alertsFromRolesCount(testRolesCount);
-    expect(result.some(alert => (
-      alert.severity === SetupAlertSeverity.ERROR &&
-      alert.message.match(/[equal|match]/i)
-    ))).toBe(true)
-  })
+    expect(
+      result.some(
+        (alert) =>
+          alert.severity === SetupAlertSeverity.ERROR &&
+          alert.message.match(/[equal|match]/i)
+      )
+    ).toBe(true);
+  });
 
-  test('Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers', () => {
+  test("Given an unbalanced number of Red Team and Blue Team, warns that Red Team should match Blue Team numbers", () => {
     const testRolesCount: RolesCount = createRolesCount({
       PRESIDENT_BLUE: 1,
       BOMBER_RED: 1,
@@ -125,9 +186,9 @@ describe('alertsFromRolesCount', () => {
     const result = alertsFromRolesCount(testRolesCount);
 
     expect(result).toHaveLength(1);
-    expect(result[0]).toHaveProperty('severity', SetupAlertSeverity.WARNING)
-  })
-})
+    expect(result[0]).toHaveProperty("severity", SetupAlertSeverity.WARNING);
+  });
+});
 
 describe("checkOtherRoleCountRestrictions", () => {
   describe("Roles that recommend each other", () => {
@@ -183,7 +244,7 @@ describe("checkOtherRoleCountRestrictions", () => {
         expect(blueCheck).toHaveLength(1);
         expect(redCheck).toHaveLength(0);
       });
-    })
+    });
 
     describe("Doctor and Engineer", () => {
       test("Warns that Doctor is recommended with Engineer", () => {
@@ -223,24 +284,27 @@ describe("checkOtherRoleCountRestrictions", () => {
         expect(engineerCheck).toHaveLength(0);
       });
     });
-  })
+  });
 });
 
-describe('checkOwnPlayerCountRoleRestrictions', () => {
+describe("checkOwnPlayerCountRoleRestrictions", () => {
   test("Warning from including Private Eye in a game with more than 10 players", () => {
-    const result = checkOwnPlayerCountRoleRestrictions(11, 'PRIVATE_EYE_GREY');
+    const result = checkOwnPlayerCountRoleRestrictions(11, "PRIVATE_EYE_GREY");
     expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe(SetupAlertSeverity.WARNING)
-  })
-})
+    expect(result[0].severity).toBe(SetupAlertSeverity.WARNING);
+  });
+});
 
-describe('checkOwnRoleCountRestrictions', () => {
+describe("checkOwnRoleCountRestrictions", () => {
   test("Error with less than one President", () => {
-    const result = checkOwnRoleCountRestrictions({ PRESIDENT_BLUE: 0 }, 'PRESIDENT_BLUE')
-    
+    const result = checkOwnRoleCountRestrictions(
+      { PRESIDENT_BLUE: 0 },
+      "PRESIDENT_BLUE"
+    );
+
     expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
-  })
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR);
+  });
 
   test("Error with more than one President", () => {
     const result = checkOwnRoleCountRestrictions(
@@ -260,14 +324,14 @@ describe('checkOwnRoleCountRestrictions', () => {
 
     expect(result).toHaveLength(0);
   });
-})
+});
 
-describe('checkPlayerCount', () => {
+describe("checkPlayerCount", () => {
   it("Errors on fewer than 6 players", () => {
     const result = checkPlayerCount(5);
     expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
-  })
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR);
+  });
 
   it("Warns on fewer than 10 players", () => {
     const result = checkPlayerCount(9);
@@ -279,14 +343,14 @@ describe('checkPlayerCount', () => {
     const result = checkPlayerCount(10);
     expect(result).toHaveLength(0);
   });
-})
+});
 
-describe('checkPlayerCountAgainstRoleCount', () => {
+describe("checkPlayerCountAgainstRoleCount", () => {
   test("Error when 2+ fewer players than roles", () => {
     const result = checkPlayerCountAgainstRoleCount(7, 10);
     expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
-  })
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR);
+  });
 
   test("Warning about Burying when 1 more role than players", () => {
     const result = checkPlayerCountAgainstRoleCount(9, 10);
@@ -303,11 +367,11 @@ describe('checkPlayerCountAgainstRoleCount', () => {
   test("Error when more players than roles", () => {
     const result = checkPlayerCountAgainstRoleCount(11, 10);
     expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR)
-  })
+    expect(result[0].severity).toBe(SetupAlertSeverity.ERROR);
+  });
 
   test("No error when player count doesn't even clear minimum", () => {
     const result = checkPlayerCountAgainstRoleCount(4, 10);
     expect(result).toHaveLength(0);
-  })
-})
+  });
+});
