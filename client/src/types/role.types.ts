@@ -29,8 +29,8 @@ export enum GreyRoleName {
   GAMBLER = "Gambler",
   INTERN = "Intern",
   PRIVATE_EYE = "Private Eye",
-  RIVAL = "RIVAL",
-  SURVIVOR = "SURVIVOR",
+  RIVAL = "Rival",
+  SURVIVOR = "Survivor",
   VICTIM = "Victim",
 }
 
