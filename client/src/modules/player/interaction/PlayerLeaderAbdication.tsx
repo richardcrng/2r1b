@@ -23,7 +23,7 @@ function PlayerLeaderAbdication({
   player,
   players,
   selectedPlayerId: controlledPlayerId,
-}: Props) {
+}: Props): JSX.Element {
   const [uncontrolledPlayerId, setUncontrolledPlayerId] = useState<
     string | undefined
   >(currentOffer?.proposedNewLeaderId);
@@ -36,9 +36,16 @@ function PlayerLeaderAbdication({
   return (
     <>
       <p>Since you are leader, you can offer to abdicate leadership.</p>
-      <p>{currentOffer ? (
-        <>You can't offer to abdicate to anybody until you withdraw your existing offer to {players[currentOffer.proposedNewLeaderId].name}.</>
-      ) : <>You have no offer pending.</>}</p>
+      <p>
+        {currentOffer ? (
+          <>
+            You can't offer to abdicate to anybody until you withdraw your
+            existing offer to {players[currentOffer.proposedNewLeaderId].name}.
+          </>
+        ) : (
+          <>You have no offer pending.</>
+        )}
+      </p>
       <PlayerDropdown
         disabled={!!currentOffer?.proposedNewLeaderId}
         filter={(playerToCheck) =>

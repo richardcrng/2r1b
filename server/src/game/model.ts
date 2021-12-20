@@ -1,30 +1,61 @@
 import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game-selectors";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
-import { GameNotification, NotificationType, PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { createStartingRounds, Game, GameStatus, LeaderRecord, LeaderRecordMethod, LeaderVote, otherRoom, Player, PlayerRoomAllocation, RoomName, Round, RoundStatus } from "../../../client/src/types/game.types";
+import {
+  GameNotification,
+  NotificationType,
+  PlayerNotification,
+  PlayerNotificationFn,
+} from "../../../client/src/types/notification.types";
+import {
+  createStartingRounds,
+  Game,
+  GameStatus,
+  LeaderRecord,
+  LeaderRecordMethod,
+  LeaderVote,
+  otherRoom,
+  Player,
+  PlayerRoomAllocation,
+  RoomName,
+  Round,
+  RoundStatus,
+} from "../../../client/src/types/game.types";
 import { RoleKey } from "../../../client/src/types/role.types";
 import sleep from "../../../client/src/utils/sleep";
 import { PlayerManager } from "../player/model";
-import { SERVER_IO } from '../server';
-import { generateRandomGameId, getColors } from "../../../client/src/utils/data-utils";
-import { DEFAULT_STARTING_ROLES_COUNT, getRoleColor } from "../../../client/src/utils/role-utils";
-import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionFn, PlayerActionShareOffered, PlayerActionType } from "../../../client/src/types/player-action.types";
+import { SERVER_IO } from "../server";
+import {
+  generateRandomGameId,
+  getColors,
+} from "../../../client/src/utils/data-utils";
+import {
+  DEFAULT_STARTING_ROLES_COUNT,
+  getRoleColor,
+} from "../../../client/src/utils/role-utils";
+import {
+  PlayerAction,
+  PlayerActionCardShareOffered,
+  PlayerActionColorShareOffered,
+  PlayerActionFn,
+  PlayerActionShareOffered,
+  PlayerActionType,
+} from "../../../client/src/types/player-action.types";
 
 const GAMES_DB: Record<Game["id"], Game> = {};
 
 export interface OperationBase<T = void> {
-  status: 'success' | 'error';
+  status: "success" | "error";
   result?: T;
 }
 
 export interface OperationSuccess<T = void> extends OperationBase<T> {
-  status: 'success';
+  status: "success";
   result: T;
 }
 
 export interface OperationError<T = void> extends OperationBase<T> {
-  status: 'error';
+  status: "error";
   result?: never;
 }
 
@@ -127,9 +158,12 @@ export class GameManager {
   }
 
   public appointRandomLeadersIfUnfilled(): void {
-    for (let roomName of Object.values(RoomName)) {
+    for (const roomName of Object.values(RoomName)) {
       if (!this.currentLeaderRecord(roomName)) {
-        const newLeader = sample(Object.values(this.playersInRoom(roomName)))!;
+        const newLeader = sample(Object.values(this.playersInRoom(roomName)));
+
+        if (!newLeader) throw new Error("Failed to randomly pick a new leader");
+
         this.updateCurrentRound((round) => {
           round.rooms[roomName].leadersRecord.push({
             method: LeaderRecordMethod.RANDOMISATION,
@@ -170,9 +204,9 @@ export class GameManager {
             player.role = shuffledRoleKeys[idx];
           });
         } else {
-          this.update(game => {
-            game.buriedRole = shuffledRoleKeys[idx]
-          })
+          this.update((game) => {
+            game.buriedRole = shuffledRoleKeys[idx];
+          });
         }
       }
     });
@@ -188,11 +222,11 @@ export class GameManager {
       this.update((game) => {
         const roomAllocation: PlayerRoomAllocation = {};
 
-        for (let playerId of playersInA) {
+        for (const playerId of playersInA) {
           roomAllocation[playerId] = RoomName.A;
         }
 
-        for (let playerId of playersInB) {
+        for (const playerId of playersInB) {
           roomAllocation[playerId] = RoomName.B;
         }
 
@@ -206,7 +240,7 @@ export class GameManager {
       const pendingActions = Object.values(
         playerManager._pointer()?.pendingActions ?? {}
       );
-      for (let action of pendingActions) {
+      for (const action of pendingActions) {
         playerManager.resolvePendingAction(action);
       }
     });
@@ -223,7 +257,7 @@ export class GameManager {
 
   public currentRound(): Round {
     const operation = this._withPointer((pointer) => {
-      for (let round of Object.values(pointer.rounds)) {
+      for (const round of Object.values(pointer.rounds)) {
         if (
           [RoundStatus.ONGOING, RoundStatus.HOSTAGE_SELECTION].includes(
             round.status
@@ -248,8 +282,8 @@ export class GameManager {
 
     const hostageRecord: Record<string, true> = {};
 
-    for (let roundRoom of Object.values(finishingRound.rooms)) {
-      for (let hostageId of roundRoom.hostages) {
+    for (const roundRoom of Object.values(finishingRound.rooms)) {
+      for (const hostageId of roundRoom.hostages) {
         nextRoundAllocation[hostageId] = otherRoom(
           nextRoundAllocation[hostageId]
         );
@@ -295,7 +329,9 @@ export class GameManager {
   }
 
   public getPlayersByRole(roleKey: RoleKey): Player[] {
-    return Object.values(this.players()).filter(player => player.role === roleKey);
+    return Object.values(this.players()).filter(
+      (player) => player.role === roleKey
+    );
   }
 
   public getPlayerOrFail(playerId: string) {
@@ -308,7 +344,7 @@ export class GameManager {
   }
 
   public manageEachPlayer(cb: (playerManager: PlayerManager) => void) {
-    for (let playerId in this.players()) {
+    for (const playerId in this.players()) {
       const playerManager = this.managePlayer(playerId);
       cb(playerManager);
     }
@@ -364,7 +400,7 @@ export class GameManager {
   public pushPlayerNotificationToRoom(
     roomName: RoomName,
     notification: PlayerNotification | PlayerNotificationFn,
-    where: (player: Player) => boolean = (player) => true
+    where: (player: Player) => boolean = () => true
   ): void {
     this.pushPlayersNotification(
       notification,
@@ -392,7 +428,7 @@ export class GameManager {
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
-    for (let player of playersToNotify) {
+    for (const player of playersToNotify) {
       this.managePlayer(player.socketId).pushNotification(notification);
     }
   }
@@ -402,25 +438,25 @@ export class GameManager {
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
-    for (let player of playersToNotify) {
+    for (const player of playersToNotify) {
       this.managePlayer(player.socketId).pushPendingAction(action);
     }
   }
 
   public resetGame(): void {
-    this.update(game => {
+    this.update((game) => {
       game.status = GameStatus.LOBBY;
       game.endgame = {};
       delete game.buriedRole;
-      game.rounds = createStartingRounds()
-    })
+      game.rounds = createStartingRounds();
+    });
 
-    this.updateEachPlayer(player => {
+    this.updateEachPlayer((player) => {
       delete player.role;
       player.conditions = { shareRecords: [] };
-      delete player.leaderVote
+      delete player.leaderVote;
       player.pendingActions = {};
-    })
+    });
   }
 
   public resetAllVotes(): void {
@@ -489,12 +525,15 @@ export class GameManager {
   }
 
   public resolveShare(shareAction: PlayerActionShareOffered): void {
-    const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role!;
-    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId).role!;
-    if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
-      this.resolveCardShare(shareAction, sharerCard, shareeCard);
-    } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
-      this.resolveColorShare(shareAction, sharerCard, shareeCard);
+    const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role;
+    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId).role;
+
+    if (sharerCard && shareeCard) {
+      if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
+        this.resolveCardShare(shareAction, sharerCard, shareeCard);
+      } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
+        this.resolveColorShare(shareAction, sharerCard, shareeCard);
+      }
     }
   }
 
@@ -542,7 +581,7 @@ export class GameManager {
   }
 
   public updateEachPlayer(mutativeCb: (player: Player) => void): void {
-    for (let playerId in this.players()) {
+    for (const playerId in this.players()) {
       this.managePlayer(playerId).update(mutativeCb);
     }
   }

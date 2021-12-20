@@ -2,8 +2,18 @@ import { cloneDeep } from "lodash";
 import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
-import { PlayerNotification, PlayerNotificationFn } from "../../../client/src/types/notification.types";
-import { PlayerAction, PlayerActionCardShareOffered, PlayerActionColorShareOffered, PlayerActionFn, PlayerActionType, PlayerShareRecord } from "../../../client/src/types/player-action.types";
+import {
+  PlayerNotification,
+  PlayerNotificationFn,
+} from "../../../client/src/types/notification.types";
+import {
+  PlayerAction,
+  PlayerActionCardShareOffered,
+  PlayerActionColorShareOffered,
+  PlayerActionFn,
+  PlayerActionType,
+  PlayerShareRecord,
+} from "../../../client/src/types/player-action.types";
 import { RoleKey, TeamColor } from "../../../client/src/types/role.types";
 
 export class PlayerManager {
@@ -85,7 +95,7 @@ export class PlayerManager {
   public pushPendingAction(playerAction: PlayerAction | PlayerActionFn): void {
     const action =
       typeof playerAction === "function"
-        ? playerAction(this.snapshot()!)
+        ? playerAction(this.snapshot() as Player)
         : playerAction;
 
     this.gameManager.io.emit(ServerEvent.ACTION_PENDING, this.socketId, action);
@@ -128,7 +138,10 @@ export class PlayerManager {
     const playerIdSharedWith = [
       offerActionToResolve.sharerId,
       offerActionToResolve.offeredPlayerId,
-    ].find((id) => this.socketId !== id)!;
+    ].find((id) => this.socketId !== id);
+
+    if (!playerIdSharedWith)
+      throw new Error("Couldn't find player id shared with");
 
     const record: PlayerShareRecord = {
       offerAction: offerActionToResolve,
@@ -160,7 +173,10 @@ export class PlayerManager {
     const playerIdSharedWith = [
       offerActionToResolve.sharerId,
       offerActionToResolve.offeredPlayerId,
-    ].find((id) => this.socketId !== id)!;
+    ].find((id) => this.socketId !== id);
+
+    if (!playerIdSharedWith)
+      throw new Error("Couldn't find a player shared with");
 
     const record: PlayerShareRecord = {
       offerAction: offerActionToResolve,

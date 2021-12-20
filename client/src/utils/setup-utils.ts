@@ -126,7 +126,7 @@ export const checkOtherRoleCountRestrictions = (
   ][];
   const requiredRoleEntries = Object.entries(requires) as [RoleKey, number][];
 
-  for (let [otherKey, otherCountPerRole] of recommendedRoleEntries) {
+  for (const [otherKey, otherCountPerRole] of recommendedRoleEntries) {
     const { color: otherColor, roleName: otherRoleName } =
       getRoleDefinition(otherKey);
     const expectedCount = countOfThisRole * otherCountPerRole;
@@ -139,7 +139,7 @@ export const checkOtherRoleCountRestrictions = (
     }
   }
 
-  for (let [otherKey, otherCountPerRole] of requiredRoleEntries) {
+  for (const [otherKey, otherCountPerRole] of requiredRoleEntries) {
     const { color: otherColor, roleName: otherRoleName } =
       getRoleDefinition(otherKey);
     const expectedCount = countOfThisRole * otherCountPerRole;
@@ -290,7 +290,7 @@ export const checkTeamBalance = (rolesCount: RolesCount): SetupAlert[] => {
   let blueCount = 0;
   let redCount = 0;
 
-  for (let roleKey of roleKeys) {
+  for (const roleKey of roleKeys) {
     const color = getRoleColor(roleKey);
     if (color === TeamColor.BLUE) {
       blueCount += rolesCount[roleKey];

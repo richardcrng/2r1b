@@ -1,30 +1,24 @@
 import { createSelector } from "reselect";
 import {
-  selectDescribeExplosivesHolder,
-  selectDescribeOfficeHolder,
-  selectExplosivesHolder,
-  selectFindPlayerWithRole,
-  selectGame,
-  selectGameEndgameState,
-  selectIsGamblerPredictionCorrect,
-  selectIsPrivateEyeIdentificationCorrect,
-  selectIsRoleInPlay,
-  selectOfficeHolder,
-} from ".";
-import { PlayerResult } from "../types/game.types";
+  Player,
+  PlayerResult,
+  PlayerRoomAllocation,
+} from "../types/game.types";
+import { RoleKey } from "../types/role.types";
 import { getRoleName } from "../utils/role-utils";
+import SELECTORS from "./selectors";
 
 export const selectGreyPlayerResults = createSelector(
-  selectGame,
-  selectIsRoleInPlay,
-  selectGameEndgameState,
-  selectIsPrivateEyeIdentificationCorrect,
-  selectIsGamblerPredictionCorrect,
-  selectFindPlayerWithRole,
-  selectOfficeHolder,
-  selectDescribeOfficeHolder,
-  selectExplosivesHolder,
-  selectDescribeExplosivesHolder,
+  SELECTORS.selectGame,
+  SELECTORS.selectIsRoleInPlay,
+  SELECTORS.selectGameEndgameState,
+  SELECTORS.selectIsPrivateEyeIdentificationCorrect,
+  SELECTORS.selectIsGamblerPredictionCorrect,
+  SELECTORS.selectFindPlayerWithRole,
+  SELECTORS.selectOfficeHolder,
+  SELECTORS.selectDescribeOfficeHolder,
+  SELECTORS.selectExplosivesHolder,
+  SELECTORS.selectDescribeExplosivesHolder,
   (
     game,
     isRoleInPlay,
@@ -32,7 +26,7 @@ export const selectGreyPlayerResults = createSelector(
     isPrivateEyeWin,
     isGamblerWin,
     findPlayerWithRole,
-    officerHolder,
+    officeHolder,
     describeOfficeHolder,
     explosivesHolder,
     describeExplosivesHolder
@@ -68,62 +62,84 @@ export const selectGreyPlayerResults = createSelector(
       });
     }
 
-    if (isRoleInPlay("INTERN_GREY")) {
-      const intern = findPlayerWithRole("INTERN_GREY")!;
-      const isInternWin =
-        game.endgame.finalRooms![intern.socketId] ===
-        game.endgame.finalRooms![officerHolder!.socketId];
-      results.push({
-        role: "INTERN_GREY",
-        isWin: isInternWin,
-        reason: `Ended in ${
-          isInternWin ? "the same" : "a different"
-        } room as the ${describeOfficeHolder}`,
-      });
-    }
-
-    if (isRoleInPlay("VICTIM_GREY")) {
-      const victim = findPlayerWithRole("VICTIM_GREY")!;
-      const isVictimWin =
-        game.endgame.finalRooms![victim.socketId] ===
-        game.endgame.finalRooms![explosivesHolder!.socketId];
-      results.push({
-        role: "VICTIM_GREY",
-        isWin: isVictimWin,
-        reason: `Ended in ${
-          isVictimWin ? "the same" : "a different"
-        } room as the ${describeExplosivesHolder}`,
-      });
-    }
-
-    if (isRoleInPlay("RIVAL_GREY")) {
-      const rival = findPlayerWithRole("RIVAL_GREY")!;
-      const isRivalWin =
-        game.endgame.finalRooms![rival.socketId] !==
-        game.endgame.finalRooms![officerHolder!.socketId];
-      results.push({
-        role: "RIVAL_GREY",
-        isWin: isRivalWin,
-        reason: `Ended in ${
-          isRivalWin ? "a different" : "the same"
-        } room as the ${describeOfficeHolder}`,
-      });
-    }
-
-    if (isRoleInPlay("SURVIVOR_GREY")) {
-      const survivor = findPlayerWithRole("SURVIVOR_GREY")!;
-      const isSurvivorWin =
-        game.endgame.finalRooms![survivor.socketId] !==
-        game.endgame.finalRooms![explosivesHolder!.socketId];
-      results.push({
-        role: "SURVIVOR_GREY",
-        isWin: isSurvivorWin,
-        reason: `Ended in ${
-          isSurvivorWin ? " a different" : "the same"
-        } room as the ${describeExplosivesHolder}`,
-      });
+    if (game.endgame.finalRooms && officeHolder && explosivesHolder) {
+      results.push(
+        ...greyResultsFromFinalRooms(
+          game.endgame.finalRooms,
+          findPlayerWithRole,
+          { player: officeHolder, description: describeOfficeHolder },
+          { player: explosivesHolder, description: describeExplosivesHolder }
+        )
+      );
     }
 
     return results;
   }
 );
+
+const greyResultsFromFinalRooms = (
+  finalRoomAllocation: PlayerRoomAllocation,
+  findPlayerWithRole: (roleKey: RoleKey) => Player | undefined,
+  officeHolder: { player: Player; description: string },
+  explosivesHolder: { player: Player; description: string }
+): PlayerResult[] => {
+  const results: PlayerResult[] = [];
+
+  const intern = findPlayerWithRole("INTERN_GREY");
+  if (intern) {
+    const isInternWin =
+      finalRoomAllocation[intern.socketId] ===
+      finalRoomAllocation[officeHolder.player.socketId];
+    results.push({
+      role: "INTERN_GREY",
+      isWin: isInternWin,
+      reason: `Ended in ${
+        isInternWin ? "the same" : "a different"
+      } room as the ${officeHolder.description}`,
+    });
+  }
+
+  const victim = findPlayerWithRole("VICTIM_GREY");
+  if (victim) {
+    const isVictimWin =
+      finalRoomAllocation[victim.socketId] ===
+      finalRoomAllocation[explosivesHolder.player.socketId];
+    results.push({
+      role: "VICTIM_GREY",
+      isWin: isVictimWin,
+      reason: `Ended in ${
+        isVictimWin ? "the same" : "a different"
+      } room as the ${explosivesHolder.description}`,
+    });
+  }
+
+  const rival = findPlayerWithRole("RIVAL_GREY");
+  if (rival) {
+    const isRivalWin =
+      finalRoomAllocation[rival.socketId] !==
+      finalRoomAllocation[officeHolder.player.socketId];
+    results.push({
+      role: "RIVAL_GREY",
+      isWin: isRivalWin,
+      reason: `Ended in ${
+        isRivalWin ? "a different" : "the same"
+      } room as the ${officeHolder.description}`,
+    });
+  }
+
+  const survivor = findPlayerWithRole("SURVIVOR_GREY");
+  if (survivor) {
+    const isSurvivorWin =
+      finalRoomAllocation[survivor.socketId] !==
+      finalRoomAllocation[explosivesHolder.player.socketId];
+    results.push({
+      role: "SURVIVOR_GREY",
+      isWin: isSurvivorWin,
+      reason: `Ended in ${
+        isSurvivorWin ? " a different" : "the same"
+      } room as the ${explosivesHolder.description}`,
+    });
+  }
+
+  return results;
+};

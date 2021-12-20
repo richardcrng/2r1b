@@ -1,8 +1,7 @@
 import { Player, PlayerWithRoom, RoomName } from "../../../types/game.types";
 import PlayerDropdown from "../dropdown/PlayerDropdown";
-import { useState } from 'react';
+import { useState } from "react";
 import { Button } from "semantic-ui-react";
-
 
 interface Props {
   player: Player;
@@ -11,7 +10,10 @@ interface Props {
   currentLeader?: Player;
   currentVote?: string;
   onAppointLeader(appointedLeaderId: string, roomName: RoomName): void;
-  onProposeLeader(proposedLeaderId: string | undefined, roomName: RoomName): void;
+  onProposeLeader(
+    proposedLeaderId: string | undefined,
+    roomName: RoomName
+  ): void;
   onPlayerSelect?(playerId: string): void;
   selectedPlayerId?: string;
 }
@@ -24,20 +26,23 @@ function PlayerLeaderProposal({
   onPlayerSelect,
   player,
   players,
-  selectedPlayerId: controlledPlayerId
-}: Props) {
-  const [uncontrolledPlayerId, setUncontrolledPlayerId] = useState<string | undefined>(currentVote);
+  selectedPlayerId: controlledPlayerId,
+}: Props): JSX.Element {
+  const [uncontrolledPlayerId, setUncontrolledPlayerId] = useState<
+    string | undefined
+  >(currentVote);
 
-  const selectedPlayerId = controlledPlayerId ?? uncontrolledPlayerId
+  const selectedPlayerId = controlledPlayerId ?? uncontrolledPlayerId;
 
   const isPlayerInCurrentRoom = (playerToCheck: Player) =>
     players[playerToCheck.socketId].room === currentRoom;
-  
+
   const isPlayerCurrentLeader = (playerToCheck: Player) =>
     playerToCheck.socketId === currentLeader?.socketId;
 
   // eligible if there is a current leader
-  const isEligibleIfSelf = (playerToCheck: Player) => (playerToCheck.socketId !== player.socketId) || !!currentLeader
+  const isEligibleIfSelf = (playerToCheck: Player) =>
+    playerToCheck.socketId !== player.socketId || !!currentLeader;
 
   return (
     <>
@@ -89,13 +94,17 @@ function PlayerLeaderProposal({
         onClick={() =>
           currentLeader
             ? onProposeLeader(selectedPlayerId, currentRoom)
-            : onAppointLeader(selectedPlayerId!, currentRoom)
+            : selectedPlayerId && onAppointLeader(selectedPlayerId, currentRoom)
         }
       >
         {currentLeader ? "Propose as" : "Appoint"} Leader
       </Button>
       {currentVote && (
-        <Button color="red" fluid onClick={() => onProposeLeader(undefined, currentRoom)}>
+        <Button
+          color="red"
+          fluid
+          onClick={() => onProposeLeader(undefined, currentRoom)}
+        >
           Rescind current proposal
         </Button>
       )}

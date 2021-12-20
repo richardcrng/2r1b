@@ -1,11 +1,13 @@
 import { createSelector } from "reselect";
 import {
   Game,
+  GameEndgame,
   LeaderVote,
   Player,
   PlayerWithRoom,
   RolesCount,
   RoomName,
+  Round,
   RoundStatus,
   TeamResult,
 } from "../types/game.types";
@@ -19,13 +21,15 @@ import { mapValues, last } from "lodash";
 import { PlayerActionType } from "../types/player-action.types";
 import { getRoleName } from "../utils/role-utils";
 
-export const selectGame = (game: Game) => game;
-export const selectGamePlayers = (game: Game) => game.players;
-export const selectGameEndgameState = (game: Game) => game.endgame;
+export const selectGame = (game: Game): Game => game;
+export const selectGamePlayers = (game: Game): Game["players"] => game.players;
+export const selectGameEndgameState = (game: Game): GameEndgame => game.endgame;
 export const selectGameRolesInSetupCount = (game: Game): RolesCount =>
   game.rolesCount;
-export const selectGameRounds = (game: Game) => game.rounds;
-export const selectBuriedRole = (game: Game) => game.buriedRole;
+export const selectGameRounds = (game: Game): Record<number, Round> =>
+  game.rounds;
+export const selectBuriedRole = (game: Game): RoleKey | undefined =>
+  game.buriedRole;
 
 export const selectTotalCountOfGameRoles = createSelector(
   selectGameRolesInSetupCount,
@@ -192,7 +196,7 @@ export const selectPlayerIdsInEachRoom = createSelector(
 
 export const selectCurrentRoundHostageTotal = createSelector(
   selectCurrentGameRound,
-  (round) => round?.hostageCount
+  (round) => round?.hostageCount ?? 1
 );
 
 export const selectCurrentRoundRooms = createSelector(
@@ -239,14 +243,14 @@ export const selectDictionaryOfVotesForPlayers = createSelector(
       playerList.map((player) => [player.socketId, []])
     );
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       const currVote = player.leaderVote;
       if (currVote) {
         votes[currVote.proposedLeaderId].push(currVote);
       }
     }
 
-    for (let playerId in votes) {
+    for (const playerId in votes) {
       votes[playerId].sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1));
     }
 

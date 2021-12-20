@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 import { LeaderVote, PlayerWithRoom } from "../../../../types/game.types";
 
 const TableContainer = styled.div`
@@ -11,7 +11,7 @@ const TableContainer = styled.div`
   th {
     text-align: left;
   }
-`
+`;
 
 interface Props {
   players: Record<string, PlayerWithRoom>;
@@ -32,7 +32,7 @@ function GameOngoingVotes({ players, votes }: Props): JSX.Element {
               <th>Voters</th>
             </tr>
             {votes.map(([playerId, votesForPlayer]) => (
-              <tr>
+              <tr key={playerId}>
                 <td>
                   <strong>{votesForPlayer.length}</strong>
                 </td>

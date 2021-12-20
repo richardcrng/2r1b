@@ -1,6 +1,5 @@
-import { PlayerRole, RoleKey } from '../../../types/role.types';
-import RoleSetupList from './list/RoleSetupList';
-
+import { PlayerRole, RoleKey } from "../../../types/role.types";
+import RoleSetupList from "./list/RoleSetupList";
 
 interface Props {
   isEditable: boolean;
@@ -8,9 +7,11 @@ interface Props {
   rolesInSetup: [PlayerRole, number][];
 }
 
-function RoleSetup({ isEditable, onRoleIncrement, rolesInSetup }: Props) {
-
-
+function RoleSetup({
+  isEditable,
+  onRoleIncrement,
+  rolesInSetup,
+}: Props): JSX.Element {
   return (
     <>
       <RoleSetupList {...{ isEditable, onRoleIncrement, rolesInSetup }} />

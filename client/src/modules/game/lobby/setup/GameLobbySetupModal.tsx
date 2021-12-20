@@ -48,7 +48,7 @@ function GameLobbySetupModal({
   onClose,
   onOpen,
   onRoleIncrement,
-}: Props) {
+}: Props): JSX.Element {
   const [selectedRole, setSelectedRole] = useState<RoleKey>();
   const nPlayers = selectGamePlayerCount(game);
   const nRoles = selectNumberOfRolesInSetup(game);

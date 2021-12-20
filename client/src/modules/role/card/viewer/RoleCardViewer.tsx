@@ -1,4 +1,8 @@
-import { ALL_ROLES, ALPHABETISED_ROLE_VALUES, RoleKey } from "../../../../types/role.types";
+import {
+  ALL_ROLES,
+  ALPHABETISED_ROLE_VALUES,
+  RoleKey,
+} from "../../../../types/role.types";
 import RoleDropdown from "../../dropdown/RoleDropdown";
 import RoleCard, { getColors } from "../RoleCard";
 
@@ -23,17 +27,15 @@ interface Props {
   selectedRole?: RoleKey;
 }
 
-function RoleCardViewer({ onRoleSelect, selectedRole }: Props) {
+function RoleCardViewer({ onRoleSelect, selectedRole }: Props): JSX.Element {
   return (
     <>
       <p>Select a role to view</p>
       <RoleDropdown {...{ onRoleSelect, selectedRole }} />
       <br />
-      {selectedRole && (
-        <RoleCard role={ALL_ROLES[selectedRole]} />
-      )}
+      {selectedRole && <RoleCard role={ALL_ROLES[selectedRole]} />}
     </>
-  )
+  );
 }
 
 export default RoleCardViewer;

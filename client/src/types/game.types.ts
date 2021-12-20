@@ -4,21 +4,21 @@ import { RoleKey, TeamColor } from "./role.types";
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
-  ENDGAME = 'ENDGAME',
-  RESULTS = 'RESULTS',
+  ENDGAME = "ENDGAME",
+  RESULTS = "RESULTS",
   COMPLETE = "COMPLETE",
 }
 export enum RoundStatus {
-  ONGOING = 'ongoing',
-  HOSTAGE_SELECTION = 'hostage-selection',
-  COMPLETE = 'complete',
-  PENDING = 'pending'
+  ONGOING = "ongoing",
+  HOSTAGE_SELECTION = "hostage-selection",
+  COMPLETE = "complete",
+  PENDING = "pending",
 }
 
 export enum CardType {
-  GOLD = 'gold',
-  FIRE = 'fire',
-  EMPTY = 'empty'
+  GOLD = "gold",
+  FIRE = "fire",
+  EMPTY = "empty",
 }
 
 export interface Card {
@@ -79,8 +79,8 @@ export interface Turn {
 export enum LeaderRecordMethod {
   APPOINTMENT = "appointment",
   ABDICATION = "abdication",
-  RANDOMISATION = 'randomisation',
-  USURPATION = "usurpation"
+  RANDOMISATION = "randomisation",
+  USURPATION = "usurpation",
 }
 
 export interface LeaderRecordBase {
@@ -99,7 +99,7 @@ export interface LeaderAppointment extends LeaderRecordBase {
 }
 
 export interface LeaderRandomisation extends LeaderRecordBase {
-  method: LeaderRecordMethod.RANDOMISATION,
+  method: LeaderRecordMethod.RANDOMISATION;
   leaderId: string;
 }
 
@@ -107,10 +107,14 @@ export interface LeaderUsurpation extends LeaderRecordBase {
   method: LeaderRecordMethod.USURPATION;
   votes: {
     [playerId: string]: number;
-  }
+  };
 }
 
-export type LeaderRecord = LeaderAbdication | LeaderAppointment | LeaderRandomisation | LeaderUsurpation;
+export type LeaderRecord =
+  | LeaderAbdication
+  | LeaderAppointment
+  | LeaderRandomisation
+  | LeaderUsurpation;
 
 export interface RoomRound {
   name: RoomName;
@@ -121,10 +125,11 @@ export interface RoomRound {
 
 export enum RoomName {
   A = "1",
-  B = "2"
+  B = "2",
 }
 
-export const otherRoom = (roomName: RoomName): RoomName => roomName === RoomName.A ? RoomName.B : RoomName.A
+export const otherRoom = (roomName: RoomName): RoomName =>
+  roomName === RoomName.A ? RoomName.B : RoomName.A;
 
 export interface Round {
   // actions: PlayerAction[];
@@ -136,33 +141,45 @@ export interface Round {
   playerAllocation: PlayerRoomAllocation;
 }
 
-export const createRound = (timerSeconds: number, number: number, hostageCount = 1): Round => ({
+export const createRound = (
+  timerSeconds: number,
+  number: number,
+  hostageCount = 1
+): Round => ({
   // actions: [],
   number,
   status: RoundStatus.PENDING,
   hostageCount,
   timerSeconds,
   rooms: {
-    [RoomName.A]: { name: RoomName.A, leadersRecord: [], hostages: [], isReadyToExchange: false },
-    [RoomName.B]: { name: RoomName.B, leadersRecord: [], hostages: [], isReadyToExchange: false },
+    [RoomName.A]: {
+      name: RoomName.A,
+      leadersRecord: [],
+      hostages: [],
+      isReadyToExchange: false,
+    },
+    [RoomName.B]: {
+      name: RoomName.B,
+      leadersRecord: [],
+      hostages: [],
+      isReadyToExchange: false,
+    },
   },
-  playerAllocation: {}
+  playerAllocation: {},
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
   1: createRound(180, 1),
   2: createRound(120, 2),
-  3: createRound(60, 3)
+  3: createRound(60, 3),
 });
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
 
+export type RolesCount = Record<RoleKey, number>;
 
-export type RolesCount = Record<RoleKey, number>
-
-export type WinningColor = TeamColor.BLUE | TeamColor.RED | "neither"
+export type WinningColor = TeamColor.BLUE | TeamColor.RED | "neither";
 export type GamblerPrediction = WinningColor;
-
 
 export interface GameEndgame {
   finalRooms?: PlayerRoomAllocation;

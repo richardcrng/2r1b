@@ -4,19 +4,42 @@ import {
   ServerEvent,
   ServerSocket,
 } from "../../client/src/types/event.types";
-import { incrementRoleInGame, startGame, appointLeader, proposeRoomLeader, offerAbdication, acceptAbdication, declineAbdication, withdrawAbdicationOffer, offerShare, withdrawShareOffer, declineShare, acceptShare, terminateShare, deselectHostage, selectHostage, submitHostages, handleGamblerPrediction, revealResults, handlePrivateEyePrediction, resetGame } from "./game/controllers";
+import {
+  incrementRoleInGame,
+  startGame,
+  appointLeader,
+  proposeRoomLeader,
+  offerAbdication,
+  acceptAbdication,
+  declineAbdication,
+  withdrawAbdicationOffer,
+  offerShare,
+  withdrawShareOffer,
+  declineShare,
+  acceptShare,
+  terminateShare,
+  deselectHostage,
+  selectHostage,
+  submitHostages,
+  handleGamblerPrediction,
+  revealResults,
+  handlePrivateEyePrediction,
+  resetGame,
+} from "./game/controllers";
 import { joinPlayerToGame, updatePlayer } from "./player/controllers";
 import { GameManager } from "./game/model";
 
 export const addListeners = (socket: ServerSocket): void => {
-
   const listeners: ClientEventListeners = {
     [ClientEvent.ACCEPT_ABDICATION]: acceptAbdication,
     [ClientEvent.ACCEPT_SHARE]: acceptShare,
     [ClientEvent.APPOINT_ROOM_LEADER]: appointLeader,
     [ClientEvent.CREATE_GAME]: (socketId, playerName) => {
-      const gameManager = GameManager.hostNew(socketId, playerName)
-      socket.emit(ServerEvent.GAME_CREATED, gameManager._pointer()!);
+      const gameManager = GameManager.hostNew(socketId, playerName);
+      const createdData = gameManager._pointer();
+      if (createdData) {
+        socket.emit(ServerEvent.GAME_CREATED, createdData);
+      }
     },
     [ClientEvent.DECLINE_ABDICATION]: declineAbdication,
     [ClientEvent.DECLINE_SHARE]: declineShare,
@@ -53,7 +76,10 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.WITHDRAW_SHARE_OFFER]: withdrawShareOffer,
   };
 
-  for (let [event, listener] of Object.entries(listeners) as [ClientEvent, ClientEventListeners[ClientEvent]][]) {
-    socket.on(event, listener)
+  for (const [event, listener] of Object.entries(listeners) as [
+    ClientEvent,
+    ClientEventListeners[ClientEvent]
+  ][]) {
+    socket.on(event, listener);
   }
 };

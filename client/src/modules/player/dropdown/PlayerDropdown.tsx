@@ -16,20 +16,18 @@ function PlayerDropdown({
   onPlayerSelect,
   players,
   selectedPlayerId: controlledPlayerId,
-}: Props) {
+}: Props): JSX.Element {
   const [uncontrolledPlayerId, setUncontrolledPlayerId] = useState<string>();
   const selectedPlayerId = controlledPlayerId ?? uncontrolledPlayerId;
 
   const playerValues = Object.values(players);
 
-  const optionsToList = filter
-    ? playerValues.filter(filter)
-    : playerValues;
+  const optionsToList = filter ? playerValues.filter(filter) : playerValues;
 
   const dropdownOptions = optionsToList
     .map((player) => ({
       key: player.socketId,
-      text: player.name!,
+      text: player.name ?? player.socketId,
       value: player.socketId,
     }))
     .sort((a, b) => (a.text < b.text ? -1 : 0));
@@ -43,7 +41,7 @@ function PlayerDropdown({
       options={dropdownOptions}
       value={selectedPlayerId}
       onChange={(_, { value }) => {
-        const newId = value as string
+        const newId = value as string;
         onPlayerSelect && onPlayerSelect(newId);
         setUncontrolledPlayerId(newId);
       }}

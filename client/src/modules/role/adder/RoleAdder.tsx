@@ -1,7 +1,7 @@
 import { Button } from "semantic-ui-react";
 import { RoleKey } from "../../../types/role.types";
 import RoleDropdown from "../dropdown/RoleDropdown";
-import { getRoleRestrictions } from '../../../utils/role-utils';
+import { getRoleRestrictions } from "../../../utils/role-utils";
 
 interface Props {
   onRoleIncrement(roleKey: RoleKey, increment: number): void;
@@ -10,17 +10,24 @@ interface Props {
   selectedRole?: RoleKey;
 }
 
-function RoleAdder({ onRoleIncrement, onRoleSelect, rolesCount, selectedRole }: Props) {
+function RoleAdder({
+  onRoleIncrement,
+  onRoleSelect,
+  rolesCount,
+  selectedRole,
+}: Props): JSX.Element {
   const handleIncrement = () => {
-    const roleToIncrement = selectedRole!;
+    if (!selectedRole)
+      throw new Error("Can't increment without a role existing");
+    const roleToIncrement = selectedRole;
     const currentCount = rolesCount[roleToIncrement];
-    const { roleMax } = getRoleRestrictions(roleToIncrement)
+    const { roleMax } = getRoleRestrictions(roleToIncrement);
     if (currentCount < roleMax) {
-      onRoleIncrement(selectedRole!, 1);
+      onRoleIncrement(selectedRole, 1);
     } else {
       window.alert(`Already at max count for ${roleToIncrement}`);
     }
-    onRoleSelect(undefined)
+    onRoleSelect(undefined);
   };
 
   return (

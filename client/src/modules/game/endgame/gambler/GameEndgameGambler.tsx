@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { Button, Dropdown } from 'semantic-ui-react';
-import styled from 'styled-components';
-import { GamblerPrediction, Player } from '../../../../types/game.types';
-import { TeamColor } from '../../../../types/role.types';
+import { useState } from "react";
+import { Button, Dropdown } from "semantic-ui-react";
+import styled from "styled-components";
+import { GamblerPrediction, Player } from "../../../../types/game.types";
+import { TeamColor } from "../../../../types/role.types";
 
-const Container = styled.div`
-`;
+const Container = styled.div``;
 
 interface Props {
   onGamblerPrediction(prediction: GamblerPrediction): void;
   player: Player;
 }
 
-function GameEndgameGambler({ onGamblerPrediction, player }: Props) {
-
-  const [prediction, setPrediction] = useState<GamblerPrediction>()
+function GameEndgameGambler({
+  onGamblerPrediction,
+  player,
+}: Props): JSX.Element {
+  const [prediction, setPrediction] = useState<GamblerPrediction>();
 
   return (
     <Container className="active-contents">
@@ -33,7 +34,7 @@ function GameEndgameGambler({ onGamblerPrediction, player }: Props) {
             options={[
               { text: "Blue team", value: TeamColor.BLUE },
               { text: "Red team", value: TeamColor.RED },
-              { text: "Neither", value: "Neither" }
+              { text: "Neither", value: "Neither" },
             ]}
             value={prediction}
             onChange={(_, { value }) => {
@@ -42,10 +43,10 @@ function GameEndgameGambler({ onGamblerPrediction, player }: Props) {
             }}
           />
           <Button
-            color='black'
+            color="black"
             disabled={!prediction}
             fluid
-            onClick={() => onGamblerPrediction(prediction!)}
+            onClick={() => prediction && onGamblerPrediction(prediction)}
           >
             Submit prediction
           </Button>

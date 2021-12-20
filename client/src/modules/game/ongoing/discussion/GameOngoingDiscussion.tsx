@@ -84,7 +84,7 @@ interface Props {
   ): void;
 }
 
-function GameOngoingDiscussion(props: Props) {
+function GameOngoingDiscussion(props: Props): JSX.Element {
   const votesForPlayers = selectNonZeroOrderedVotesForPlayers(props.game);
   const votesInThisRoom = votesForPlayers.filter(
     ([playerId]) => props.players[playerId].room === props.currentRoom

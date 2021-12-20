@@ -32,7 +32,7 @@ interface Props {
   player: Player;
 }
 
-function GameResults({ game, onGameReset, player }: Props) {
+function GameResults({ game, onGameReset, player }: Props): JSX.Element {
   const teamResult = selectTeamWinCheckResult(game);
   const greyResults = selectGreyPlayerResults(game);
   const findPlayerWithRole = selectFindPlayerWithRole(game);

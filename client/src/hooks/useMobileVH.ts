@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-function useMobileVH() {
+function useMobileVH(): void {
   useEffect(() => {
     // https://chanind.github.io/javascript/2019/09/28/avoid-100vh-on-mobile-web.html#comment-4634921967
     function setDocHeight() {
@@ -22,4 +22,4 @@ function useMobileVH() {
   });
 }
 
-export default useMobileVH
+export default useMobileVH;

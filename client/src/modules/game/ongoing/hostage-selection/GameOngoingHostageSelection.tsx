@@ -82,9 +82,9 @@ function GameOngoingHostageSelection({
   players,
   roomName,
   round,
-}: Props) {
+}: Props): JSX.Element {
   const currentHostages = selectCurrentRoundRoomHostages(game)[roomName];
-  const hostageTotal = selectCurrentRoundHostageTotal(game)!;
+  const hostageTotal = selectCurrentRoundHostageTotal(game);
   const isRightHostageCount = hostageTotal === currentHostages.length;
 
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>();
@@ -137,7 +137,9 @@ function GameOngoingHostageSelection({
                 !selectedPlayerId || isRightHostageCount || isReadyToExchange
               }
               fluid
-              onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
+              onClick={() =>
+                selectedPlayerId && onHostageSelect(selectedPlayerId, roomName)
+              }
               primary
             >
               Select hostage

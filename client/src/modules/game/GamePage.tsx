@@ -1,6 +1,19 @@
-import { selectCurrentGameRoomAllocation, selectCurrentRoomCurrentLeaders, selectGamePlayersWithRooms } from "../../selectors/game-selectors";
-import { GamblerPrediction, Game, GameStatus, Player, RoomName } from "../../types/game.types";
-import { PlayerActionAbdicationOffered, PlayerActionShareOfferedType } from "../../types/player-action.types";
+import {
+  selectCurrentGameRoomAllocation,
+  selectCurrentRoomCurrentLeaders,
+  selectGamePlayersWithRooms,
+} from "../../selectors/game-selectors";
+import {
+  GamblerPrediction,
+  Game,
+  GameStatus,
+  Player,
+  RoomName,
+} from "../../types/game.types";
+import {
+  PlayerActionAbdicationOffered,
+  PlayerActionShareOfferedType,
+} from "../../types/player-action.types";
 import { RoleKey } from "../../types/role.types";
 import GameEndgame from "./endgame/GameEndgame";
 import GameLobby from "./lobby/GameLobby";
@@ -13,7 +26,11 @@ interface Props {
   onGamblerPrediction(prediction: GamblerPrediction): void;
   onGameStart(): void;
   onGameReset(): void;
-  onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
+  onHostageSelect(
+    playerId: string,
+    roomName: RoomName,
+    isDeselect?: boolean
+  ): void;
   onHostageSubmit(roomName: RoomName): void;
   onOfferAbdication: (roomName: RoomName, proposedLeaderId: string) => void;
   onOfferShare(
@@ -50,8 +67,7 @@ function GamePage({
   onWithdrawAbdicationOffer,
   players,
   player,
-}: Props) {
-
+}: Props): JSX.Element {
   const currentRooms = selectCurrentGameRoomAllocation(game);
   const currentRoom = currentRooms && currentRooms[player.socketId];
 
@@ -62,22 +78,51 @@ function GamePage({
     ? game.players[leaderIdInThisRoom]
     : undefined;
 
-  const playersWithRooms = selectGamePlayersWithRooms(game)
+  const playersWithRooms = selectGamePlayersWithRooms(game);
 
   if (game.status === GameStatus.LOBBY) {
-    return <GameLobby {...{ game, onGameStart, onRoleIncrement, players, player }} />;
+    return (
+      <GameLobby {...{ game, onGameStart, onRoleIncrement, players, player }} />
+    );
   } else if (game.status === GameStatus.ONGOING && currentRoom) {
-    return <GameOngoing {...{ currentLeader, currentRoom, game, player, players: playersWithRooms, onAppointLeader, onHostageSelect, onHostageSubmit, onOfferAbdication, onOfferShare, onProposeLeader, onWithdrawAbdicationOffer }} />;
+    return (
+      <GameOngoing
+        {...{
+          currentLeader,
+          currentRoom,
+          game,
+          player,
+          players: playersWithRooms,
+          onAppointLeader,
+          onHostageSelect,
+          onHostageSubmit,
+          onOfferAbdication,
+          onOfferShare,
+          onProposeLeader,
+          onWithdrawAbdicationOffer,
+        }}
+      />
+    );
   } else if (game.status === GameStatus.ONGOING) {
     return <p>Waiting for room allocation...</p>;
   } else if (game.status === GameStatus.ENDGAME) {
-    return <GameEndgame {...{ game, onGamblerPrediction, onPrivateEyeRolePrediction, onResultsReveal, player }} />
+    return (
+      <GameEndgame
+        {...{
+          game,
+          onGamblerPrediction,
+          onPrivateEyeRolePrediction,
+          onResultsReveal,
+          player,
+        }}
+      />
+    );
   } else if (game.status === GameStatus.RESULTS) {
-    return <GameResults {...{ game, onGameReset, player }} />
+    return <GameResults {...{ game, onGameReset, player }} />;
   } else if (game.status === GameStatus.COMPLETE) {
-    return <p>Game is complete!</p>
+    return <p>Game is complete!</p>;
   } else {
-    return <p>Something weird has happened</p>
+    return <p>Something weird has happened</p>;
   }
 }
 

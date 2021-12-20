@@ -4,7 +4,7 @@ import { useSocket } from "../socket";
 import { ClientEvent, ServerEvent } from "../types/event.types";
 import { Game } from "../types/game.types";
 import useSocketListener from "./useSocketListener";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 interface UseGameResult {
   data: Game | undefined;
@@ -49,11 +49,14 @@ export default function useGame(gameId: Game["id"]): UseGameResult {
     );
   });
 
-  useSocketListener(ServerEvent.GAME_NOTIFICATION, (notificationGameId, notification) => {
-    if (notificationGameId === gameId) {
-      toast(notification.message)
+  useSocketListener(
+    ServerEvent.GAME_NOTIFICATION,
+    (notificationGameId, notification) => {
+      if (notificationGameId === gameId) {
+        toast(notification.message);
+      }
     }
-  })
+  );
 
   return state;
 }
