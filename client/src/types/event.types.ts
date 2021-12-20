@@ -1,6 +1,12 @@
 import { Socket as TClientSocket } from "socket.io-client";
 import { Socket as TServerSocket, Server as TServer } from "socket.io";
-import { GamblerPrediction, Game, Player, RoomName } from "./game.types";
+import {
+  GamblerPrediction,
+  Game,
+  GameSettings,
+  Player,
+  RoomName,
+} from "./game.types";
 import { RoleKey } from "./role.types";
 import { GameNotification, PlayerNotification } from "./notification.types";
 import {
@@ -46,6 +52,7 @@ export enum ClientEvent {
   SUBMIT_HOSTAGES = "submit-hostages",
   TERMINATE_SHARE = "terminate-share",
   UPDATE_PLAYER = "update-player",
+  UPDATE_GAME_SETTINGS = "update-game-settingS",
   WITHDRAW_ABDICATION_OFFER = "withdraw-abdication-offer",
   WITHDRAW_SHARE_OFFER = "withdraw-share-offer",
 }
@@ -180,10 +187,17 @@ export type ClientEventListeners = {
   ) => void;
 
   [ClientEvent.UPDATE_PLAYER]: (gameId: string, player: Player) => void;
+
+  [ClientEvent.UPDATE_GAME_SETTINGS]: (
+    gameId: string,
+    newSettings: Partial<GameSettings>
+  ) => void;
+
   [ClientEvent.WITHDRAW_ABDICATION_OFFER]: (
     gameId: string,
     offer: PlayerActionAbdicationOffered
   ) => void;
+
   [ClientEvent.WITHDRAW_SHARE_OFFER]: (
     gameId: string,
     action: PlayerActionShareOffered

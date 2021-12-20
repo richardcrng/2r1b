@@ -25,6 +25,7 @@ import {
   revealResults,
   handlePrivateEyePrediction,
   resetGame,
+  updateGameSettings,
 } from "./game/controllers";
 import { joinPlayerToGame, updatePlayer } from "./player/controllers";
 import { GameManager } from "./game/model";
@@ -72,6 +73,7 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.SUBMIT_HOSTAGES]: submitHostages,
     [ClientEvent.TERMINATE_SHARE]: terminateShare,
     [ClientEvent.UPDATE_PLAYER]: updatePlayer,
+    [ClientEvent.UPDATE_GAME_SETTINGS]: updateGameSettings,
     [ClientEvent.WITHDRAW_ABDICATION_OFFER]: withdrawAbdicationOffer,
     [ClientEvent.WITHDRAW_SHARE_OFFER]: withdrawShareOffer,
   };

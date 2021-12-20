@@ -347,6 +347,14 @@ export const terminateShare: ClientEventListeners[ClientEvent.TERMINATE_SHARE] =
       });
   };
 
+export const updateGameSettings: ClientEventListeners[ClientEvent.UPDATE_GAME_SETTINGS] =
+  (gameId, newSettings) => {
+    new GameManager(gameId).update((game) => ({
+      ...game,
+      settings: Object.assign(game.settings, newSettings),
+    }));
+  };
+
 const usurpLeader = (
   gameId: string,
   roomName: RoomName,

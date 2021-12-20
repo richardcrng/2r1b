@@ -571,6 +571,11 @@ export class GameManager {
     });
   }
 
+  /**
+   * Updates a game, by applying a callback function,
+   *  and broadcasts the update to sockets
+   * @param mutativeCb - mutative callback function for the game data
+   */
   public update(mutativeCb: (game: Game) => void) {
     this._mutate(mutativeCb);
   }
