@@ -12,6 +12,76 @@ import {
 } from "./setup-utils";
 
 describe("alertsFromSetup", () => {
+  describe("6-10 player games", () => {
+    describe("Color sharing", () => {
+      test("Given 6 players and color sharing on, warns that color sharing is not recommended", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+          }),
+          6,
+          { colorSharing: true }
+        );
+
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.WARNING &&
+              result.message.match(/color shar[e|ing]/i) &&
+              result.message.match(/not recommend/i)
+          )
+        ).toBe(true);
+      });
+
+      test("Given 10 players and color sharing on, warns that color sharing is not recommended", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+          }),
+          6,
+          { colorSharing: true }
+        );
+
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.WARNING &&
+              result.message.match(/color shar[e|ing]/i) &&
+              result.message.match(/not recommend/i)
+          )
+        ).toBe(true);
+      });
+
+      test("Given 11 players and color sharing on, does not warn that color sharing is not recommended", () => {
+        const result = alertsFromSetup(
+          createRolesCount({
+            PRESIDENT_BLUE: 1,
+            BOMBER_RED: 1,
+            TEAM_BLUE: 2,
+            TEAM_RED: 2,
+          }),
+          11,
+          { colorSharing: true }
+        );
+
+        expect(
+          result.some(
+            (result) =>
+              result.severity === SetupAlertSeverity.WARNING &&
+              result.message.match(/color shar[e|ing]/i) &&
+              result.message.match(/not recommend/i)
+          )
+        ).toBe(false);
+      });
+    });
+  });
+
   describe("secondary roles", () => {
     describe("Vice-President", () => {
       test("Given that a role will not be buried, does not error if there is no Vice-President", () => {
