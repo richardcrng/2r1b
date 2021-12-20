@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Modal } from "semantic-ui-react";
-import styled from "styled-components";
 import {
   selectGamePlayerCount,
   selectGameRolesInSetupCount,
