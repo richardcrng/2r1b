@@ -2,6 +2,7 @@ import { createSelector } from "reselect";
 import {
   Game,
   GameEndgame,
+  GameSettings,
   LeaderVote,
   Player,
   PlayerWithRoom,
@@ -30,6 +31,7 @@ export const selectGameRounds = (game: Game): Record<number, Round> =>
   game.rounds;
 export const selectBuriedRole = (game: Game): RoleKey | undefined =>
   game.buriedRole;
+export const selectGameSettings = (game: Game): GameSettings => game.settings;
 
 export const selectTotalCountOfGameRoles = createSelector(
   selectGameRolesInSetupCount,
@@ -54,7 +56,9 @@ export const selectGamePlayerCount = createSelector(
 export const selectGameSetupAlerts = createSelector(
   selectGameRolesInSetupCount,
   selectGamePlayerCount,
-  (rolesCount, nPlayers) => alertsFromSetup(rolesCount, nPlayers)
+  selectGameSettings,
+  (rolesCount, nPlayers, settings) =>
+    alertsFromSetup(rolesCount, nPlayers, settings)
 );
 
 export const selectGameSetupAlertsFromPlayerCount = createSelector(
