@@ -1,5 +1,4 @@
-// import { gameLobbyReadiness } from "../../selectors/game";
-import { Game, GameSettings, Player } from "../../../types/game.types";
+import { Game, Player } from "../../../types/game.types";
 import GameLobbyHome from "./home/GameLobbyHome";
 import { useState } from "react";
 import GameLobbySetupModal from "./setup/GameLobbySetupModal";
