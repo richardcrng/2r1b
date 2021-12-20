@@ -178,6 +178,14 @@ function GameRoute(): JSX.Element {
                   increment
                 );
             }}
+            onSettingsUpdate={(newSettings) => {
+              game.data &&
+                socket.emit(
+                  ClientEvent.UPDATE_GAME_SETTINGS,
+                  game.data.id,
+                  newSettings
+                );
+            }}
             onWithdrawAbdicationOffer={(action) => {
               game.data &&
                 socket.emit(

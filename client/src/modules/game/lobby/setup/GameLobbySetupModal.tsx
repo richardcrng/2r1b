@@ -13,6 +13,7 @@ import RoleAdder from "../../../role/adder/RoleAdder";
 import RoleSetup from "../../../role/setup/RoleSetup";
 import { GameHandlers } from "../../GamePage";
 import GameLobbySetupErrors from "./errors/GameLobbySetupErrors";
+import GameLobbySetupSettings from "./settings/GameLobbySetupSettings";
 
 interface Props {
   game: Game;
@@ -31,6 +32,7 @@ function GameLobbySetupModal({
   onClose,
   onOpen,
   onRoleIncrement,
+  onSettingsUpdate,
 }: Props): JSX.Element {
   const [selectedRole, setSelectedRole] = useState<RoleKey>();
   const nPlayers = selectGamePlayerCount(game);
@@ -46,6 +48,11 @@ function GameLobbySetupModal({
       </Modal.Header>
       <Modal.Content>
         <GameLobbySetupErrors {...{ errors, warnings }} />
+        <br />
+        <GameLobbySetupSettings
+          {...{ isEditable, onSettingsUpdate }}
+          settings={game.settings}
+        />
         <RoleSetup {...{ isEditable, rolesInSetup, onRoleIncrement }} />
         {isEditable && (
           <RoleAdder
