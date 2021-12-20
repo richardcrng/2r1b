@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { Button } from 'semantic-ui-react';
-import styled from 'styled-components';
-import { selectCurrentRoundHostageTotal, selectCurrentRoundRoomHostages } from '../../../../selectors/game-selectors';
-import { Game, Player, RoomName, Round } from '../../../../types/game.types';
-import PlayerDropdown from '../../../player/dropdown/PlayerDropdown';
+import { useState } from "react";
+import { Button } from "semantic-ui-react";
+import styled from "styled-components";
+import {
+  selectCurrentRoundHostageTotal,
+  selectCurrentRoundRoomHostages,
+} from "../../../../selectors/game-selectors";
+import { Game, Player, RoomName, Round } from "../../../../types/game.types";
+import PlayerDropdown from "../../../player/dropdown/PlayerDropdown";
 
 const Container = styled.div`
   display: grid;
@@ -17,15 +20,13 @@ const Container = styled.div`
 
 const Main = styled.div`
   grid-area: main;
-`
+`;
 
 const Actions = styled.div`
   grid-area: actions;
-`
-
-const HostageOl = styled.ol`
 `;
 
+const HostageOl = styled.ol``;
 
 const HostageLi = styled.li`
   div {
@@ -35,11 +36,35 @@ const HostageLi = styled.li`
   }
 `;
 
+const RoomGuideUl = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 1rem;
+
+  li {
+    padding-left: 1rem;
+    text-indent: -0.7rem;
+  }
+
+  li.incomplete::before {
+    content: "🤔 ";
+  }
+
+  li.complete::before {
+    content: "✅ ";
+  }
+`;
+
 interface Props {
   game: Game;
   leaderName: string;
   isLeader: boolean;
-  onHostageSelect(playerId: string, roomName: RoomName, isDeselect?: boolean): void;
+  onHostageSelect(
+    playerId: string,
+    roomName: RoomName,
+    isDeselect?: boolean
+  ): void;
   onHostageSubmit(roomName: RoomName): void;
   player: Player;
   players: Record<string, Player>;
@@ -47,8 +72,17 @@ interface Props {
   round: Round;
 }
 
-function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSelect, onHostageSubmit, player, players, roomName, round }: Props) {
-  
+function GameOngoingHostageSelection({
+  game,
+  leaderName,
+  isLeader,
+  onHostageSelect,
+  onHostageSubmit,
+  player,
+  players,
+  roomName,
+  round,
+}: Props) {
   const currentHostages = selectCurrentRoundRoomHostages(game)[roomName];
   const hostageTotal = selectCurrentRoundHostageTotal(game)!;
   const isRightHostageCount = hostageTotal === currentHostages.length;
@@ -64,16 +98,31 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
       <Main>
         <h1>Situation Room {roomName}</h1>
         <h2>Hostage{maybeS} selection</h2>
-        <p>
-          This round, {hostageTotal} hostage{maybeS} must be sent to the other
-          room.
-        </p>
         {isLeader ? (
           <>
             <p>
-              As Room Leader, you must choose the hostage
-              {maybeS} (but cannot pick yourself).
+              As Room Leader, you must <strong>select</strong> and{" "}
+              <strong>submit</strong> {hostageTotal} hostage
+              {maybeS} this round (but cannot pick yourself).
             </p>
+
+            <RoomGuideUl>
+              <li className={isRightHostageCount ? "complete" : "incomplete"}>
+                <strong>Selection</strong>:{" "}
+                {isRightHostageCount
+                  ? "You have completed hostage selection"
+                  : `${hostageTotal - currentHostages.length} left to pick`}
+              </li>
+              <li className={isReadyToExchange ? "complete" : "incomplete"}>
+                <strong>Submission</strong>:{" "}
+                {isReadyToExchange
+                  ? "Complete"
+                  : isRightHostageCount
+                  ? "You can submit your hostage selection when you are ready"
+                  : "You must complete selection first"}
+              </li>
+            </RoomGuideUl>
+
             <PlayerDropdown
               filter={(p) =>
                 player.socketId !== p.socketId &&
@@ -91,15 +140,21 @@ function GameOngoingHostageSelection({ game, leaderName, isLeader, onHostageSele
               onClick={() => onHostageSelect(selectedPlayerId!, roomName)}
               primary
             >
-              Add hostage
+              Select hostage
             </Button>
           </>
         ) : (
-          <p>
-            {isReadyToExchange
-              ? `Waiting for the other room to select and submit their hostage${maybeS}`
-              : `Waiting for ${leaderName} to select and submit hostages`}
-          </p>
+          <>
+            <p>
+              This round, {hostageTotal} hostage{maybeS} must be sent to the
+              other room.
+            </p>
+            <p>
+              {isReadyToExchange
+                ? `Waiting for the other room to select and submit their hostage${maybeS}`
+                : `Waiting for ${leaderName} to select and submit hostages`}
+            </p>
+          </>
         )}
         <hr />
         {!isLeader && <h3>Selected hostage{maybeS}</h3>}
