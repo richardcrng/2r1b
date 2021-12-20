@@ -8,7 +8,8 @@ export default function useSocketListener<
   const socket = useSocket();
 
   useEffect(() => {
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore this is okay - it's the right type of listener
     socket.on(event, listener);
 
     return function cleanup() {
