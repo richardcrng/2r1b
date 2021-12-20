@@ -89,6 +89,7 @@ export class GameManager {
       rolesCount: { ...DEFAULT_STARTING_ROLES_COUNT },
       status: GameStatus.LOBBY,
       rounds: createStartingRounds(),
+      settings: { colorSharing: true },
     };
     const gameManager = new GameManager(gameId);
     gameManager.set(game);
