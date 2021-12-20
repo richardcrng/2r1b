@@ -1,9 +1,13 @@
-import styled from 'styled-components'
-import { ROLE_RESPONSIBILITIES, TEAM_ICONS, WIN_CONDITIONS } from '../../../types/role-responsibilities';
+import styled from "styled-components";
+import {
+  ROLE_RESPONSIBILITIES,
+  TEAM_ICONS,
+  WIN_CONDITIONS,
+} from "../../../types/role-responsibilities";
 import { FullyDefined, PlayerRole, TeamColor } from "../../../types/role.types";
 
 interface Props {
-  role: FullyDefined<PlayerRole>
+  role: FullyDefined<PlayerRole>;
 }
 
 const CardContainer = styled.div`
@@ -14,8 +18,8 @@ const CardContainer = styled.div`
   grid-template-rows: 300px 50px;
   grid-template-areas:
     "description role"
-    "team icon"
-`
+    "team icon";
+`;
 
 const Description = styled.div`
   grid-area: description;
@@ -29,7 +33,7 @@ const Description = styled.div`
   ul > li {
     margin-bottom: 5px;
   }
-`
+`;
 
 const RoleReveal = styled.div`
   grid-area: role;
@@ -41,7 +45,7 @@ const RoleReveal = styled.div`
 const RoleName = styled.p`
   font-size: 2rem;
   font-weight: 900;
-`
+`;
 
 const TeamName = styled.div`
   grid-area: team;
@@ -62,10 +66,9 @@ const TeamIcon = styled.div`
 `;
 
 function RoleCard({ role }: Props): JSX.Element {
+  const { primary, secondary } = getColors(role.color);
 
-  const { primary, secondary } = getColors(role.color)
-
-  const Icon = TEAM_ICONS[role.color]
+  const Icon = TEAM_ICONS[role.color];
 
   return (
     <CardContainer style={{ backgroundColor: primary }}>
@@ -90,7 +93,9 @@ function RoleCard({ role }: Props): JSX.Element {
         <div>{role.color.toUpperCase()} TEAM</div>
       </TeamName>
       <TeamIcon>
-        <div><Icon size={32} /></div>
+        <div>
+          <Icon size={32} />
+        </div>
       </TeamIcon>
     </CardContainer>
   );
@@ -103,7 +108,6 @@ interface Colors {
 
 export const getColors = (teamColor: TeamColor): Colors => {
   switch (teamColor) {
-  
     case TeamColor.BLUE:
       return { primary: "#0100E5", secondary: "#4D4DFE" };
 
@@ -111,8 +115,8 @@ export const getColors = (teamColor: TeamColor): Colors => {
       return { primary: "#656363", secondary: "#868685" };
 
     case TeamColor.RED:
-      return { primary: "#E50000", secondary: "#FE4D4D" }; 
+      return { primary: "#E50000", secondary: "#FE4D4D" };
   }
-}
+};
 
-export default RoleCard
+export default RoleCard;

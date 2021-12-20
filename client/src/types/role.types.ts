@@ -29,6 +29,8 @@ export enum GreyRoleName {
   GAMBLER = "Gambler",
   INTERN = "Intern",
   PRIVATE_EYE = "Private Eye",
+  RIVAL = "Rival",
+  SURVIVOR = "Survivor",
   VICTIM = "Victim",
 }
 
@@ -321,6 +323,22 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
       pauseGameNumber: 5,
     },
     { playerMaxRecommended: 10 }
+  ),
+
+  RIVAL_GREY: RoleDefinition.Grey(
+    {
+      key: "RIVAL_GREY",
+      roleName: GreyRoleName.RIVAL,
+    },
+    { recommended: { SURVIVOR_GREY: 1 } }
+  ),
+
+  SURVIVOR_GREY: RoleDefinition.Grey(
+    {
+      key: "SURVIVOR_GREY",
+      roleName: GreyRoleName.SURVIVOR,
+    },
+    { recommended: { RIVAL_GREY: 1 } }
   ),
 
   VICTIM_GREY: RoleDefinition.Grey(
