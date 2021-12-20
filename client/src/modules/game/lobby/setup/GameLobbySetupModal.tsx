@@ -46,7 +46,7 @@ function GameLobbySetupModal({
       <Modal.Header>
         Setup: {nPlayers} players, {nRoles} roles
       </Modal.Header>
-      <Modal.Content>
+      <Modal.Content style={{ maxHeight: "65vh", overflowY: "scroll" }}>
         <GameLobbySetupErrors {...{ errors, warnings }} />
         <br />
         <GameLobbySetupSettings
