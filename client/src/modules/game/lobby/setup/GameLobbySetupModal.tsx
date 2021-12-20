@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Modal } from "semantic-ui-react";
-import { selectGameRolesInSetupCount, selectRolesInSetupAlphabetised } from "../../../../selectors/game-selectors";
+import {
+  selectGamePlayerCount,
+  selectGameRolesInSetupCount,
+  selectNumberOfRolesInSetup,
+  selectRolesInSetupAlphabetised,
+} from "../../../../selectors/game-selectors";
 import { Game } from "../../../../types/game.types";
 import { RoleKey } from "../../../../types/role.types";
 import RoleAdder from "../../../role/adder/RoleAdder";
 import RoleSetup from "../../../role/setup/RoleSetup";
-
 
 interface Props {
   game: Game;
@@ -16,19 +20,27 @@ interface Props {
   onRoleIncrement(roleKey: RoleKey, increment: number): void;
 }
 
-function GameLobbySetupModal({ game, isEditable, isOpen, onClose, onOpen, onRoleIncrement }: Props) {
+function GameLobbySetupModal({
+  game,
+  isEditable,
+  isOpen,
+  onClose,
+  onOpen,
+  onRoleIncrement,
+}: Props) {
   const [selectedRole, setSelectedRole] = useState<RoleKey>();
+  const nPlayers = selectGamePlayerCount(game);
+  const nRoles = selectNumberOfRolesInSetup(game);
   const rolesCount = selectGameRolesInSetupCount(game);
   const rolesInSetup = selectRolesInSetupAlphabetised(game);
 
   return (
-    <Modal
-      {...{ onClose, onOpen }}
-      closeIcon
-      open={isOpen}
-    >
+    <Modal {...{ onClose, onOpen }} closeIcon open={isOpen}>
       <Modal.Header>Role setup</Modal.Header>
       <Modal.Content>
+        <p>
+          {nPlayers} players, {nRoles} roles
+        </p>
         <RoleSetup {...{ isEditable, rolesInSetup, onRoleIncrement }} />
         {isEditable && (
           <RoleAdder
