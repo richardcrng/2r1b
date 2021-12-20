@@ -78,7 +78,7 @@ export const selectGreyPlayerResults = createSelector(
         isWin: isInternWin,
         reason: `Ended in ${
           isInternWin ? "the same" : "a different"
-        } room to the ${describeOfficeHolder}`,
+        } room as the ${describeOfficeHolder}`,
       });
     }
 
@@ -92,7 +92,7 @@ export const selectGreyPlayerResults = createSelector(
         isWin: isVictimWin,
         reason: `Ended in ${
           isVictimWin ? "the same" : "a different"
-        } room to the ${describeExplosivesHolder}`,
+        } room as the ${describeExplosivesHolder}`,
       });
     }
 
@@ -106,7 +106,7 @@ export const selectGreyPlayerResults = createSelector(
         isWin: isRivalWin,
         reason: `Ended in ${
           isRivalWin ? "a different" : "the same"
-        } room to the ${describeOfficeHolder}`,
+        } room as the ${describeOfficeHolder}`,
       });
     }
 
@@ -120,7 +120,7 @@ export const selectGreyPlayerResults = createSelector(
         isWin: isSurvivorWin,
         reason: `Ended in ${
           isSurvivorWin ? " a different" : "the same"
-        } room to the ${describeExplosivesHolder}`,
+        } room as the ${describeExplosivesHolder}`,
       });
     }
 
