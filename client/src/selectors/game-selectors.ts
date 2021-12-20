@@ -678,7 +678,7 @@ export const selectGreyPlayerResults = createSelector(
         game.endgame.finalRooms![victim.socketId] ===
         game.endgame.finalRooms![explosivesHolder!.socketId];
       results.push({
-        role: "INTERN_GREY",
+        role: "VICTIM_GREY",
         isWin: isVictimWin,
         reason: `Ended in ${
           isVictimWin ? "the same" : "a different"
