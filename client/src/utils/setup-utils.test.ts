@@ -104,12 +104,12 @@ describe("alertsFromSetup", () => {
     });
   });
 
-  describe("Gambler", () => {
-    test("Given that a role will not be buried, errors if there is a Gambler", () => {
+  describe("Private Eye", () => {
+    test("Given that a role will not be buried, errors if there is a Private Eye", () => {
       const result = alertsFromSetup(
         createRolesCount({
           PRESIDENT_BLUE: 1,
-          GAMBLER_GREY: 1,
+          PRIVATE_EYE_GREY: 1,
           TEAM_BLUE: 1,
           TEAM_RED: 1,
           MARTYR_RED: 1,
@@ -122,22 +122,22 @@ describe("alertsFromSetup", () => {
         result.some(
           (result) =>
             result.severity === SetupAlertSeverity.ERROR &&
-            result.message.match(/gambler/i) &&
+            result.message.match(/private eye/i) &&
             result.message.match(/buried/i)
         )
       ).toBe(true);
     });
 
-    test("Given that a role will be buried, does not error for Gambler", () => {
+    test("Given that a role will be buried, does not error for Private Eye", () => {
       const result = alertsFromSetup(
         createRolesCount({
           PRESIDENT_BLUE: 1,
-          GAMBLER_GREY: 1,
+          PRIVATE_EYE_GREY: 1,
           TEAM_BLUE: 1,
           TEAM_RED: 1,
           MARTYR_RED: 1,
           VICE_PRESIDENT_BLUE: 1,
-          PRIVATE_EYE_GREY: 1,
+          GAMBLER_GREY: 1,
         }),
         6
       );
@@ -146,7 +146,7 @@ describe("alertsFromSetup", () => {
         result.some(
           (result) =>
             result.severity === SetupAlertSeverity.ERROR &&
-            result.message.match(/gambler/i) &&
+            result.message.match(/private eye/i) &&
             result.message.match(/buried/i)
         )
       ).toBe(false);

@@ -82,11 +82,11 @@ export const alertsFromPlayersCount = (
       });
     }
   } else {
-    if (rolesCount.GAMBLER_GREY === 1) {
+    if (rolesCount.PRIVATE_EYE_GREY === 1) {
       alerts.push({
         severity: SetupAlertSeverity.ERROR,
         message: `Can't include ${getRoleName(
-          "GAMBLER_GREY"
+          "PRIVATE_EYE_GREY"
         )} if no role is getting buried`,
         source: SetupAlertSource.ROLE_SETUP,
       });
