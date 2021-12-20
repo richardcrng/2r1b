@@ -2,7 +2,7 @@ import { useStorageState } from "react-storage-hooks";
 import { useSocket } from "../socket";
 import { useEffect } from "react";
 
-function useSocketAliases() {
+function useSocketAliases(): string[] {
   const socket = useSocket();
 
   const [socketAliases, setSocketAliases] = useStorageState(
