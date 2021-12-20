@@ -1,6 +1,19 @@
 import { PlayerAction, PlayerShareRecord } from "./player-action.types";
 import { RoleKey, TeamColor } from "./role.types";
 
+export interface Game {
+  id: string;
+  players: {
+    [playerSocketId: string]: Player;
+  };
+  currentTimerSeconds?: number;
+  endgame: GameEndgame;
+  rounds: Record<number, Round>;
+  rolesCount: RolesCount;
+  buriedRole?: RoleKey;
+  status: GameStatus;
+}
+
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
@@ -41,15 +54,6 @@ export interface Player {
 
 export interface PlayerWithRoom extends Player {
   room?: RoomName;
-}
-
-export interface Turn {
-  keyholderId: string;
-  selected: {
-    playerId: string;
-    cardIdx: number;
-  };
-  flip: CardType;
 }
 
 export enum LeaderRecordMethod {
@@ -172,17 +176,4 @@ export interface PlayerResult {
   role: RoleKey;
   isWin: boolean;
   reason: string;
-}
-
-export interface Game {
-  id: string;
-  players: {
-    [playerSocketId: string]: Player;
-  };
-  currentTimerSeconds?: number;
-  endgame: GameEndgame;
-  rounds: Record<number, Round>;
-  rolesCount: RolesCount;
-  buriedRole?: RoleKey;
-  status: GameStatus;
 }
