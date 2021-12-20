@@ -3,7 +3,6 @@ import {
   Game,
   LeaderVote,
   Player,
-  PlayerResult,
   PlayerWithRoom,
   RolesCount,
   RoomName,
