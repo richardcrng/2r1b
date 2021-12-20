@@ -1,17 +1,23 @@
-import styled from 'styled-components'
-import { IconType } from 'react-icons'
-import { AiFillStar as Star } from 'react-icons/ai'
-import { FaBomb as Bomb } from 'react-icons/fa'
-import { BsPersonBoundingBox as GreyIcon } from 'react-icons/bs'
-import { BlueRoleName, RedRoleName, GreyRoleName, RoleName, TeamColor } from "./role.types";
+import styled from "styled-components";
+import { IconType } from "react-icons";
+import { AiFillStar as Star } from "react-icons/ai";
+import { FaBomb as Bomb } from "react-icons/fa";
+import { BsPersonBoundingBox as GreyIcon } from "react-icons/bs";
+import {
+  BlueRoleName,
+  RedRoleName,
+  GreyRoleName,
+  RoleName,
+  TeamColor,
+} from "./role.types";
 
 const StyledCondition = styled.span`
   font-weight: bold;
-`
+`;
 
 const StyledAction = styled.span`
   font-weight: bold;
-`
+`;
 
 const StyledRole = styled.span`
   font-style: italic;
@@ -19,45 +25,73 @@ const StyledRole = styled.span`
   background-color: white;
   padding: 0px 1.5px;
   margin: 0px 1px;
-`
+`;
 
 const StyledBlueRole = styled(StyledRole)`
   color: blue;
-`
+`;
 
 const StyledRedRole = styled(StyledRole)`
   color: red;
-`
+`;
 
 export const TEAM_ICONS: Record<TeamColor, IconType> = {
   [TeamColor.BLUE]: Star,
   [TeamColor.RED]: Bomb,
-  [TeamColor.GREY]: GreyIcon
-}
-
-const action = (actionName: string) => <StyledAction>{actionName}</StyledAction>
-const blue = (roleName: string) => <StyledBlueRole>{roleName}</StyledBlueRole>
-const condition = (conditionName: string) => <StyledCondition>{conditionName}</StyledCondition>
-const red = (roleName: string) => <StyledRedRole>{roleName}</StyledRedRole>
-const responsibility = (responsibilityName: string) => <strong>{responsibilityName}:</strong>
-
-const BLUE_TEAM = blue("Blue Team")
-const BOMBER = red("Bomber")
-const CARD_SHARE = action("card share")
-const DEAD = condition("dead")
-const DOCTOR = blue(BlueRoleName.DOCTOR)
-const ENGINEER = red(RedRoleName.ENGINEER)
-const PRESIDENT = blue(BlueRoleName.PRESIDENT)
-const RED_TEAM = red("Red Team")
-
-export const WIN_CONDITIONS = {
-  BLUE: <>You if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).</>,
-  [GreyRoleName.GAMBLER]: <>You win if you make a correct {action("Wager")}.</>,
-  [GreyRoleName.PRIVATE_EYE]: <>You win if you make a correct {action("Identification")}.</>,
-  RED: <>You win if the {PRESIDENT} is killed (gains the '{DEAD}' condition).</>
+  [TeamColor.GREY]: GreyIcon,
 };
 
-export type WinCondition = keyof typeof WIN_CONDITIONS
+const action = (actionName: string) => (
+  <StyledAction>{actionName}</StyledAction>
+);
+const blue = (roleName: string) => <StyledBlueRole>{roleName}</StyledBlueRole>;
+const condition = (conditionName: string) => (
+  <StyledCondition>{conditionName}</StyledCondition>
+);
+const red = (roleName: string) => <StyledRedRole>{roleName}</StyledRedRole>;
+const responsibility = (responsibilityName: string) => (
+  <strong>{responsibilityName}:</strong>
+);
+
+const BLUE_TEAM = blue("Blue Team");
+const BOMBER = red("Bomber");
+const CARD_SHARE = action("card share");
+const DEAD = condition("dead");
+const DOCTOR = blue(BlueRoleName.DOCTOR);
+const ENGINEER = red(RedRoleName.ENGINEER);
+const PRESIDENT = blue(BlueRoleName.PRESIDENT);
+const RED_TEAM = red("Red Team");
+
+export const WIN_CONDITIONS = {
+  BLUE: (
+    <>
+      You if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).
+    </>
+  ),
+  [GreyRoleName.GAMBLER]: <>You win if you make a correct {action("Wager")}.</>,
+  [GreyRoleName.INTERN]: (
+    <>
+      You win if you are in the same room as the {PRESIDENT} at the end of the
+      game.
+    </>
+  ),
+  [GreyRoleName.PRIVATE_EYE]: (
+    <>You win if you make a correct {action("Identification")}.</>
+  ),
+  [GreyRoleName.VICTIM]: (
+    <>
+      You win if you are in the same room as the {BOMBER} at the end of the
+      game.
+    </>
+  ),
+  RED: (
+    <>
+      You win if the {PRESIDENT} is killed (gains the '{DEAD}' condition).
+    </>
+  ),
+};
+
+export type WinCondition = keyof typeof WIN_CONDITIONS;
 
 export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [BlueRoleName.CLOWN]: (
@@ -66,14 +100,17 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
 
   [BlueRoleName.DOCTOR]: (
     <>
-      {responsibility("Treatment")} The President will die unless you {CARD_SHARE} with them before the game ends.
+      {responsibility("Treatment")} The President will die unless you{" "}
+      {CARD_SHARE} with them before the game ends.
     </>
   ),
 
   [BlueRoleName.NURSE]: (
     <ul>
       <li>
-        {responsibility("Backup Doctor")} If the {DOCTOR} role is Buried, or receives the '{DEAD}' condition before it has Treated the {PRESIDENT}, you assume all of its duties and your latent responsibility activates.
+        {responsibility("Backup Doctor")} If the {DOCTOR} role is Buried, or
+        receives the '{DEAD}' condition before it has Treated the {PRESIDENT},
+        you assume all of its duties and your latent responsibility activates.
       </li>
       <li>
         {responsibility("Treatment (latent)")} The President will die unless you
@@ -142,8 +179,9 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [RedRoleName.MARTYR]: (
     <ul>
       <li>
-        {responsibility("Backup Bomber")} If the {BOMBER} role is Buried, or receives the '{DEAD}' condition before
-        its explosives detonate, you assume all of its duties and your latent responsibility activates.
+        {responsibility("Backup Bomber")} If the {BOMBER} role is Buried, or
+        receives the '{DEAD}' condition before its explosives detonate, you
+        assume all of its duties and your latent responsibility activates.
       </li>
       <li>
         {responsibility("Secondary")} You are the secondary character for the{" "}
@@ -166,8 +204,10 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [RedRoleName.TINKERER]: (
     <ul>
       <li>
-        {responsibility("Backup Engineer")} If the {ENGINEER} role is Buried, or receives the '{DEAD}' condition
-        before it has wired the {BOMBER}'s explosives, you assume all of its duties and your latent responsibility activates.
+        {responsibility("Backup Engineer")} If the {ENGINEER} role is Buried, or
+        receives the '{DEAD}' condition before it has wired the {BOMBER}'s
+        explosives, you assume all of its duties and your latent responsibility
+        activates.
       </li>
       <li>
         {responsibility("Wiring (latent)")} The {BOMBER}'s explosives will be
@@ -184,11 +224,19 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </>
   ),
 
+  [GreyRoleName.INTERN]: (
+    <>You're a keen intern - get close to the {PRESIDENT}!</>
+  ),
+
   [GreyRoleName.PRIVATE_EYE]: (
     <>
       {responsibility("Identification")} At the end of the last round, before
       all players reveal their character cards, you must publicly predict the
       identity of the buried card.
     </>
+  ),
+
+  [GreyRoleName.VICTIM]: (
+    <>You're here to suffer - get close to the {BOMBER}!</>
   ),
 };
