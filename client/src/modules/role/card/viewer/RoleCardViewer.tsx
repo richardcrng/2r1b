@@ -3,8 +3,9 @@ import {
   ALPHABETISED_ROLE_VALUES,
   RoleKey,
 } from "../../../../types/role.types";
+import { getTeamColorHex } from "../../../../utils/colors";
 import RoleDropdown from "../../dropdown/RoleDropdown";
-import RoleCard, { getColors } from "../RoleCard";
+import RoleCard from "../RoleCard";
 
 export const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
   key: RoleKey;
@@ -16,7 +17,7 @@ export const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
   text: roleValue.roleName,
   value: roleValue.key,
   content: (
-    <span style={{ color: getColors(roleValue.color).primary }}>
+    <span style={{ color: getTeamColorHex(roleValue.color).primary }}>
       {roleValue.roleName}
     </span>
   ),

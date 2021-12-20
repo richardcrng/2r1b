@@ -25,6 +25,7 @@ export const createDummyGame = ({
     rounds,
     rolesCount: createRolesCount(rolesCount),
     status,
+    settings: { colorSharing: false },
   };
 };
 

@@ -6,6 +6,7 @@ import {
 import {
   GamblerPrediction,
   Game,
+  GameSettings,
   GameStatus,
   Player,
   RoomName,
@@ -20,8 +21,13 @@ import GameLobby from "./lobby/GameLobby";
 import GameOngoing from "./ongoing/GameOngoing";
 import GameResults from "./results/GameResults";
 
-interface Props {
+interface Props extends GameHandlers {
   game: Game;
+  players: Player[];
+  player: Player;
+}
+
+export interface GameHandlers {
   onAppointLeader(appointedLeaderId: string, currentRoom: RoomName): void;
   onGamblerPrediction(prediction: GamblerPrediction): void;
   onGameStart(): void;
@@ -45,9 +51,8 @@ interface Props {
   ): void;
   onResultsReveal(): void;
   onRoleIncrement: (roleKey: RoleKey, increment: number) => void;
+  onSettingsUpdate(newSettings: Partial<GameSettings>): void;
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
-  players: Player[];
-  player: Player;
 }
 
 function GamePage({
@@ -64,6 +69,7 @@ function GamePage({
   onProposeLeader,
   onResultsReveal,
   onRoleIncrement,
+  onSettingsUpdate,
   onWithdrawAbdicationOffer,
   players,
   player,
@@ -82,7 +88,16 @@ function GamePage({
 
   if (game.status === GameStatus.LOBBY) {
     return (
-      <GameLobby {...{ game, onGameStart, onRoleIncrement, players, player }} />
+      <GameLobby
+        {...{
+          game,
+          onGameStart,
+          onRoleIncrement,
+          onSettingsUpdate,
+          players,
+          player,
+        }}
+      />
     );
   } else if (game.status === GameStatus.ONGOING && currentRoom) {
     return (

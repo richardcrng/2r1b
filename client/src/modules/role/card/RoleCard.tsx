@@ -4,7 +4,8 @@ import {
   TEAM_ICONS,
   WIN_CONDITIONS,
 } from "../../../types/role-responsibilities";
-import { FullyDefined, PlayerRole, TeamColor } from "../../../types/role.types";
+import { FullyDefined, PlayerRole } from "../../../types/role.types";
+import { getTeamColorHex } from "../../../utils/colors";
 
 interface Props {
   role: FullyDefined<PlayerRole>;
@@ -66,7 +67,7 @@ const TeamIcon = styled.div`
 `;
 
 function RoleCard({ role }: Props): JSX.Element {
-  const { primary, secondary } = getColors(role.color);
+  const { primary, secondary } = getTeamColorHex(role.color);
 
   const Icon = TEAM_ICONS[role.color];
 
@@ -100,23 +101,5 @@ function RoleCard({ role }: Props): JSX.Element {
     </CardContainer>
   );
 }
-
-interface Colors {
-  primary: string;
-  secondary: string;
-}
-
-export const getColors = (teamColor: TeamColor): Colors => {
-  switch (teamColor) {
-    case TeamColor.BLUE:
-      return { primary: "#0100E5", secondary: "#4D4DFE" };
-
-    case TeamColor.GREY:
-      return { primary: "#656363", secondary: "#868685" };
-
-    case TeamColor.RED:
-      return { primary: "#E50000", secondary: "#FE4D4D" };
-  }
-};
 
 export default RoleCard;

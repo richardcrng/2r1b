@@ -1,5 +1,5 @@
 import { createRolesCount } from "./data-utils";
-import { RolesCount } from "../types/game.types";
+import { GameSettings, RolesCount } from "../types/game.types";
 import { RoleKey, TeamColor } from "../types/role.types";
 import {
   getRoleColor,
@@ -29,10 +29,12 @@ export interface SetupAlert {
 
 export const alertsFromSetup = (
   rolesCount: RolesCount,
-  nPlayers: number
+  nPlayers: number,
+  settings: GameSettings = { colorSharing: false }
 ): SetupAlert[] => [
   ...alertsFromPlayersCount(rolesCount, nPlayers),
   ...alertsFromRolesCount(rolesCount),
+  ...alertsFromSettings(settings, nPlayers),
 ];
 
 export const alertsFromPlayersCount = (
@@ -109,6 +111,23 @@ export const alertsFromRolesCount = (rolesCount: RolesCount): SetupAlert[] => {
   );
 
   return [...checkTeamBalance(rolesCount), ...alerts];
+};
+
+export const alertsFromSettings = (
+  settings: GameSettings,
+  nPlayers: number
+): SetupAlert[] => {
+  const alerts: SetupAlert[] = [];
+
+  if (nPlayers <= 10 && settings.colorSharing) {
+    alerts.push({
+      severity: SetupAlertSeverity.WARNING,
+      message: "Color sharing is not recommended with 10 or fewer players",
+      source: SetupAlertSource.PLAYER_COUNT,
+    });
+  }
+
+  return alerts;
 };
 
 export const checkOtherRoleCountRestrictions = (

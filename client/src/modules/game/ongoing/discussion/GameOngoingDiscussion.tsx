@@ -184,7 +184,7 @@ function GameOngoingDiscussion(props: Props): JSX.Element {
       actions.modal.create.assign({
         isOpen: true,
         title: () => "Offer Share",
-        content: ({ currentRoom, onOfferShare, player, players }) => {
+        content: ({ currentRoom, game, onOfferShare, player, players }) => {
           // there can only be one abdication offer at any given time
           const currentOffer = Object.values(player.pendingActions).find(
             isPlayerShareAction
@@ -192,6 +192,7 @@ function GameOngoingDiscussion(props: Props): JSX.Element {
 
           return (
             <PlayerShareOffer
+              colorSharing={game.settings.colorSharing}
               currentOffer={currentOffer}
               currentRoom={currentRoom}
               player={player}

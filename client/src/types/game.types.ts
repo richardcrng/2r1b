@@ -1,6 +1,20 @@
 import { PlayerAction, PlayerShareRecord } from "./player-action.types";
 import { RoleKey, TeamColor } from "./role.types";
 
+export interface Game {
+  id: string;
+  players: {
+    [playerSocketId: string]: Player;
+  };
+  currentTimerSeconds?: number;
+  endgame: GameEndgame;
+  rounds: Record<number, Round>;
+  rolesCount: RolesCount;
+  buriedRole?: RoleKey;
+  status: GameStatus;
+  settings: GameSettings;
+}
+
 export enum GameStatus {
   LOBBY = "LOBBY",
   ONGOING = "ONGOING",
@@ -13,30 +27,6 @@ export enum RoundStatus {
   HOSTAGE_SELECTION = "hostage-selection",
   COMPLETE = "complete",
   PENDING = "pending",
-}
-
-export enum CardType {
-  GOLD = "gold",
-  FIRE = "fire",
-  EMPTY = "empty",
-}
-
-export interface Card {
-  /** If not present, then the card has not been dealt (and is stacked) */
-  holdingPlayerId?: string;
-  id: number;
-  isFlipped?: boolean;
-  isStacked?: boolean;
-  type: CardType;
-}
-
-export interface Deck {
-  /** Cards keyed by a unique card id */
-  cards: Record<number, Card>;
-  // /** Array of card ids */
-  // dealt: string[];
-  // /** Array of card ids */
-  // stacked: number[];
 }
 
 export interface LeaderVote {
@@ -65,15 +55,6 @@ export interface Player {
 
 export interface PlayerWithRoom extends Player {
   room?: RoomName;
-}
-
-export interface Turn {
-  keyholderId: string;
-  selected: {
-    playerId: string;
-    cardIdx: number;
-  };
-  flip: CardType;
 }
 
 export enum LeaderRecordMethod {
@@ -198,15 +179,6 @@ export interface PlayerResult {
   reason: string;
 }
 
-export interface Game {
-  id: string;
-  players: {
-    [playerSocketId: string]: Player;
-  };
-  currentTimerSeconds?: number;
-  endgame: GameEndgame;
-  rounds: Record<number, Round>;
-  rolesCount: RolesCount;
-  buriedRole?: RoleKey;
-  status: GameStatus;
+export interface GameSettings {
+  colorSharing?: boolean;
 }
