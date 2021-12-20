@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { PlayerRole, RoleKey, RoleRanking } from "../../../../types/role.types";
+import { getTeamColorHex } from "../../../../utils/colors";
 import {
   getRoleRanking,
   getRoleRestrictions,
 } from "../../../../utils/role-utils";
-import { getColors } from "../../card/RoleCard";
 
 const RoleUl = styled.ul`
   padding-inline-start: 0;
@@ -45,7 +45,7 @@ function RoleSetupList({
             <div>
               <span
                 style={{
-                  color: getColors(role.color).primary,
+                  color: getTeamColorHex(role.color).primary,
                   fontWeight:
                     getRoleRanking(role.key) === RoleRanking.PRIMARY
                       ? "bold"

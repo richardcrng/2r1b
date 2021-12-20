@@ -4,6 +4,7 @@ import { ClientEvent, ServerEvent } from "../../types/event.types";
 import { toast } from "react-toastify";
 import {
   isPlayerCardShareRecord,
+  isPlayerColorShareRecord,
   PlayerActionType,
 } from "../../types/player-action.types";
 import { Button } from "semantic-ui-react";
@@ -11,6 +12,7 @@ import { useSocket } from "../../socket";
 import { useRef } from "react";
 import RoleCard from "../role/card/RoleCard";
 import { getRoleDefinition } from "../../utils/role-utils";
+import { getTeamColorHex } from "../../utils/colors";
 
 function usePlayerActions(game: Game, player: Player): void {
   const socket = useSocket();
@@ -190,6 +192,43 @@ function usePlayerActions(game: Game, player: Player): void {
               <RoleCard
                 role={getRoleDefinition(shareRecord.sharedWithPlayer)}
               />
+              <Button
+                color="red"
+                fluid
+                onClick={() => {
+                  toast.dismiss(toastId);
+                  socket.emit(ClientEvent.TERMINATE_SHARE, game.id, action);
+                }}
+                style={{ marginTop: "5px" }}
+              >
+                End share
+              </Button>
+            </div>,
+            {
+              autoClose: false,
+              closeButton: false,
+              closeOnClick: false,
+              draggable: false,
+            }
+          );
+
+          toastIds.current[action.id] = toastId;
+        } else if (isPlayerColorShareRecord(shareRecord)) {
+          const otherPlayer = game.players[shareRecord.playerIdSharedWith];
+          const otherColor = shareRecord.sharedWithPlayer;
+
+          const toastId = toast(
+            <div>
+              <p>
+                You are color sharing with {otherPlayer.name} - you are seeing
+                their color below, and they are seeing yours.
+              </p>
+              <p style={{ fontWeight: "bold", fontSize: "120%" }}>
+                {otherPlayer.name}'s card color is{" "}
+                <strong style={{ color: getTeamColorHex(otherColor).primary }}>
+                  {otherColor}
+                </strong>
+              </p>
               <Button
                 color="red"
                 fluid

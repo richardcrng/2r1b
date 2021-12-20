@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dropdown } from "semantic-ui-react";
 import { ALPHABETISED_ROLE_VALUES, RoleKey } from "../../../types/role.types";
-import { getColors } from "../card/RoleCard";
+import { getTeamColorHex } from "../../../utils/colors";
 
 const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
   key: RoleKey;
@@ -13,7 +13,7 @@ const ALPHABETISED_ROLE_VALUE_DROPDOWN_OPTIONS: {
   text: roleValue.roleName,
   value: roleValue.key,
   content: (
-    <span style={{ color: getColors(roleValue.color).primary }}>
+    <span style={{ color: getTeamColorHex(roleValue.color).primary }}>
       {roleValue.roleName}
     </span>
   ),
