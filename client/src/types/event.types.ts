@@ -70,6 +70,7 @@ export enum ServerEvent {
   GAME_OVER = "game-over",
   GAME_UPDATED = "game-updated",
   PLAYER_GOTTEN = "player-gotten",
+  PLAYER_KICKED = "player-kicked",
   PLAYER_NOTIFICATION = "player-notification",
   PLAYER_NOT_FOUND = "player-not-found",
   PLAYER_UPDATED = "player-updated",
@@ -237,6 +238,7 @@ export type ServerEventListeners = {
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
+  [ServerEvent.PLAYER_KICKED]: (gameId: string, playerId: string) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOTIFICATION]: (
     playersToNotify: Record<string, true>,

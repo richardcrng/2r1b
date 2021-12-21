@@ -176,6 +176,16 @@ export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROL
     });
   };
 
+export const kickPlayer: ClientEventListeners[ClientEvent.KICK_PLAYER] = (
+  gameId,
+  playerIdToKick
+) => {
+  const gameManager = new GameManager(gameId);
+  gameManager.update((game) => {
+    delete game.players[playerIdToKick];
+  });
+};
+
 export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION] =
   (gameId, room, abdicatingLeaderId, proposedNewLeaderId) => {
     const gameManager = new GameManager(gameId);

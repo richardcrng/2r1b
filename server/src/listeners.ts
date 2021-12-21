@@ -27,6 +27,7 @@ import {
   resetGame,
   updateGameSettings,
   handleSniperShot,
+  kickPlayer,
 } from "./game/controllers";
 import { joinPlayerToGame, updatePlayer } from "./player/controllers";
 import { GameManager } from "./game/model";
@@ -63,6 +64,10 @@ export const addListeners = (socket: ServerSocket): void => {
     },
     [ClientEvent.INCREMENT_ROLE]: incrementRoleInGame,
     [ClientEvent.JOIN_GAME]: joinPlayerToGame,
+    [ClientEvent.KICK_PLAYER]: (gameId, playerId) => {
+      socket.emit(ServerEvent.PLAYER_KICKED, gameId, playerId);
+      kickPlayer(gameId, playerId);
+    },
     [ClientEvent.OFFER_ABDICATION]: offerAbdication,
     [ClientEvent.OFFER_SHARE]: offerShare,
     [ClientEvent.PRIVATE_EYE_PREDICT]: handlePrivateEyePrediction,
