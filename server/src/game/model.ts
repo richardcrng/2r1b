@@ -468,7 +468,7 @@ export class GameManager {
     });
   }
 
-  public resolveCardShare(
+  public resolveAcceptedCardShare(
     cardShareAction: PlayerActionCardShareOffered,
     sharerCard: RoleKey,
     shareeCard: RoleKey
@@ -495,7 +495,7 @@ export class GameManager {
     );
   }
 
-  public resolveColorShare(
+  public resolveAcceptedColorShare(
     colorShareAction: PlayerActionColorShareOffered,
     sharerCard: RoleKey,
     shareeCard: RoleKey
@@ -531,9 +531,9 @@ export class GameManager {
 
     if (sharerCard && shareeCard) {
       if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
-        this.resolveCardShare(shareAction, sharerCard, shareeCard);
+        this.resolveAcceptedCardShare(shareAction, sharerCard, shareeCard);
       } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
-        this.resolveColorShare(shareAction, sharerCard, shareeCard);
+        this.resolveAcceptedColorShare(shareAction, sharerCard, shareeCard);
       }
     }
   }
