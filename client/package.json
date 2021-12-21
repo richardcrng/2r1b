@@ -33,6 +33,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
+    "dev": "react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "lint": "eslint src",

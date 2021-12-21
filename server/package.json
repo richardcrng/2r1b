@@ -32,9 +32,9 @@
     "socket.io": "^4.0.0"
   },
   "scripts": {
+    "dev": "ts-node-dev src/index.ts",
     "start": "yarn start:compiled",
     "start:compiled": "node build/server/src/index.js",
-    "start:dev": "ts-node-dev src/index.ts",
     "build": "tsc",
     "lint": "eslint src",
     "lint:strict": "eslint src --max-warnings 0",
