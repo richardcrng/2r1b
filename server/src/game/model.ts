@@ -3,9 +3,8 @@ import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import {
   GameNotification,
+  NotificationForPlayer,
   NotificationType,
-  PlayerNotification,
-  PlayerNotificationFn,
 } from "../../../client/src/types/notification.types";
 import {
   createStartingRounds,
@@ -400,7 +399,7 @@ export class GameManager {
 
   public pushPlayerNotificationToRoom(
     roomName: RoomName,
-    notification: PlayerNotification | PlayerNotificationFn,
+    notification: NotificationForPlayer,
     where: (player: Player) => boolean = () => true
   ): void {
     this.pushPlayersNotification(
@@ -412,7 +411,7 @@ export class GameManager {
 
   public pushPlayerNotificationById(
     playerId: string,
-    notification: PlayerNotification | PlayerNotificationFn
+    notification: NotificationForPlayer
   ): void {
     this.managePlayer(playerId).pushNotification(notification);
   }
@@ -425,7 +424,7 @@ export class GameManager {
   }
 
   public pushPlayersNotification(
-    notification: PlayerNotification | PlayerNotificationFn,
+    notification: NotificationForPlayer,
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
@@ -468,7 +467,7 @@ export class GameManager {
     });
   }
 
-  public resolveCardShare(
+  public resolveAcceptedCardShare(
     cardShareAction: PlayerActionCardShareOffered,
     sharerCard: RoleKey,
     shareeCard: RoleKey
@@ -495,7 +494,7 @@ export class GameManager {
     );
   }
 
-  public resolveColorShare(
+  public resolveAcceptedColorShare(
     colorShareAction: PlayerActionColorShareOffered,
     sharerCard: RoleKey,
     shareeCard: RoleKey
@@ -525,16 +524,29 @@ export class GameManager {
     );
   }
 
-  public resolveShare(shareAction: PlayerActionShareOffered): void {
-    const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role;
-    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId).role;
+  public resolveAcceptedShare(shareAction: PlayerActionShareOffered): void {
+    const offerId = shareAction.id;
+    const sharerManager = this.managePlayer(shareAction.sharerId);
+    const accepterManager = this.managePlayer(shareAction.offeredPlayerId);
 
-    if (sharerCard && shareeCard) {
-      if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
-        this.resolveCardShare(shareAction, sharerCard, shareeCard);
-      } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
-        this.resolveColorShare(shareAction, sharerCard, shareeCard);
-      }
+    sharerManager.cancelAllPendingShares({ except: [offerId] });
+    accepterManager.cancelAllPendingShares({ except: [offerId] });
+
+    const sharerRole = sharerManager.getRoleOrFail();
+    const accepterRole = accepterManager.getRoleOrFail();
+
+    if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
+      this.resolveAcceptedCardShare(
+        shareAction,
+        sharerRole.key,
+        accepterRole.key
+      );
+    } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
+      this.resolveAcceptedColorShare(
+        shareAction,
+        sharerRole.key,
+        accepterRole.key
+      );
     }
   }
 

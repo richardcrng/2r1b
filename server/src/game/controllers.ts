@@ -55,7 +55,7 @@ export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] = (
   action
 ): void => {
   const gameManager = new GameManager(gameId);
-  gameManager.resolveShare(action);
+  gameManager.resolveAcceptedShare(action);
 };
 
 export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER] =

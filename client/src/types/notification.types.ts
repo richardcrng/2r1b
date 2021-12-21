@@ -7,6 +7,13 @@ export enum NotificationType {
   PLAYER_JOINED = "player-joined",
 }
 
+/**
+ * A type for the different ways a player notification can be defined
+ *  on the server (before ultimately being sent back as an object
+ *  `PlayerNotification`)
+ */
+export type NotificationForPlayer = PlayerNotification | PlayerNotificationFn;
+
 export type PlayerNotificationFn = (player: Player) => PlayerNotification;
 
 export interface NotificationBase {
