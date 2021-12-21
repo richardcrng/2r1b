@@ -61,12 +61,20 @@ export interface OperationError<T = void> extends OperationBase<T> {
 
 export type Operation<T = void> = OperationSuccess<T> | OperationError<T>;
 
+/** Map of all game managers - to avoid creating new ones */
+const gameManagerMap = new Map<string, GameManager>();
+
 export class GameManager {
   constructor(
     public gameId: string,
     public gamesStore: Record<string, Game> = GAMES_DB,
     public io: ServerIO = SERVER_IO
   ) {}
+
+  static for(gameId: string): GameManager {
+    const existingManager = gameManagerMap.get(gameId);
+    return existingManager ?? new this(gameId);
+  }
 
   static hostNew(socketId: string, playerName?: string): GameManager {
     const gameId = generateRandomGameId();
@@ -91,7 +99,7 @@ export class GameManager {
       rounds: createStartingRounds(),
       settings: { colorSharing: false },
     };
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     gameManager.set(game);
     return gameManager;
   }

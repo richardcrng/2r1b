@@ -19,7 +19,7 @@ import {
 
 export const acceptAbdication: ClientEventListeners[ClientEvent.ACCEPT_ABDICATION] =
   (gameId, action): void => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     const { abdicatingLeaderId, proposedNewLeaderId } = action;
     const abdicaterName = gameManager.getPlayerOrFail(abdicatingLeaderId).name;
     const newLeaderName = gameManager.getPlayerOrFail(proposedNewLeaderId).name;
@@ -55,7 +55,7 @@ export const acceptShare: ClientEventListeners[ClientEvent.ACCEPT_SHARE] = (
   gameId,
   action
 ): void => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   gameManager.resolveAcceptedShare(action);
 };
 
@@ -66,7 +66,7 @@ export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER
     appointerId: string,
     appointedLeaderId: string
   ): void => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     const targetRoom = gameManager.currentRound().rooms[roomName];
 
     if (targetRoom.leadersRecord.length === 0) {
@@ -98,7 +98,7 @@ export const appointLeader: ClientEventListeners[ClientEvent.APPOINT_ROOM_LEADER
 
 export const declineAbdication: ClientEventListeners[ClientEvent.DECLINE_ABDICATION] =
   (gameId, action): void => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     const { abdicatingLeaderId, proposedNewLeaderId } = action;
     const abdicaterName = gameManager.getPlayerOrFail(abdicatingLeaderId).name;
     const proposedLeaderName =
@@ -119,7 +119,7 @@ export const declineShare: ClientEventListeners[ClientEvent.DECLINE_SHARE] = (
   gameId,
   action
 ): void => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   const { sharerId, offeredPlayerId } = action;
   const shareType =
     action.type === PlayerActionType.CARD_SHARE_OFFERED ? "card" : "color";
@@ -139,7 +139,7 @@ export const declineShare: ClientEventListeners[ClientEvent.DECLINE_SHARE] = (
 
 export const deselectHostage: ClientEventListeners[ClientEvent.DESELECT_HOSTAGE] =
   (gameId, playerId, roomName) => {
-    new GameManager(gameId).updateCurrentRound((round) => {
+    GameManager.for(gameId).updateCurrentRound((round) => {
       round.rooms[roomName].hostages = round.rooms[roomName].hostages.filter(
         (id) => id !== playerId
       );
@@ -148,7 +148,7 @@ export const deselectHostage: ClientEventListeners[ClientEvent.DESELECT_HOSTAGE]
 
 export const handleGamblerPrediction: ClientEventListeners[ClientEvent.GAMBLER_PREDICT] =
   (gameId, prediction) => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     gameManager.update((game) => {
       game.endgame.gamblerPrediction = prediction;
     });
@@ -158,21 +158,21 @@ export const handleSniperShot: ClientEventListeners[ClientEvent.SNIPER_SHOT] = (
   gameId,
   sniperShotId
 ) => {
-  new GameManager(gameId).update((game) => {
+  GameManager.for(gameId).update((game) => {
     game.endgame.sniperShot = sniperShotId;
   });
 };
 
 export const handlePrivateEyePrediction: ClientEventListeners[ClientEvent.PRIVATE_EYE_PREDICT] =
   (gameId, roleKey) => {
-    new GameManager(gameId).update((game) => {
+    GameManager.for(gameId).update((game) => {
       game.endgame.privateEyePrediction = roleKey;
     });
   };
 
 export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROLE] =
   (gameId: string, role: RoleKey, increment: number): void => {
-    new GameManager(gameId).update((game) => {
+    GameManager.for(gameId).update((game) => {
       game.rolesCount[role] += increment;
     });
   };
@@ -181,7 +181,7 @@ export const kickPlayer: ClientEventListeners[ClientEvent.KICK_PLAYER] = (
   gameId,
   playerIdToKick
 ) => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   gameManager.io.emit(ServerEvent.PLAYER_KICKED, gameId, playerIdToKick);
   gameManager.update((game) => {
     delete game.players[playerIdToKick];
@@ -190,7 +190,7 @@ export const kickPlayer: ClientEventListeners[ClientEvent.KICK_PLAYER] = (
 
 export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION] =
   (gameId, room, abdicatingLeaderId, proposedNewLeaderId) => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     const abdicationOffer: PlayerActionAbdicationOffered = {
       id: `${Date.now()}-${Math.random().toFixed(5).slice(2)}`,
       room,
@@ -212,7 +212,7 @@ export const offerShare: ClientEventListeners[ClientEvent.OFFER_SHARE] = (
   gameId,
   action
 ): void => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
 
   for (const playerId of [action.sharerId, action.offeredPlayerId]) {
     const playerManager = gameManager.managePlayer(playerId);
@@ -230,7 +230,7 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
     voterId: string,
     proposedLeaderId?: string
   ): void => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
 
     const currentLeaderRecord = gameManager.currentLeaderRecord(roomName);
     if (!currentLeaderRecord)
@@ -269,14 +269,14 @@ export const proposeRoomLeader: ClientEventListeners[ClientEvent.PROPOSE_ROOM_LE
 export const resetGame: ClientEventListeners[ClientEvent.RESET_GAME] = (
   gameId
 ) => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   gameManager.resetGame();
 };
 
 export const revealResults: ClientEventListeners[ClientEvent.REVEAL_RESULTS] = (
   gameId
 ) => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   gameManager.update((game) => {
     game.status = GameStatus.RESULTS;
   });
@@ -287,7 +287,7 @@ export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (
   playerId,
   roomName
 ) => {
-  new GameManager(gameId).updateCurrentRound((round) => {
+  GameManager.for(gameId).updateCurrentRound((round) => {
     if (!round.rooms[roomName].hostages.includes(playerId)) {
       round.rooms[roomName].hostages.push(playerId);
     }
@@ -297,7 +297,7 @@ export const selectHostage: ClientEventListeners[ClientEvent.SELECT_HOSTAGE] = (
 export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
   gameId: string
 ): void => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   gameManager.assignInitialRoles();
   gameManager.assignInitialRooms();
   gameManager.update((game) => {
@@ -316,7 +316,7 @@ export const startGame: ClientEventListeners[ClientEvent.START_GAME] = (
 
 export const submitHostages: ClientEventListeners[ClientEvent.SUBMIT_HOSTAGES] =
   (gameId, roomName) => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     gameManager.updateCurrentRound((round) => {
       round.rooms[roomName].isReadyToExchange = true;
     });
@@ -334,7 +334,7 @@ export const submitHostages: ClientEventListeners[ClientEvent.SUBMIT_HOSTAGES] =
 
 export const terminateShare: ClientEventListeners[ClientEvent.TERMINATE_SHARE] =
   (gameId, shareResultAction) => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
 
     const cardShareType =
       shareResultAction.record.offerAction.type ===
@@ -370,7 +370,7 @@ export const terminateShare: ClientEventListeners[ClientEvent.TERMINATE_SHARE] =
 
 export const updateGameSettings: ClientEventListeners[ClientEvent.UPDATE_GAME_SETTINGS] =
   (gameId, newSettings) => {
-    new GameManager(gameId).update((game) => ({
+    GameManager.for(gameId).update((game) => ({
       ...game,
       settings: Object.assign(game.settings, newSettings),
     }));
@@ -383,7 +383,7 @@ const usurpLeader = (
   oldLeaderId: string,
   voterIds: string[]
 ): void => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
 
   gameManager.addLeaderRecord(roomName, {
     method: LeaderRecordMethod.USURPATION,
@@ -417,7 +417,7 @@ const usurpLeader = (
 
 export const withdrawAbdicationOffer: ClientEventListeners[ClientEvent.WITHDRAW_ABDICATION_OFFER] =
   (gameId, offer) => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
 
     const abdicatingPlayerName = gameManager.getPlayerOrFail(
       offer.abdicatingLeaderId
@@ -443,7 +443,7 @@ export const withdrawAbdicationOffer: ClientEventListeners[ClientEvent.WITHDRAW_
 
 export const withdrawShareOffer: ClientEventListeners[ClientEvent.WITHDRAW_SHARE_OFFER] =
   (gameId, action): void => {
-    const gameManager = new GameManager(gameId);
+    const gameManager = GameManager.for(gameId);
     const { sharerId, offeredPlayerId } = action;
     const shareType =
       action.type === PlayerActionType.CARD_SHARE_OFFERED ? "card" : "color";
