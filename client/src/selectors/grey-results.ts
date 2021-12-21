@@ -19,6 +19,7 @@ export const selectGreyPlayerResults = createSelector(
   SELECTORS.selectDescribeOfficeHolder,
   SELECTORS.selectExplosivesHolder,
   SELECTORS.selectDescribeExplosivesHolder,
+  SELECTORS.selectDidRolesCardShare,
   (
     game,
     isRoleInPlay,
@@ -29,7 +30,8 @@ export const selectGreyPlayerResults = createSelector(
     officeHolder,
     describeOfficeHolder,
     explosivesHolder,
-    describeExplosivesHolder
+    describeExplosivesHolder,
+    didRolesCardShare
   ): PlayerResult[] => {
     const results: PlayerResult[] = [];
 
@@ -59,6 +61,31 @@ export const selectGreyPlayerResults = createSelector(
             ? `Correct prediction that ${prediction} team would win`
             : `Incorrect prediction that ${prediction} team would win`
         }.`,
+      });
+    }
+
+    if (isRoleInPlay("MI6_GREY") && officeHolder && explosivesHolder) {
+      const didShareWithOfficeHolder = didRolesCardShare(
+        "MI6_GREY",
+        officeHolder.role
+      );
+      const didShareWithExplosivesHolder = didRolesCardShare(
+        "MI6_GREY",
+        explosivesHolder.role
+      );
+      const isMI6win = didShareWithOfficeHolder && didShareWithExplosivesHolder;
+      results.push({
+        role: "MI6_GREY",
+        isWin: isMI6win,
+        reason: `${
+          isMI6win
+            ? `Card shared with both ${describeOfficeHolder} and ${describeExplosivesHolder}`
+            : didShareWithOfficeHolder
+            ? `Card shared with ${describeOfficeHolder} but not ${describeExplosivesHolder}`
+            : didShareWithExplosivesHolder
+            ? `Card shared with ${describeExplosivesHolder} but not ${describeOfficeHolder}`
+            : `Card shared with neither ${describeOfficeHolder} nor ${describeExplosivesHolder}`
+        }`,
       });
     }
 
