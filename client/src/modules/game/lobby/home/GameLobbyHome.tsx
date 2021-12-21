@@ -9,11 +9,11 @@ import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
 import { SetupAlert } from "../../../../utils/setup-utils";
 import { selectGameSetupErrorsAndWarnings } from "../../../../selectors/game-selectors";
+import { GameHandlers } from "../../GamePage";
 
-interface Props {
+interface Props extends Pick<GameHandlers, "onGameStart" | "onPlayerKick"> {
   game: Game;
   handleViewSetup(): void;
-  onGameStart(): void;
   players: Player[];
   player: Player;
 }
@@ -38,7 +38,6 @@ const Header = styled.div`
 const StyledPlayerList = styled(PlayerList)`
   grid-area: players;
   overflow-y: scroll;
-  list-style: none;
   padding-inline-start: 20px;
 `;
 
@@ -55,13 +54,25 @@ const StyledA = styled.a`
 const PlayerListItemContents = styled.div`
   display: flex;
   align-items: center;
+  align-content: center;
   font-size: 1.2rem;
+  justify-content: space-between;
   padding-bottom: 10px;
+
+  p {
+    margin: 0;
+  }
+
+  button {
+    font-size: 0.9rem;
+    margin: 0;
+  }
 `;
 
 function GameLobbyHome({
   game,
   onGameStart,
+  onPlayerKick,
   handleViewSetup,
   players,
   player,
@@ -106,16 +117,19 @@ function GameLobbyHome({
       <StyledPlayerList
         players={players}
         ownPlayerId={player.socketId}
-        renderPlayer={(player, idx, ownPlayerId) => {
+        renderPlayer={(playerToRender, idx, ownPlayerId) => {
           return (
             <PlayerListItemContents>
-              <span style={{ marginRight: "10px" }}>{idx + 1}.</span>
-              <PlayerAvatar player={player} size={32} />
               <p style={{ marginLeft: "10px" }}>
-                {player.name}
-                {player.socketId === ownPlayerId && " (you)"}
-                {player.isHost && " (host)"}
+                {playerToRender.name}
+                {playerToRender.socketId === ownPlayerId && " (you)"}
+                {playerToRender.isHost && " (host)"}
               </p>
+              {player.isHost && playerToRender.socketId !== player.socketId && (
+                <button onClick={() => onPlayerKick(playerToRender.socketId)}>
+                  x
+                </button>
+              )}
             </PlayerListItemContents>
           );
         }}
