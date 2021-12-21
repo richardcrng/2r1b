@@ -1,14 +1,16 @@
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
+import { selectIsSniperShotNeeded } from "../../../selectors";
 import {
   selectGameRolesInSetupCount,
   selectIsGamblerPredictionNeeded,
   selectIsPrivateEyeIdentificationNeeded,
-} from "../../../selectors/game-selectors";
-import { GamblerPrediction, Game, Player } from "../../../types/game.types";
-import { RoleKey } from "../../../types/role.types";
+} from "../../../selectors/";
+import { Game, Player } from "../../../types/game.types";
+import { GameHandlers } from "../GamePage";
 import GameEndgameGambler from "./gambler/GameEndgameGambler";
 import GameEndgamePrivateEye from "./private-eye/GameEndgamePrivateEye";
+import GameEndgameSniper from "./sniper/GameEndgameSniper";
 
 const Container = styled.div`
   display: grid;
@@ -28,11 +30,15 @@ const Actions = styled.div`
   grid-area: actions;
 `;
 
-interface Props {
+interface Props
+  extends Pick<
+    GameHandlers,
+    | "onGamblerPrediction"
+    | "onPrivateEyeRolePrediction"
+    | "onResultsReveal"
+    | "onSniperShot"
+  > {
   game: Game;
-  onGamblerPrediction(prediction: GamblerPrediction): void;
-  onPrivateEyeRolePrediction(roleKey: RoleKey): void;
-  onResultsReveal(): void;
   player: Player;
 }
 
@@ -41,13 +47,10 @@ function GameEndgame({
   onGamblerPrediction,
   onPrivateEyeRolePrediction,
   onResultsReveal,
+  onSniperShot,
   player,
 }: Props): JSX.Element {
-  const isPrivateEyeIdentificationNeeded =
-    selectIsPrivateEyeIdentificationNeeded(game);
-  const isGamblerPredictionNeeded = selectIsGamblerPredictionNeeded(game);
-
-  if (isPrivateEyeIdentificationNeeded) {
+  if (selectIsPrivateEyeIdentificationNeeded(game)) {
     return (
       <GameEndgamePrivateEye
         onPrivateEyeRolePrediction={onPrivateEyeRolePrediction}
@@ -55,8 +58,12 @@ function GameEndgame({
         rolesCount={selectGameRolesInSetupCount(game)}
       />
     );
-  } else if (isGamblerPredictionNeeded) {
+  } else if (selectIsGamblerPredictionNeeded(game)) {
     return <GameEndgameGambler {...{ onGamblerPrediction, player }} />;
+  } else if (selectIsSniperShotNeeded(game)) {
+    return (
+      <GameEndgameSniper {...{ onSniperShot, player, players: game.players }} />
+    );
   }
 
   return (

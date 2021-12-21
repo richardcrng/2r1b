@@ -186,6 +186,14 @@ function GameRoute(): JSX.Element {
                   newSettings
                 );
             }}
+            onSniperShot={(targetPlayerId) => {
+              game.data &&
+                socket.emit(
+                  ClientEvent.SNIPER_SHOT,
+                  game.data.id,
+                  targetPlayerId
+                );
+            }}
             onWithdrawAbdicationOffer={(action) => {
               game.data &&
                 socket.emit(

@@ -48,6 +48,7 @@ export enum ClientEvent {
   RESET_GAME = "reset-game",
   REVEAL_RESULTS = "reveal-results",
   SELECT_HOSTAGE = "select-hostage",
+  SNIPER_SHOT = "sniper-shot",
   START_GAME = "start-game",
   SUBMIT_HOSTAGES = "submit-hostages",
   TERMINATE_SHARE = "terminate-share",
@@ -176,6 +177,8 @@ export type ClientEventListeners = {
     playerId: string,
     roomName: RoomName
   ) => void;
+
+  [ClientEvent.SNIPER_SHOT]: (gameId: string, sniperTargetId: string) => void;
 
   [ClientEvent.START_GAME]: (gameId: string) => void;
 

@@ -52,6 +52,7 @@ export interface GameHandlers {
   onResultsReveal(): void;
   onRoleIncrement: (roleKey: RoleKey, increment: number) => void;
   onSettingsUpdate(newSettings: Partial<GameSettings>): void;
+  onSniperShot(playerIdShot: string): void;
   onWithdrawAbdicationOffer(action: PlayerActionAbdicationOffered): void;
 }
 
@@ -70,6 +71,7 @@ function GamePage({
   onResultsReveal,
   onRoleIncrement,
   onSettingsUpdate,
+  onSniperShot,
   onWithdrawAbdicationOffer,
   players,
   player,
@@ -128,6 +130,7 @@ function GamePage({
           onGamblerPrediction,
           onPrivateEyeRolePrediction,
           onResultsReveal,
+          onSniperShot,
           player,
         }}
       />
