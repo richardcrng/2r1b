@@ -106,33 +106,33 @@ export const selectTeamWinCheckResult = createSelector(
         if (isArmed) {
           return {
             winningColor: TeamColor.RED,
-            reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}, whose explosives were successfully armed by the ${armer}.`,
+            reason: `The ${officeHolder.description} was killed in an explosion! They ended up in the same room as the ${explosivesHolder.description}, whose explosives were successfully armed by the ${armer.description}.`,
           };
         } else if (isTreated) {
           return {
             winningColor: TeamColor.BLUE,
-            reason: `The ${officeHolder} survived! Their medical condition was treated by the ${treater}, and whilst they ended up in the same room as the ${explosivesHolder}, the explosives were not armed by the ${armer}.`,
+            reason: `The ${officeHolder.description} survived! Their medical condition was treated by the ${treater.description}, and whilst they ended up in the same room as the ${explosivesHolder.description}, the explosives were not armed by the ${armer.description}.`,
           };
         } else {
           return {
             winningColor: "neither",
-            reason: `The ${officeHolder} died... but peacefully! Their fatal medical condition was not treated by the ${treater}; and no explosion happened, since the ${explosivesHolder}'s explosives were not armed by the ${armer}.`,
+            reason: `The ${officeHolder.description} died... but peacefully! Their fatal medical condition was not treated by the ${treater.description}; and no explosion happened, since the ${explosivesHolder.description}'s explosives were not armed by the ${armer.description}.`,
           };
         }
       } else if (isTreated) {
         return {
           winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! Their medical condition was treated by the ${treater}, and they were kept apart from the ${explosivesHolder}.`,
+          reason: `The ${officeHolder.description} survived! Their medical condition was treated by the ${treater.description}, and they were kept apart from the ${explosivesHolder.description}.`,
         };
       } else if (isArmed) {
         return {
           winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} died... and chaos errupted! Their fatal medical condition was not treated by the ${treater}, and the ${explosivesHolder}'s explosives were successfully armed by the ${armer}.`,
+          reason: `The ${officeHolder.description} died... and chaos errupted! Their fatal medical condition was not treated by the ${treater.description}, and the ${explosivesHolder.description}'s explosives were successfully armed by the ${armer.description}.`,
         };
       } else {
         return {
           winningColor: "neither",
-          reason: `The ${officeHolder} died... but peacefully! Their fatal medical condition was not treated by the ${treater}; and no explosion happened, since the ${explosivesHolder}'s explosives were not armed by the ${armer}.`,
+          reason: `The ${officeHolder.description} died... but peacefully! Their fatal medical condition was not treated by the ${treater.description}; and no explosion happened, since the ${explosivesHolder.description}'s explosives were not armed by the ${armer.description}.`,
         };
       }
     }
@@ -142,17 +142,17 @@ export const selectTeamWinCheckResult = createSelector(
       if (isSameRoom) {
         return {
           winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}.`,
+          reason: `The ${officeHolder.description} was killed in an explosion! They ended up in the same room as the ${explosivesHolder.description}.`,
         };
       } else if (!isTreated) {
         return {
           winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} died! Their fatal medical condition was not treated by the ${treater}.`,
+          reason: `The ${officeHolder.description} died! Their fatal medical condition was not treated by the ${treater.description}.`,
         };
       } else {
         return {
           winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! Their medical condition was successfully treated by the ${treater}, and they were kept apart from the ${explosivesHolder}.`,
+          reason: `The ${officeHolder.description} survived! Their medical condition was successfully treated by the ${treater.description}, and they were kept apart from the ${explosivesHolder.description}.`,
         };
       }
     }
@@ -162,20 +162,24 @@ export const selectTeamWinCheckResult = createSelector(
       if (isSameRoom && isArmed) {
         return {
           winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}, whose explosives were successfully armed by the ${armer}.`,
+          reason: `The ${officeHolder.description} was killed in an explosion! They ended up in the same room as the ${explosivesHolder.description}, whose explosives were successfully armed by the ${armer.description}.`,
         };
       } else if (isSameRoom) {
         return {
           winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! Although they ended up in the same room as the ${explosivesHolder}, the explosives had not been armed by the ${armer}.`,
+          reason: `The ${officeHolder.description} survived! Although they ended up in the same room as the ${explosivesHolder.description}, the explosives had not been armed by the ${armer.description}.`,
         };
       } else {
         return {
           winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! They were kept apart from the ${explosivesHolder}, whose explosives ${
+          reason: `The ${
+            officeHolder.description
+          } survived! They were kept apart from the ${
+            explosivesHolder.description
+          }, whose explosives ${
             isArmed
-              ? `had been successfully armed by the ${armer}`
-              : `had not been armed by the ${armer} in any case`
+              ? `had been successfully armed by the ${armer.description}`
+              : `had not been armed by the ${armer.description} in any case`
           }.`,
         };
       }
@@ -185,12 +189,12 @@ export const selectTeamWinCheckResult = createSelector(
     if (isSameRoom) {
       return {
         winningColor: TeamColor.RED,
-        reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}.`,
+        reason: `The ${officeHolder.description} was killed in an explosion! They ended up in the same room as the ${explosivesHolder.description}.`,
       };
     } else {
       return {
         winningColor: TeamColor.BLUE,
-        reason: `The ${officeHolder} was survived! They were kept apart from the ${explosivesHolder}.`,
+        reason: `The ${officeHolder.description} was survived! They were kept apart from the ${explosivesHolder.description}.`,
       };
     }
   }
