@@ -28,6 +28,7 @@ export enum RedRoleName {
 export enum GreyRoleName {
   GAMBLER = "Gambler",
   INTERN = "Intern",
+  MI6 = "MI6",
   PRIVATE_EYE = "Private Eye",
   RIVAL = "Rival",
   SURVIVOR = "Survivor",
@@ -315,6 +316,11 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
     },
     { recommended: { VICTIM_GREY: 1 } }
   ),
+
+  MI6_GREY: RoleDefinition.Grey({
+    key: "MI6_GREY",
+    roleName: GreyRoleName.MI6,
+  }),
 
   PRIVATE_EYE_GREY: RoleDefinition.Grey(
     {

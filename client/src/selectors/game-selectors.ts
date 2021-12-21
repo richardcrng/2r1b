@@ -298,8 +298,12 @@ export const selectIsRoleInPlay = createSelector(
 export const selectFindPlayerWithRole = createSelector(
   selectGamePlayers,
   (players) =>
-    (roleKey: RoleKey): Player | undefined =>
-      Object.values(players).find((player) => player.role === roleKey)
+    (roleKey: RoleKey): (Player & { role: RoleKey }) | undefined =>
+      // type assertion okay since roleKey is defined here
+      //  so the player found must have a role
+      Object.values(players).find(
+        (player) => player.role === roleKey
+      ) as Player & { role: RoleKey }
 );
 
 export const selectPresident = createSelector(

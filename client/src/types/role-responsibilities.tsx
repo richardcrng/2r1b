@@ -75,6 +75,12 @@ export const WIN_CONDITIONS = {
       game.
     </>
   ),
+  [GreyRoleName.MI6]: (
+    <>
+      You win if you card share with <i>both</i> the {PRESIDENT} and the{" "}
+      {BOMBER} before the end of the game.
+    </>
+  ),
   [GreyRoleName.PRIVATE_EYE]: (
     <>You win if you make a correct {action("Identification")}.</>
   ),
@@ -238,6 +244,12 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
 
   [GreyRoleName.INTERN]: (
     <>You're a keen intern - get close to the {PRESIDENT}!</>
+  ),
+
+  [GreyRoleName.MI6]: (
+    <>
+      Locate the identities of the {PRESIDENT} and the {BOMBER}!
+    </>
   ),
 
   [GreyRoleName.PRIVATE_EYE]: (
