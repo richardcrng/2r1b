@@ -49,13 +49,13 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.DESELECT_HOSTAGE]: deselectHostage,
     [ClientEvent.GAMBLER_PREDICT]: handleGamblerPrediction,
     [ClientEvent.GET_GAME]: (gameId) => {
-      const game = new GameManager(gameId)._pointer();
+      const game = GameManager.for(gameId)._pointer();
       game
         ? socket.emit(ServerEvent.GAME_GOTTEN, game.id, game)
         : socket.emit(ServerEvent.GAME_NOT_FOUND);
     },
     [ClientEvent.GET_PLAYER]: (gameId, playerId, aliasIds) => {
-      const player = new GameManager(gameId)
+      const player = GameManager.for(gameId)
         .managePlayer(playerId, aliasIds)
         ._pointer();
       player

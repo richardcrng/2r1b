@@ -10,7 +10,7 @@ export const joinPlayerToGame: ClientEventListeners[ClientEvent.JOIN_GAME] = (
   gameId: string,
   playerData: Player
 ): void => {
-  const gameManager = new GameManager(gameId);
+  const gameManager = GameManager.for(gameId);
   gameManager.managePlayer(playerData.socketId).set({
     ...playerData,
     gameId,
@@ -22,7 +22,7 @@ export const updatePlayer: ClientEventListeners[ClientEvent.UPDATE_PLAYER] = (
   gameId: string,
   playerData: Player
 ): void => {
-  new GameManager(gameId).updatePlayer(playerData.socketId, (player) => {
+  GameManager.for(gameId).updatePlayer(playerData.socketId, (player) => {
     Object.assign(player, playerData);
   });
 };
