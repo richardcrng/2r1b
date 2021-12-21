@@ -1,6 +1,7 @@
 import {
   ClientEvent,
   ClientEventListeners,
+  ServerEvent,
 } from "../../../client/src/types/event.types";
 import {
   GameStatus,
@@ -181,6 +182,7 @@ export const kickPlayer: ClientEventListeners[ClientEvent.KICK_PLAYER] = (
   playerIdToKick
 ) => {
   const gameManager = new GameManager(gameId);
+  gameManager.io.emit(ServerEvent.PLAYER_KICKED, gameId, playerIdToKick);
   gameManager.update((game) => {
     delete game.players[playerIdToKick];
   });

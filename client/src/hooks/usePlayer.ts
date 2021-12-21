@@ -6,6 +6,7 @@ import { ClientEvent, ServerEvent } from "../types/event.types";
 import { Player } from "../types/game.types";
 import useSocketListener from "./useSocketListener";
 import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom";
 
 interface UsePlayerResult {
   data: Player | undefined;
@@ -24,6 +25,7 @@ export default function usePlayer(
   aliasIds: string[] = []
 ): UsePlayerResult {
   const socket = useSocket();
+  const history = useHistory();
   const { state, dispatch, actions } = useRiducer(initialState);
   const { gameId } = useParams<{ gameId: string }>();
   const playerSocketId = playerId ?? socket.id;
@@ -45,6 +47,13 @@ export default function usePlayer(
 
   useSocketListener(ServerEvent.PLAYER_GOTTEN, (id, player) => {
     [...aliasIds, playerId].includes(id) && setPlayer(player);
+  });
+
+  useSocketListener(ServerEvent.PLAYER_KICKED, (fromGameId, kickedPlayerId) => {
+    if (fromGameId === gameId && state.data?.socketId === kickedPlayerId) {
+      history.push("/");
+      window.alert("You have been kicked from the game by the host!");
+    }
   });
 
   useSocketListener(ServerEvent.PLAYER_UPDATED, (id, player) => {
