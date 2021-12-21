@@ -6,19 +6,28 @@ import {
 } from "../types/game.types";
 import { RoleKey } from "../types/role.types";
 import { getRoleName } from "../utils/role-utils";
-import SELECTORS from "./selectors";
+import {
+  selectDidRolesCardShare,
+  selectGreyResultHelpers,
+} from "./endgame-selectors";
+import {
+  selectExplosivesHolder,
+  selectFindPlayerWithRole,
+  selectGame,
+  selectGameEndgameState,
+  selectIsRoleInPlay,
+  selectOfficeHolder,
+} from "./game-selectors";
 
 export const selectGreyPlayerResults = createSelector(
-  SELECTORS.selectGame,
-  SELECTORS.selectIsRoleInPlay,
-  SELECTORS.selectGameEndgameState,
-  SELECTORS.selectGreyResultHelpers,
-  SELECTORS.selectFindPlayerWithRole,
-  SELECTORS.selectOfficeHolder,
-  SELECTORS.selectDescribeOfficeHolder,
-  SELECTORS.selectExplosivesHolder,
-  SELECTORS.selectDescribeExplosivesHolder,
-  SELECTORS.selectDidRolesCardShare,
+  selectGame,
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  selectGreyResultHelpers,
+  selectFindPlayerWithRole,
+  selectOfficeHolder,
+  selectExplosivesHolder,
+  selectDidRolesCardShare,
   (
     game,
     isRoleInPlay,
@@ -31,9 +40,7 @@ export const selectGreyPlayerResults = createSelector(
     },
     findPlayerWithRole,
     officeHolder,
-    describeOfficeHolder,
     explosivesHolder,
-    describeExplosivesHolder,
     didRolesCardShare
   ): PlayerResult[] => {
     const results: PlayerResult[] = [];
@@ -82,12 +89,12 @@ export const selectGreyPlayerResults = createSelector(
         isWin: isMI6win,
         reason: `${
           isMI6win
-            ? `Card shared with both ${describeOfficeHolder} and ${describeExplosivesHolder}`
+            ? `Card shared with both ${officeHolder.description} and ${explosivesHolder.description}`
             : didShareWithOfficeHolder
-            ? `Card shared with ${describeOfficeHolder} but not ${describeExplosivesHolder}`
+            ? `Card shared with ${officeHolder.description} but not ${explosivesHolder.description}`
             : didShareWithExplosivesHolder
-            ? `Card shared with ${describeExplosivesHolder} but not ${describeOfficeHolder}`
-            : `Card shared with neither ${describeOfficeHolder} nor ${describeExplosivesHolder}`
+            ? `Card shared with ${explosivesHolder.description} but not ${officeHolder.description}`
+            : `Card shared with neither ${officeHolder.description} nor ${explosivesHolder.description}`
         }`,
       });
     }
@@ -131,8 +138,11 @@ export const selectGreyPlayerResults = createSelector(
         ...greyResultsFromFinalRooms(
           game.endgame.finalRooms,
           findPlayerWithRole,
-          { player: officeHolder, description: describeOfficeHolder },
-          { player: explosivesHolder, description: describeExplosivesHolder }
+          { player: officeHolder, description: officeHolder.description },
+          {
+            player: explosivesHolder,
+            description: explosivesHolder.description,
+          }
         )
       );
     }

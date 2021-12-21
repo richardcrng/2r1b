@@ -1,11 +1,11 @@
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
-import { selectIsSniperShotNeeded } from "../../../selectors";
 import {
-  selectGameRolesInSetupCount,
   selectIsGamblerPredictionNeeded,
   selectIsPrivateEyeIdentificationNeeded,
-} from "../../../selectors/";
+  selectIsSniperShotNeeded,
+} from "../../../selectors/endgame-selectors";
+import { selectGameRolesInSetupCount } from "../../../selectors/game-selectors";
 import { Game, Player } from "../../../types/game.types";
 import { GameHandlers } from "../GamePage";
 import GameEndgameGambler from "./gambler/GameEndgameGambler";

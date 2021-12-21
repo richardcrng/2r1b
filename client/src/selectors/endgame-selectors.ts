@@ -16,7 +16,7 @@ import {
   selectOfficeHolder,
   selectOfficeHolderRole,
   selectOfficeHolderTreaterRole,
-} from ".";
+} from "./game-selectors";
 import { TeamResult } from "../types/game.types";
 import { PlayerActionType } from "../types/player-action.types";
 import { RoleKey, TeamColor } from "../types/role.types";

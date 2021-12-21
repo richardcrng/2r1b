@@ -304,26 +304,6 @@ export const selectFindPlayerWithRole = createSelector(
       ) as Player & { role: RoleKey }
 );
 
-export const selectPresident = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("PRESIDENT_BLUE")
-);
-
-export const selectBomber = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("BOMBER_RED")
-);
-
-export const selectEngineer = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("ENGINEER_RED")
-);
-
-export const selectDoctor = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("DOCTOR_BLUE")
-);
-
 export const selectExplosivesRole = createSelector(
   selectIsRoleInPlay,
   (isRoleInPlay): RoleKey =>
@@ -348,46 +328,90 @@ export const selectOfficeHolderTreaterRole = createSelector(
     isRoleInPlay("DOCTOR_BLUE") ? "DOCTOR_BLUE" : "NURSE_BLUE"
 );
 
+interface SelectedRoleDescription {
+  role: RoleKey;
+  description: string;
+}
+
 export const selectDescribeOfficeHolder = createSelector(
   selectOfficeHolderRole,
-  (officeHolderRole) =>
-    officeHolderRole === "PRESIDENT_BLUE"
-      ? getRoleName(officeHolderRole)
-      : `${getRoleName(officeHolderRole)} (filling in for the President)`
+  (officeHolderRole): SelectedRoleDescription => ({
+    role: officeHolderRole,
+    description:
+      officeHolderRole === "PRESIDENT_BLUE"
+        ? getRoleName(officeHolderRole)
+        : `${getRoleName(officeHolderRole)} (filling in for the President)`,
+  })
 );
 
 export const selectDescribeExplosivesHolder = createSelector(
   selectExplosivesRole,
-  (explosivesRole) =>
-    explosivesRole === "BOMBER_RED"
-      ? getRoleName(explosivesRole)
-      : `${getRoleName(explosivesRole)} (filling in for the Bomber)`
+  (explosivesRole): SelectedRoleDescription => ({
+    role: explosivesRole,
+    description:
+      explosivesRole === "BOMBER_RED"
+        ? getRoleName(explosivesRole)
+        : `${getRoleName(explosivesRole)} (filling in for the Bomber)`,
+  })
 );
 
 export const selectDescribeTreater = createSelector(
   selectOfficeHolderTreaterRole,
-  (treaterRole) =>
-    treaterRole === "DOCTOR_BLUE"
-      ? getRoleName(treaterRole)
-      : `${getRoleName(treaterRole)} (filling in for the Doctor)`
+  (treaterRole): SelectedRoleDescription => ({
+    role: treaterRole,
+    description:
+      treaterRole === "DOCTOR_BLUE"
+        ? getRoleName(treaterRole)
+        : `${getRoleName(treaterRole)} (filling in for the Doctor)`,
+  })
 );
 
 export const selectDescribeArmer = createSelector(
   selectExplosivesArmerRole,
-  (armerRole) =>
-    armerRole === "ENGINEER_RED"
-      ? getRoleName(armerRole)
-      : `${getRoleName(armerRole)} (filling in for the Engineer)`
+  (armerRole) => ({
+    role: armerRole,
+    description:
+      armerRole === "ENGINEER_RED"
+        ? getRoleName(armerRole)
+        : `${getRoleName(armerRole)} (filling in for the Engineer)`,
+  })
+);
+
+type SelectedPlayerWithDescription = Player & SelectedRoleDescription;
+
+export const selectOfficeHolder = createSelector(
+  selectOfficeHolderRole,
+  selectFindPlayerWithRole,
+  selectDescribeOfficeHolder,
+  (
+    officeHolderRole,
+    findPlayerWithRole,
+    describeOfficeHolder
+  ): SelectedPlayerWithDescription => {
+    const officeHolder = findPlayerWithRole(officeHolderRole);
+    if (!officeHolder) throw new Error("Couldn't find office holding player");
+    return {
+      ...officeHolder,
+      ...describeOfficeHolder,
+    };
+  }
 );
 
 export const selectExplosivesHolder = createSelector(
   selectExplosivesRole,
   selectFindPlayerWithRole,
-  (explosivesRole, findPlayerWithRole) => findPlayerWithRole(explosivesRole)
-);
-
-export const selectOfficeHolder = createSelector(
-  selectOfficeHolderRole,
-  selectFindPlayerWithRole,
-  (officeHolderRole, findPlayerWithRole) => findPlayerWithRole(officeHolderRole)
+  selectDescribeExplosivesHolder,
+  (
+    explosivesRole,
+    findPlayerWithRole,
+    describeExplosivesHolder
+  ): SelectedPlayerWithDescription => {
+    const explosivesHolder = findPlayerWithRole(explosivesRole);
+    if (!explosivesHolder)
+      throw new Error("Couldn't find office holding player");
+    return {
+      ...explosivesHolder,
+      ...describeExplosivesHolder,
+    };
+  }
 );
