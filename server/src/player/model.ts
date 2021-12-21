@@ -5,8 +5,6 @@ import { GameManager, Operation } from "../game/model";
 import {
   NotificationForPlayer,
   NotificationType,
-  PlayerNotification,
-  PlayerNotificationFn,
 } from "../../../client/src/types/notification.types";
 import {
   isPlayerShareAction,

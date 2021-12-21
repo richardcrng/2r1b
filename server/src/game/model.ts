@@ -5,8 +5,6 @@ import {
   GameNotification,
   NotificationForPlayer,
   NotificationType,
-  PlayerNotification,
-  PlayerNotificationFn,
 } from "../../../client/src/types/notification.types";
 import {
   createStartingRounds,
