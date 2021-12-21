@@ -153,6 +153,15 @@ export const handleGamblerPrediction: ClientEventListeners[ClientEvent.GAMBLER_P
     });
   };
 
+export const handleSniperShot: ClientEventListeners[ClientEvent.SNIPER_SHOT] = (
+  gameId,
+  sniperShotId
+) => {
+  new GameManager(gameId).update((game) => {
+    game.endgame.sniperShot = sniperShotId;
+  });
+};
+
 export const handlePrivateEyePrediction: ClientEventListeners[ClientEvent.PRIVATE_EYE_PREDICT] =
   (gameId, roleKey) => {
     new GameManager(gameId).update((game) => {
