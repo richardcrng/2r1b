@@ -525,7 +525,7 @@ export class GameManager {
     );
   }
 
-  public resolveShare(shareAction: PlayerActionShareOffered): void {
+  public resolveAcceptedShare(shareAction: PlayerActionShareOffered): void {
     const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role;
     const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId).role;
 
