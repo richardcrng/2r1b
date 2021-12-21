@@ -65,6 +65,8 @@ export type Operation<T = void> = OperationSuccess<T> | OperationError<T>;
 const gameManagerMap = new Map<string, GameManager>();
 
 export class GameManager {
+  _playerManagerMap = new Map<string, PlayerManager>();
+
   constructor(
     public gameId: string,
     public gamesStore: Record<string, Game> = GAMES_DB,
@@ -73,7 +75,13 @@ export class GameManager {
 
   static for(gameId: string): GameManager {
     const existingManager = gameManagerMap.get(gameId);
-    return existingManager ?? new this(gameId);
+    if (existingManager) {
+      return existingManager;
+    } else {
+      const newManager = new this(gameId);
+      gameManagerMap.set(gameId, newManager);
+      return newManager;
+    }
   }
 
   static hostNew(socketId: string, playerName?: string): GameManager {
@@ -375,7 +383,14 @@ export class GameManager {
     playerId: string,
     aliasIds: string[] = []
   ): PlayerManager {
-    return new PlayerManager(this, playerId, aliasIds);
+    const extantPlayerManager = this._playerManagerMap.get(playerId);
+    if (extantPlayerManager) {
+      return extantPlayerManager;
+    } else {
+      const newPlayerManager = new PlayerManager(this, playerId, aliasIds);
+      this._playerManagerMap.set(playerId, newPlayerManager);
+      return newPlayerManager;
+    }
   }
 
   public moveRoundToHostageSelection(): void {
