@@ -201,15 +201,14 @@ export class GameManager {
         [] as RoleKey[]
       );
 
-      const playerIds = Object.keys(pointer.players);
+      const playerIds = shuffle(Object.keys(pointer.players));
 
-      // ensures the final shuffled key is buryable
       const [maybeBuriedKey, ...shuffledBuryableKeys] = shuffle(buryableKeys);
-      const shuffledRoleKeys = shuffle([
-        ...shuffledBuryableKeys,
-        ...nonBuryableKeys,
+      // ensures the final shuffled key can be buried if needed
+      const shuffledRoleKeys = [
+        ...shuffle([...shuffledBuryableKeys, ...nonBuryableKeys]),
         maybeBuriedKey,
-      ]);
+      ];
 
       for (let idx = 0; idx < shuffledRoleKeys.length; idx++) {
         const playerId = playerIds[idx];
