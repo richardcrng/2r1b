@@ -4,6 +4,7 @@ import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
 import {
   NotificationForPlayer,
+  NotificationType,
   PlayerNotification,
   PlayerNotificationFn,
 } from "../../../client/src/types/notification.types";
@@ -85,17 +86,38 @@ export class PlayerManager {
 
   public cancelAllPendingShares({
     except = [],
-    notification,
   }: {
     except?: string[];
-    notification?: NotificationForPlayer;
   } = {}): void {
     this._withPointer((player) => {
       const pendingShares = Object.values(player.pendingActions)
         .filter(isPlayerShareAction)
         .filter(({ id }) => !except.includes(id));
+
       pendingShares.forEach((shareOffer) => {
-        this.resolvePendingAction(shareOffer, notification);
+        this.resolvePendingAction(shareOffer);
+
+        const otherPlayerId = [
+          shareOffer.offeredPlayerId,
+          shareOffer.sharerId,
+        ].find((id) => id !== player.socketId);
+
+        if (otherPlayerId) {
+          const shareType =
+            shareOffer.type === PlayerActionType.CARD_SHARE_OFFERED
+              ? "card"
+              : "color";
+
+          const messageToOtherPlayer =
+            otherPlayerId === shareOffer.sharerId
+              ? `${this.getNameOrFail()} has declined your ${shareType} share offer to share with someone else`
+              : `${this.getNameOrFail()} has withdrawn their ${shareType} share offer to share with someone else`;
+
+          this.gameManager.pushPlayerNotificationById(otherPlayerId, {
+            type: NotificationType.GENERAL,
+            message: messageToOtherPlayer,
+          });
+        }
       });
     });
   }
@@ -104,6 +126,12 @@ export class PlayerManager {
     const roleKey = this._pointer()?.role;
     if (!roleKey) throw new Error("Couldn't find role key for players");
     return getRoleDefinition(roleKey);
+  }
+
+  public getNameOrFail(): string {
+    const name = this._pointer()?.name;
+    if (!name) throw new Error("Couldn't find a name");
+    return name;
   }
 
   public pushNotification(playerNotification: NotificationForPlayer): void {
