@@ -1,4 +1,4 @@
-import { chunk, cloneDeep, last, sample, shuffle } from "lodash";
+import { chunk, cloneDeep, last, partition, sample, shuffle } from "lodash";
 import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors/game-selectors";
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import {
@@ -31,6 +31,7 @@ import {
 import {
   DEFAULT_STARTING_ROLES_COUNT,
   getRoleColor,
+  getRoleDefinition,
 } from "../../../client/src/utils/role-utils";
 import {
   PlayerAction,
@@ -185,17 +186,30 @@ export class GameManager {
 
   public assignInitialRoles(): void {
     this._withPointer((pointer) => {
-      const rolesCount = pointer.rolesCount;
-      const keysToShuffle = Object.keys(rolesCount).reduce(
-        (acc, currRoleKey) => [
-          ...acc,
-          ...Array(rolesCount[currRoleKey as RoleKey]).fill(currRoleKey),
-        ],
+      const [buryableRoles, nonBuryableRoles] = partition(
+        Object.entries(pointer.rolesCount) as [RoleKey, number][],
+        ([roleKey]) => getRoleDefinition(roleKey).restrictions.isBuryable
+      );
+
+      const buryableKeys = buryableRoles.reduce(
+        (acc, [key, count]) => [...acc, ...Array(count).fill(key)],
+        [] as RoleKey[]
+      );
+
+      const nonBuryableKeys = nonBuryableRoles.reduce(
+        (acc, [key, count]) => [...acc, ...Array(count).fill(key)],
         [] as RoleKey[]
       );
 
       const playerIds = Object.keys(pointer.players);
-      const shuffledRoleKeys = shuffle(keysToShuffle);
+
+      // ensures the final shuffled key is buryable
+      const [maybeBuriedKey, ...shuffledBuryableKeys] = shuffle(buryableKeys);
+      const shuffledRoleKeys = shuffle([
+        ...shuffledBuryableKeys,
+        ...nonBuryableKeys,
+        maybeBuriedKey,
+      ]);
 
       for (let idx = 0; idx < shuffledRoleKeys.length; idx++) {
         const playerId = playerIds[idx];

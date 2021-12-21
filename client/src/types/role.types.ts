@@ -78,6 +78,8 @@ export type FullyDefined<TRole extends PlayerRole> = TRole & {
 export type Restrictions = RoleRestrictions & PlayerRestrictions;
 
 export interface RoleRestrictions {
+  /** Whether or not the role is eligible for burying */
+  isBuryable: boolean;
   /** Maximum of this role */
   roleMax: number;
   /** Minimum of this role */
@@ -176,6 +178,7 @@ class RoleDefinition<TRole extends PlayerRole> {
   constructor(
     { key, color, roleName, ...info }: TRole & RoleInfo,
     {
+      isBuryable = true,
       roleMax = 1,
       roleMin = 0,
       requires = {},
@@ -191,6 +194,7 @@ class RoleDefinition<TRole extends PlayerRole> {
     this.roleName = roleName;
     this.info = info;
     this.restrictions = {
+      isBuryable,
       roleMax,
       roleMin,
       requires,
@@ -311,7 +315,7 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
       key: "DECOY_GREY",
       roleName: GreyRoleName.DECOY,
     },
-    { requires: { SNIPER_GREY: 1 } }
+    { requires: { SNIPER_GREY: 1 }, isBuryable: false }
   ),
 
   GAMBLER_GREY: RoleDefinition.Grey({
@@ -356,7 +360,7 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
       roleName: GreyRoleName.SNIPER,
       pauseGameNumber: 50,
     },
-    { requires: { TARGET_GREY: 1 } }
+    { requires: { TARGET_GREY: 1 }, isBuryable: false }
   ),
 
   SURVIVOR_GREY: RoleDefinition.Grey(
@@ -372,7 +376,7 @@ export const GREY_ROLES: Record<GreyRoleKey, FullyDefined<GreyRole>> = {
       key: "TARGET_GREY",
       roleName: GreyRoleName.TARGET,
     },
-    { requires: { DECOY_GREY: 1 } }
+    { requires: { DECOY_GREY: 1 }, isBuryable: false }
   ),
 
   VICTIM_GREY: RoleDefinition.Grey(
