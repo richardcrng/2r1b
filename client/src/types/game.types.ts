@@ -150,9 +150,9 @@ export const createRound = (
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
-  1: createRound(180, 1),
-  2: createRound(120, 2),
-  3: createRound(60, 3),
+  1: createRound(10, 1),
+  2: createRound(10, 2),
+  3: createRound(10, 3),
 });
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
@@ -166,6 +166,8 @@ export interface GameEndgame {
   finalRooms?: PlayerRoomAllocation;
   gamblerPrediction?: GamblerPrediction;
   privateEyePrediction?: RoleKey;
+  /** Player ID shot by the Sniper */
+  sniperShot?: string;
 }
 
 export interface TeamResult {

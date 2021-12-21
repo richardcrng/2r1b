@@ -26,6 +26,7 @@ import {
   handlePrivateEyePrediction,
   resetGame,
   updateGameSettings,
+  handleSniperShot,
 } from "./game/controllers";
 import { joinPlayerToGame, updatePlayer } from "./player/controllers";
 import { GameManager } from "./game/model";
@@ -69,6 +70,7 @@ export const addListeners = (socket: ServerSocket): void => {
     [ClientEvent.RESET_GAME]: resetGame,
     [ClientEvent.REVEAL_RESULTS]: revealResults,
     [ClientEvent.SELECT_HOSTAGE]: selectHostage,
+    [ClientEvent.SNIPER_SHOT]: handleSniperShot,
     [ClientEvent.START_GAME]: startGame,
     [ClientEvent.SUBMIT_HOSTAGES]: submitHostages,
     [ClientEvent.TERMINATE_SHARE]: terminateShare,

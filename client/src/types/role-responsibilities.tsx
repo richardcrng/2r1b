@@ -10,6 +10,7 @@ import {
   RoleName,
   TeamColor,
 } from "./role.types";
+import { getTeamColorHex } from "../utils/colors";
 
 const StyledCondition = styled.span`
   font-weight: bold;
@@ -28,11 +29,15 @@ const StyledRole = styled.span`
 `;
 
 const StyledBlueRole = styled(StyledRole)`
-  color: blue;
+  color: ${getTeamColorHex(TeamColor.BLUE).primary};
+`;
+
+const StyledGreyRole = styled(StyledRole)`
+  color: ${getTeamColorHex(TeamColor.GREY).primary};
 `;
 
 const StyledRedRole = styled(StyledRole)`
-  color: red;
+  color: ${getTeamColorHex(TeamColor.RED).primary};
 `;
 
 export const TEAM_ICONS: Record<TeamColor, IconType> = {
@@ -48,6 +53,7 @@ const blue = (roleName: string) => <StyledBlueRole>{roleName}</StyledBlueRole>;
 const condition = (conditionName: string) => (
   <StyledCondition>{conditionName}</StyledCondition>
 );
+const grey = (roleName: string) => <StyledGreyRole>{roleName}</StyledGreyRole>;
 const red = (roleName: string) => <StyledRedRole>{roleName}</StyledRedRole>;
 const responsibility = (responsibilityName: string) => (
   <strong>{responsibilityName}:</strong>
@@ -61,11 +67,19 @@ const DOCTOR = blue(BlueRoleName.DOCTOR);
 const ENGINEER = red(RedRoleName.ENGINEER);
 const PRESIDENT = blue(BlueRoleName.PRESIDENT);
 const RED_TEAM = red("Red Team");
+const SNIPER = grey("Sniper");
+const TARGET = grey("Target");
 
 export const WIN_CONDITIONS = {
   BLUE: (
     <>
       You if the {PRESIDENT} does not die (i.e. gain the '{DEAD}' condition).
+    </>
+  ),
+  [GreyRoleName.DECOY]: (
+    <>
+      You win if the {SNIPER} chooses to {action("Shoot")} you at the end of the
+      last round.
     </>
   ),
   [GreyRoleName.GAMBLER]: <>You win if you make a correct {action("Wager")}.</>,
@@ -90,10 +104,22 @@ export const WIN_CONDITIONS = {
       the game.
     </>
   ),
+  [GreyRoleName.SNIPER]: (
+    <>
+      You win if you {action("Shoot")} the {TARGET} at the end of the last
+      round.
+    </>
+  ),
   [GreyRoleName.SURVIVOR]: (
     <>
       You win if you are NOT in the same room as the {BOMBER} at the end of the
       game.
+    </>
+  ),
+  [GreyRoleName.TARGET]: (
+    <>
+      You win if the {SNIPER} does NOT {action("Shoot")} you at the end of the
+      last round.
     </>
   ),
   [GreyRoleName.VICTIM]: (
@@ -234,11 +260,18 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </ul>
   ),
 
+  [GreyRoleName.DECOY]: (
+    <>
+      You're here to distract the {SNIPER} - try to get them to{" "}
+      {action("Shoot")} you!
+    </>
+  ),
+
   [GreyRoleName.GAMBLER]: (
     <>
       {responsibility("Wager")} At the end of the last round, before all players
-      reveal their cards, you must publicly predict the winning team ({RED_TEAM}
-      , {BLUE_TEAM}, or neither).
+      reveal their cards, you must predict the winning team ({RED_TEAM},{" "}
+      {BLUE_TEAM}, or neither).
     </>
   ),
 
@@ -255,8 +288,8 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
   [GreyRoleName.PRIVATE_EYE]: (
     <>
       {responsibility("Identification")} At the end of the last round, before
-      all players reveal their character cards, you must publicly predict the
-      identity of the buried card.
+      all players reveal their character cards, you must predict the identity of
+      the buried card.
     </>
   ),
 
@@ -267,8 +300,23 @@ export const ROLE_RESPONSIBILITIES: Record<RoleName, JSX.Element> = {
     </>
   ),
 
+  [GreyRoleName.SNIPER]: (
+    <>
+      {responsibility("Shoot")} At the end of the last round, before all players
+      reveal their character cards, you must choose a player to{" "}
+      {action("Shoot")}.
+    </>
+  ),
+
   [GreyRoleName.SURVIVOR]: (
     <>You're only looking out for yourself - try to avoid the {BOMBER}!</>
+  ),
+
+  [GreyRoleName.TARGET]: (
+    <>
+      The {SNIPER} is looking for you - try to avoid getting shot at the end of
+      the game!
+    </>
   ),
 
   [GreyRoleName.VICTIM]: (

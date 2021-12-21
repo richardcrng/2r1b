@@ -8,7 +8,7 @@ import { Game, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
 import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
 import { SetupAlert } from "../../../../utils/setup-utils";
-import { selectGameSetupErrorsAndWarnings } from "../../../../selectors";
+import { selectGameSetupErrorsAndWarnings } from "../../../../selectors/game-selectors";
 
 interface Props {
   game: Game;

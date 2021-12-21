@@ -10,7 +10,6 @@ import {
   RoomName,
   Round,
   RoundStatus,
-  TeamResult,
 } from "../types/game.types";
 import { ALL_ROLES, PlayerRole, RoleKey, TeamColor } from "../types/role.types";
 import {
@@ -19,7 +18,6 @@ import {
   SetupAlertSource,
 } from "../utils/setup-utils";
 import { mapValues, last } from "lodash";
-import { PlayerActionType } from "../types/player-action.types";
 import { getRoleName } from "../utils/role-utils";
 
 export const selectGame = (game: Game): Game => game;
@@ -306,26 +304,6 @@ export const selectFindPlayerWithRole = createSelector(
       ) as Player & { role: RoleKey }
 );
 
-export const selectPresident = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("PRESIDENT_BLUE")
-);
-
-export const selectBomber = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("BOMBER_RED")
-);
-
-export const selectEngineer = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("ENGINEER_RED")
-);
-
-export const selectDoctor = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) => findPlayerWithRole("DOCTOR_BLUE")
-);
-
 export const selectExplosivesRole = createSelector(
   selectIsRoleInPlay,
   (isRoleInPlay): RoleKey =>
@@ -350,275 +328,90 @@ export const selectOfficeHolderTreaterRole = createSelector(
     isRoleInPlay("DOCTOR_BLUE") ? "DOCTOR_BLUE" : "NURSE_BLUE"
 );
 
+interface SelectedRoleDescription {
+  role: RoleKey;
+  description: string;
+}
+
 export const selectDescribeOfficeHolder = createSelector(
   selectOfficeHolderRole,
-  (officeHolderRole) =>
-    officeHolderRole === "PRESIDENT_BLUE"
-      ? getRoleName(officeHolderRole)
-      : `${getRoleName(officeHolderRole)} (filling in for the President)`
+  (officeHolderRole): SelectedRoleDescription => ({
+    role: officeHolderRole,
+    description:
+      officeHolderRole === "PRESIDENT_BLUE"
+        ? getRoleName(officeHolderRole)
+        : `${getRoleName(officeHolderRole)} (filling in for the President)`,
+  })
 );
 
 export const selectDescribeExplosivesHolder = createSelector(
   selectExplosivesRole,
-  (explosivesRole) =>
-    explosivesRole === "BOMBER_RED"
-      ? getRoleName(explosivesRole)
-      : `${getRoleName(explosivesRole)} (filling in for the Bomber)`
+  (explosivesRole): SelectedRoleDescription => ({
+    role: explosivesRole,
+    description:
+      explosivesRole === "BOMBER_RED"
+        ? getRoleName(explosivesRole)
+        : `${getRoleName(explosivesRole)} (filling in for the Bomber)`,
+  })
 );
 
 export const selectDescribeTreater = createSelector(
   selectOfficeHolderTreaterRole,
-  (treaterRole) =>
-    treaterRole === "DOCTOR_BLUE"
-      ? getRoleName(treaterRole)
-      : `${getRoleName(treaterRole)} (filling in for the Doctor)`
+  (treaterRole): SelectedRoleDescription => ({
+    role: treaterRole,
+    description:
+      treaterRole === "DOCTOR_BLUE"
+        ? getRoleName(treaterRole)
+        : `${getRoleName(treaterRole)} (filling in for the Doctor)`,
+  })
 );
 
 export const selectDescribeArmer = createSelector(
   selectExplosivesArmerRole,
-  (armerRole) =>
-    armerRole === "ENGINEER_RED"
-      ? getRoleName(armerRole)
-      : `${getRoleName(armerRole)} (filling in for the Engineer)`
+  (armerRole) => ({
+    role: armerRole,
+    description:
+      armerRole === "ENGINEER_RED"
+        ? getRoleName(armerRole)
+        : `${getRoleName(armerRole)} (filling in for the Engineer)`,
+  })
+);
+
+type SelectedPlayerWithDescription = Player & SelectedRoleDescription;
+
+export const selectOfficeHolder = createSelector(
+  selectOfficeHolderRole,
+  selectFindPlayerWithRole,
+  selectDescribeOfficeHolder,
+  (
+    officeHolderRole,
+    findPlayerWithRole,
+    describeOfficeHolder
+  ): SelectedPlayerWithDescription => {
+    const officeHolder = findPlayerWithRole(officeHolderRole);
+    if (!officeHolder) throw new Error("Couldn't find office holding player");
+    return {
+      ...officeHolder,
+      ...describeOfficeHolder,
+    };
+  }
 );
 
 export const selectExplosivesHolder = createSelector(
   selectExplosivesRole,
   selectFindPlayerWithRole,
-  (explosivesRole, findPlayerWithRole) => findPlayerWithRole(explosivesRole)
-);
-
-export const selectOfficeHolder = createSelector(
-  selectOfficeHolderRole,
-  selectFindPlayerWithRole,
-  (officeHolderRole, findPlayerWithRole) => findPlayerWithRole(officeHolderRole)
-);
-
-export const selectIsPrivateEyeIdentificationNeeded = createSelector(
-  selectIsRoleInPlay,
-  selectGameEndgameState,
-  (isRoleInPlay, endgame) =>
-    isRoleInPlay("PRIVATE_EYE_GREY") && !endgame.privateEyePrediction
-);
-
-export const selectIsGamblerPredictionNeeded = createSelector(
-  selectIsRoleInPlay,
-  selectGameEndgameState,
-  (isRoleInPlay, endgame) =>
-    isRoleInPlay("GAMBLER_GREY") && !endgame.gamblerPrediction
-);
-
-export const selectDidRolesCardShare = createSelector(
-  selectFindPlayerWithRole,
-  (findPlayerWithRole) =>
-    (roleOne: RoleKey, roleTwo: RoleKey): boolean => {
-      const didTwoCardShareWithOne = !!findPlayerWithRole(
-        roleOne
-      )?.conditions.shareRecords.find(
-        (record) =>
-          record.offerAction.type === PlayerActionType.CARD_SHARE_OFFERED &&
-          record.sharedWithPlayer === roleTwo
-      );
-      const didOneCardShareWithTwo = !!findPlayerWithRole(
-        roleTwo
-      )?.conditions.shareRecords.find(
-        (record) =>
-          record.offerAction.type === PlayerActionType.CARD_SHARE_OFFERED &&
-          record.sharedWithPlayer === roleOne
-      );
-
-      return didOneCardShareWithTwo && didTwoCardShareWithOne;
-    }
-);
-
-export const selectDidDoctorCardShareWithPresident = createSelector(
-  selectDidRolesCardShare,
-  (didRolesCardShare) => didRolesCardShare("DOCTOR_BLUE", "PRESIDENT_BLUE")
-);
-
-export const selectDidNurseCardShareWithPresident = createSelector(
-  selectDidRolesCardShare,
-  (didRolesCardShare) => didRolesCardShare("NURSE_BLUE", "PRESIDENT_BLUE")
-);
-
-export const selectDidEngineerCardShareWithBomber = createSelector(
-  selectDidRolesCardShare,
-  (didRolesCardShare) => didRolesCardShare("ENGINEER_RED", "BOMBER_RED")
-);
-
-export const selectDidTinkererCardShareWithBomber = createSelector(
-  selectDidRolesCardShare,
-  (didRolesCardShare) => didRolesCardShare("TINKERER_RED", "BOMBER_RED")
-);
-
-export const selectIsExplosiveArmedIfApplicable = createSelector(
-  selectDidRolesCardShare,
-  selectExplosivesRole,
-  selectExplosivesArmerRole,
-  selectIsRoleInPlay,
-  (didShare, explosivesRole, explosivesArmerRole, isRoleInPlay) =>
-    isRoleInPlay(explosivesArmerRole)
-      ? didShare(explosivesArmerRole, explosivesRole)
-      : true
-);
-
-export const selectIsOfficeHolderTreatedIfApplicable = createSelector(
-  selectDidRolesCardShare,
-  selectOfficeHolderRole,
-  selectOfficeHolderTreaterRole,
-  selectIsRoleInPlay,
-  (didShare, officeHolderRole, treaterRole, isRoleInPlay) =>
-    isRoleInPlay(treaterRole) ? didShare(treaterRole, officeHolderRole) : true
-);
-
-export const selectIsExplosivesInSameFinalRoomAsOfficeHolder = createSelector(
-  selectExplosivesHolder,
-  selectOfficeHolder,
-  selectFinalPlayerRooms,
-  (explosivesHolder, officeHolder, finalPlayerRooms) => {
-    const explosivesRoom = finalPlayerRooms?.[explosivesHolder?.socketId ?? ""];
-    const officeHolderRoom = finalPlayerRooms?.[officeHolder?.socketId ?? ""];
-    return (
-      typeof explosivesRoom !== "undefined" &&
-      explosivesRoom === officeHolderRoom
-    );
-  }
-);
-
-export const selectTeamWinCheckResult = createSelector(
-  selectIsOfficeHolderTreatedIfApplicable,
-  selectIsExplosiveArmedIfApplicable,
-  selectIsExplosivesInSameFinalRoomAsOfficeHolder,
-  selectIsRoleInSetup,
-  selectDescribeOfficeHolder,
   selectDescribeExplosivesHolder,
-  selectDescribeTreater,
-  selectDescribeArmer,
   (
-    isTreated,
-    isArmed,
-    isSameRoom,
-    isRoleInSetup,
-    officeHolder,
-    explosivesHolder,
-    treater,
-    armer
-  ): TeamResult => {
-    const isDoctorInvolved = isRoleInSetup("DOCTOR_BLUE");
-    const isEngineerInvolved = isRoleInSetup("ENGINEER_RED");
-
-    // DOCTOR AND ENGINEER DUAL CASE
-    if (isDoctorInvolved && isEngineerInvolved) {
-      if (isSameRoom) {
-        if (isArmed) {
-          return {
-            winningColor: TeamColor.RED,
-            reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}, whose explosives were successfully armed by the ${armer}.`,
-          };
-        } else if (isTreated) {
-          return {
-            winningColor: TeamColor.BLUE,
-            reason: `The ${officeHolder} survived! Their medical condition was treated by the ${treater}, and whilst they ended up in the same room as the ${explosivesHolder}, the explosives were not armed by the ${armer}.`,
-          };
-        } else {
-          return {
-            winningColor: "neither",
-            reason: `The ${officeHolder} died... but peacefully! Their fatal medical condition was not treated by the ${treater}; and no explosion happened, since the ${explosivesHolder}'s explosives were not armed by the ${armer}.`,
-          };
-        }
-      } else if (isTreated) {
-        return {
-          winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! Their medical condition was treated by the ${treater}, and they were kept apart from the ${explosivesHolder}.`,
-        };
-      } else if (isArmed) {
-        return {
-          winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} died... and chaos errupted! Their fatal medical condition was not treated by the ${treater}, and the ${explosivesHolder}'s explosives were successfully armed by the ${armer}.`,
-        };
-      } else {
-        return {
-          winningColor: "neither",
-          reason: `The ${officeHolder} died... but peacefully! Their fatal medical condition was not treated by the ${treater}; and no explosion happened, since the ${explosivesHolder}'s explosives were not armed by the ${armer}.`,
-        };
-      }
-    }
-
-    // DOCTOR CASE
-    if (isDoctorInvolved /* && !isEngineerInvolved - implicit */) {
-      if (isSameRoom) {
-        return {
-          winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}.`,
-        };
-      } else if (!isTreated) {
-        return {
-          winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} died! Their fatal medical condition was not treated by the ${treater}.`,
-        };
-      } else {
-        return {
-          winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! Their medical condition was successfully treated by the ${treater}, and they were kept apart from the ${explosivesHolder}.`,
-        };
-      }
-    }
-
-    // ENGINEER CASE
-    if (isEngineerInvolved /* && !isDoctorInvolved - implicit */) {
-      if (isSameRoom && isArmed) {
-        return {
-          winningColor: TeamColor.RED,
-          reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}, whose explosives were successfully armed by the ${armer}.`,
-        };
-      } else if (isSameRoom) {
-        return {
-          winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! Although they ended up in the same room as the ${explosivesHolder}, the explosives had not been armed by the ${armer}.`,
-        };
-      } else {
-        return {
-          winningColor: TeamColor.BLUE,
-          reason: `The ${officeHolder} survived! They were kept apart from the ${explosivesHolder}, whose explosives ${
-            isArmed
-              ? `had been successfully armed by the ${armer}`
-              : `had not been armed by the ${armer} in any case`
-          }.`,
-        };
-      }
-    }
-
-    // VANILLA CASE
-    if (isSameRoom) {
-      return {
-        winningColor: TeamColor.RED,
-        reason: `The ${officeHolder} was killed in an explosion! They ended up in the same room as the ${explosivesHolder}.`,
-      };
-    } else {
-      return {
-        winningColor: TeamColor.BLUE,
-        reason: `The ${officeHolder} was survived! They were kept apart from the ${explosivesHolder}.`,
-      };
-    }
+    explosivesRole,
+    findPlayerWithRole,
+    describeExplosivesHolder
+  ): SelectedPlayerWithDescription => {
+    const explosivesHolder = findPlayerWithRole(explosivesRole);
+    if (!explosivesHolder)
+      throw new Error("Couldn't find office holding player");
+    return {
+      ...explosivesHolder,
+      ...describeExplosivesHolder,
+    };
   }
-);
-
-export const selectIsPrivateEyeIdentificationCorrect = createSelector(
-  selectGameEndgameState,
-  selectBuriedRole,
-  (endgame, buried) => endgame.privateEyePrediction === buried
-);
-
-export const selectIsGamblerPredictionCorrect = createSelector(
-  selectGameEndgameState,
-  selectTeamWinCheckResult,
-  (endgame, teamWin) => endgame.gamblerPrediction === teamWin.winningColor
-);
-export const selectIsGameEndgameComplete = createSelector(
-  selectIsPrivateEyeIdentificationNeeded,
-  selectIsGamblerPredictionNeeded,
-  (isPrivateEyeIdentificationNeeded, isGamblerPredictionNeeded) =>
-    [isPrivateEyeIdentificationNeeded, isGamblerPredictionNeeded].some(
-      (bool) => bool
-    )
 );

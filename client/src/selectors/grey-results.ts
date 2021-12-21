@@ -6,31 +6,41 @@ import {
 } from "../types/game.types";
 import { RoleKey } from "../types/role.types";
 import { getRoleName } from "../utils/role-utils";
-import SELECTORS from "./selectors";
+import {
+  selectDidRolesCardShare,
+  selectGreyResultHelpers,
+} from "./endgame-selectors";
+import {
+  selectExplosivesHolder,
+  selectFindPlayerWithRole,
+  selectGame,
+  selectGameEndgameState,
+  selectIsRoleInPlay,
+  selectOfficeHolder,
+} from "./game-selectors";
 
 export const selectGreyPlayerResults = createSelector(
-  SELECTORS.selectGame,
-  SELECTORS.selectIsRoleInPlay,
-  SELECTORS.selectGameEndgameState,
-  SELECTORS.selectIsPrivateEyeIdentificationCorrect,
-  SELECTORS.selectIsGamblerPredictionCorrect,
-  SELECTORS.selectFindPlayerWithRole,
-  SELECTORS.selectOfficeHolder,
-  SELECTORS.selectDescribeOfficeHolder,
-  SELECTORS.selectExplosivesHolder,
-  SELECTORS.selectDescribeExplosivesHolder,
-  SELECTORS.selectDidRolesCardShare,
+  selectGame,
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  selectGreyResultHelpers,
+  selectFindPlayerWithRole,
+  selectOfficeHolder,
+  selectExplosivesHolder,
+  selectDidRolesCardShare,
   (
     game,
     isRoleInPlay,
     endgame,
-    isPrivateEyeWin,
-    isGamblerWin,
+    {
+      isGamblerWin,
+      isPrivateEyeWin,
+      isSniperShotOnTarget,
+      isSniperShotOnDecoy,
+    },
     findPlayerWithRole,
     officeHolder,
-    describeOfficeHolder,
     explosivesHolder,
-    describeExplosivesHolder,
     didRolesCardShare
   ): PlayerResult[] => {
     const results: PlayerResult[] = [];
@@ -79,12 +89,46 @@ export const selectGreyPlayerResults = createSelector(
         isWin: isMI6win,
         reason: `${
           isMI6win
-            ? `Card shared with both ${describeOfficeHolder} and ${describeExplosivesHolder}`
+            ? `Card shared with both ${officeHolder.description} and ${explosivesHolder.description}`
             : didShareWithOfficeHolder
-            ? `Card shared with ${describeOfficeHolder} but not ${describeExplosivesHolder}`
+            ? `Card shared with ${officeHolder.description} but not ${explosivesHolder.description}`
             : didShareWithExplosivesHolder
-            ? `Card shared with ${describeExplosivesHolder} but not ${describeOfficeHolder}`
-            : `Card shared with neither ${describeOfficeHolder} nor ${describeExplosivesHolder}`
+            ? `Card shared with ${explosivesHolder.description} but not ${officeHolder.description}`
+            : `Card shared with neither ${officeHolder.description} nor ${explosivesHolder.description}`
+        }`,
+      });
+    }
+
+    if (
+      isRoleInPlay("SNIPER_GREY") &&
+      isRoleInPlay("TARGET_GREY") &&
+      isRoleInPlay("DECOY_GREY")
+    ) {
+      results.push({
+        role: "SNIPER_GREY",
+        isWin: isSniperShotOnTarget,
+        reason: `${
+          isSniperShotOnTarget ? `Shot the Target` : "Did not shoot the Target"
+        }`,
+      });
+
+      results.push({
+        role: "TARGET_GREY",
+        isWin: !isSniperShotOnTarget,
+        reason: `${
+          isSniperShotOnTarget
+            ? "Was shot by the Sniper"
+            : "Was not shot by the Sniper"
+        }`,
+      });
+
+      results.push({
+        role: "DECOY_GREY",
+        isWin: isSniperShotOnDecoy,
+        reason: `${
+          isSniperShotOnDecoy
+            ? "Was shot by the Sniper"
+            : "Was not shot by the Sniper"
         }`,
       });
     }
@@ -94,8 +138,11 @@ export const selectGreyPlayerResults = createSelector(
         ...greyResultsFromFinalRooms(
           game.endgame.finalRooms,
           findPlayerWithRole,
-          { player: officeHolder, description: describeOfficeHolder },
-          { player: explosivesHolder, description: describeExplosivesHolder }
+          { player: officeHolder, description: officeHolder.description },
+          {
+            player: explosivesHolder,
+            description: explosivesHolder.description,
+          }
         )
       );
     }

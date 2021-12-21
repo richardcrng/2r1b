@@ -1,10 +1,8 @@
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
-import {
-  selectFindPlayerWithRole,
-  selectGreyPlayerResults,
-  selectTeamWinCheckResult,
-} from "../../../selectors/";
+import { selectTeamWinCheckResult } from "../../../selectors/endgame-selectors";
+import { selectFindPlayerWithRole } from "../../../selectors/game-selectors";
+import { selectGreyPlayerResults } from "../../../selectors/grey-results";
 import { Game, Player } from "../../../types/game.types";
 import { getRoleName } from "../../../utils/role-utils";
 
