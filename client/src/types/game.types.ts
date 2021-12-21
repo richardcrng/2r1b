@@ -166,6 +166,8 @@ export interface GameEndgame {
   finalRooms?: PlayerRoomAllocation;
   gamblerPrediction?: GamblerPrediction;
   privateEyePrediction?: RoleKey;
+  /** Player ID shot by the Sniper */
+  sniperShot?: string;
 }
 
 export interface TeamResult {
