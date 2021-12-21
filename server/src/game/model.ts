@@ -526,15 +526,23 @@ export class GameManager {
   }
 
   public resolveAcceptedShare(shareAction: PlayerActionShareOffered): void {
-    const sharerCard = this.getPlayerOrFail(shareAction.sharerId).role;
-    const shareeCard = this.getPlayerOrFail(shareAction.offeredPlayerId).role;
+    const sharerRole = this.managePlayer(shareAction.sharerId).getRoleOrFail();
+    const shareeRole = this.managePlayer(
+      shareAction.offeredPlayerId
+    ).getRoleOrFail();
 
-    if (sharerCard && shareeCard) {
-      if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
-        this.resolveAcceptedCardShare(shareAction, sharerCard, shareeCard);
-      } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
-        this.resolveAcceptedColorShare(shareAction, sharerCard, shareeCard);
-      }
+    if (shareAction.type === PlayerActionType.CARD_SHARE_OFFERED) {
+      this.resolveAcceptedCardShare(
+        shareAction,
+        sharerRole.key,
+        shareeRole.key
+      );
+    } else if (shareAction.type === PlayerActionType.COLOR_SHARE_OFFERED) {
+      this.resolveAcceptedColorShare(
+        shareAction,
+        sharerRole.key,
+        shareeRole.key
+      );
     }
   }
 
