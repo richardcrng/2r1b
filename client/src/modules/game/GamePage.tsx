@@ -44,6 +44,7 @@ export interface GameHandlers {
     offeredPlayerId: string,
     shareType: PlayerActionShareOfferedType
   ): void;
+  onPlayerKick(playerIdToKick: string): void;
   onPrivateEyeRolePrediction(roleKey: RoleKey): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,

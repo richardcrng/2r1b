@@ -146,6 +146,10 @@ function GameRoute(): JSX.Element {
                   offeredPlayerId,
                 });
             }}
+            onPlayerKick={(playerId) => {
+              game.data &&
+                socket.emit(ClientEvent.KICK_PLAYER, game.data.id, playerId);
+            }}
             onPrivateEyeRolePrediction={(roleKey) => {
               game.data &&
                 socket.emit(
