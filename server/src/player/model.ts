@@ -3,10 +3,12 @@ import { ServerEvent } from "../../../client/src/types/event.types";
 import { Player, RoomName } from "../../../client/src/types/game.types";
 import { GameManager, Operation } from "../game/model";
 import {
+  NotificationForPlayer,
   PlayerNotification,
   PlayerNotificationFn,
 } from "../../../client/src/types/notification.types";
 import {
+  isPlayerShareAction,
   PlayerAction,
   PlayerActionCardShareOffered,
   PlayerActionColorShareOffered,
@@ -81,15 +83,30 @@ export class PlayerManager {
     }
   }
 
+  public cancelAllPendingShares({
+    except = [],
+    notification,
+  }: {
+    except?: string[];
+    notification?: NotificationForPlayer;
+  } = {}): void {
+    this._withPointer((player) => {
+      const pendingShares = Object.values(player.pendingActions)
+        .filter(isPlayerShareAction)
+        .filter(({ id }) => !except.includes(id));
+      pendingShares.forEach((shareOffer) => {
+        this.resolvePendingAction(shareOffer, notification);
+      });
+    });
+  }
+
   public getRoleOrFail(): FullyDefined<PlayerRole> {
     const roleKey = this._pointer()?.role;
     if (!roleKey) throw new Error("Couldn't find role key for players");
     return getRoleDefinition(roleKey);
   }
 
-  public pushNotification(
-    playerNotification: PlayerNotification | PlayerNotificationFn
-  ): void {
+  public pushNotification(playerNotification: NotificationForPlayer): void {
     this._withPointer((player) => {
       const notification =
         typeof playerNotification === "function"
@@ -115,7 +132,7 @@ export class PlayerManager {
 
   public resolvePendingAction(
     playerAction: PlayerAction,
-    playerNotification?: PlayerNotification
+    playerNotification?: NotificationForPlayer
   ): void {
     this.update((player) => {
       delete player.pendingActions[playerAction.id];

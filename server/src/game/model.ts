@@ -3,6 +3,7 @@ import { selectDictionaryOfVotesForPlayers } from "../../../client/src/selectors
 import { ServerEvent, ServerIO } from "../../../client/src/types/event.types";
 import {
   GameNotification,
+  NotificationForPlayer,
   NotificationType,
   PlayerNotification,
   PlayerNotificationFn,
@@ -400,7 +401,7 @@ export class GameManager {
 
   public pushPlayerNotificationToRoom(
     roomName: RoomName,
-    notification: PlayerNotification | PlayerNotificationFn,
+    notification: NotificationForPlayer,
     where: (player: Player) => boolean = () => true
   ): void {
     this.pushPlayersNotification(
@@ -412,7 +413,7 @@ export class GameManager {
 
   public pushPlayerNotificationById(
     playerId: string,
-    notification: PlayerNotification | PlayerNotificationFn
+    notification: NotificationForPlayer
   ): void {
     this.managePlayer(playerId).pushNotification(notification);
   }
@@ -425,7 +426,7 @@ export class GameManager {
   }
 
   public pushPlayersNotification(
-    notification: PlayerNotification | PlayerNotificationFn,
+    notification: NotificationForPlayer,
     where: (player: Player) => boolean = () => true
   ): void {
     const playersToNotify = Object.values(this.players()).filter(where);
