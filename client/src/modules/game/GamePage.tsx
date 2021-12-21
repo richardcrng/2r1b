@@ -44,6 +44,7 @@ export interface GameHandlers {
     offeredPlayerId: string,
     shareType: PlayerActionShareOfferedType
   ): void;
+  onPlayerKick(playerIdToKick: string): void;
   onPrivateEyeRolePrediction(roleKey: RoleKey): void;
   onProposeLeader(
     proposedLeaderId: string | undefined,
@@ -66,6 +67,7 @@ function GamePage({
   onHostageSubmit,
   onOfferAbdication,
   onOfferShare,
+  onPlayerKick,
   onPrivateEyeRolePrediction,
   onProposeLeader,
   onResultsReveal,
@@ -94,6 +96,7 @@ function GamePage({
         {...{
           game,
           onGameStart,
+          onPlayerKick,
           onRoleIncrement,
           onSettingsUpdate,
           players,

@@ -1,6 +1,7 @@
 import {
   ClientEvent,
   ClientEventListeners,
+  ServerEvent,
 } from "../../../client/src/types/event.types";
 import {
   GameStatus,
@@ -175,6 +176,17 @@ export const incrementRoleInGame: ClientEventListeners[ClientEvent.INCREMENT_ROL
       game.rolesCount[role] += increment;
     });
   };
+
+export const kickPlayer: ClientEventListeners[ClientEvent.KICK_PLAYER] = (
+  gameId,
+  playerIdToKick
+) => {
+  const gameManager = new GameManager(gameId);
+  gameManager.io.emit(ServerEvent.PLAYER_KICKED, gameId, playerIdToKick);
+  gameManager.update((game) => {
+    delete game.players[playerIdToKick];
+  });
+};
 
 export const offerAbdication: ClientEventListeners[ClientEvent.OFFER_ABDICATION] =
   (gameId, room, abdicatingLeaderId, proposedNewLeaderId) => {

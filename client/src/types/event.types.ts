@@ -41,6 +41,7 @@ export enum ClientEvent {
   GET_PLAYER = "get-player",
   INCREMENT_ROLE = "increment-role",
   JOIN_GAME = "join",
+  KICK_PLAYER = "kick-player",
   OFFER_ABDICATION = "offer-abdication",
   OFFER_SHARE = "offer-share",
   PRIVATE_EYE_PREDICT = "private-eye-predict",
@@ -69,6 +70,7 @@ export enum ServerEvent {
   GAME_OVER = "game-over",
   GAME_UPDATED = "game-updated",
   PLAYER_GOTTEN = "player-gotten",
+  PLAYER_KICKED = "player-kicked",
   PLAYER_NOTIFICATION = "player-notification",
   PLAYER_NOT_FOUND = "player-not-found",
   PLAYER_UPDATED = "player-updated",
@@ -143,6 +145,8 @@ export type ClientEventListeners = {
   ) => void;
 
   [ClientEvent.JOIN_GAME]: (gameId: string, player: Player) => void;
+
+  [ClientEvent.KICK_PLAYER]: (gameId: string, playerId: string) => void;
 
   [ClientEvent.OFFER_ABDICATION]: (
     gameId: string,
@@ -234,6 +238,7 @@ export type ServerEventListeners = {
   [ServerEvent.GAME_NOT_FOUND]: () => void;
   [ServerEvent.GAME_UPDATED]: (gameId: string, game: Game) => void;
   [ServerEvent.PLAYER_GOTTEN]: (playerId: string, player: Player) => void;
+  [ServerEvent.PLAYER_KICKED]: (gameId: string, playerId: string) => void;
   [ServerEvent.PLAYER_UPDATED]: (playerId: string, player: Player) => void;
   [ServerEvent.PLAYER_NOTIFICATION]: (
     playersToNotify: Record<string, true>,

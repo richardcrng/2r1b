@@ -4,11 +4,12 @@ import { useState } from "react";
 import GameLobbySetupModal from "./setup/GameLobbySetupModal";
 import { GameHandlers } from "../GamePage";
 
-interface Props {
+interface Props
+  extends Pick<
+    GameHandlers,
+    "onGameStart" | "onPlayerKick" | "onRoleIncrement" | "onSettingsUpdate"
+  > {
   game: Game;
-  onGameStart: GameHandlers["onGameStart"];
-  onRoleIncrement: GameHandlers["onRoleIncrement"];
-  onSettingsUpdate: GameHandlers["onSettingsUpdate"];
   players: Player[];
   player: Player;
 }
@@ -16,6 +17,7 @@ interface Props {
 function GameLobby({
   game,
   onGameStart,
+  onPlayerKick,
   onRoleIncrement,
   onSettingsUpdate,
   players,
@@ -29,7 +31,7 @@ function GameLobby({
   return (
     <>
       <GameLobbyHome
-        {...{ game, onGameStart, players, player }}
+        {...{ game, onGameStart, onPlayerKick, players, player }}
         handleViewSetup={handleOpen}
       />
       <GameLobbySetupModal
