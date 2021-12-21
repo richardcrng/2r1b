@@ -77,8 +77,8 @@ export const WIN_CONDITIONS = {
   ),
   [GreyRoleName.MI6]: (
     <>
-      You win if card share with <i>both</i> the {PRESIDENT} and the {BOMBER}{" "}
-      before the end of the game.
+      You win if you card share with <i>both</i> the {PRESIDENT} and the{" "}
+      {BOMBER} before the end of the game.
     </>
   ),
   [GreyRoleName.PRIVATE_EYE]: (
