@@ -6,7 +6,6 @@ import styled from "styled-components";
 // import { gameLobbyReadiness } from "../../selectors/game";
 import { Game, Player } from "../../../../types/game.types";
 import PlayerList from "../../../../lib/atoms/PlayerList";
-import PlayerAvatar from "../../../../lib/atoms/PlayerAvatar";
 import { SetupAlert } from "../../../../utils/setup-utils";
 import { selectGameSetupErrorsAndWarnings } from "../../../../selectors/game-selectors";
 import { GameHandlers } from "../../GamePage";
