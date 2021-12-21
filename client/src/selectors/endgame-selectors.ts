@@ -221,11 +221,41 @@ export const selectIsGamblerPredictionCorrect = createSelector(
   selectTeamWinCheckResult,
   (endgame, teamWin) => endgame.gamblerPrediction === teamWin.winningColor
 );
+
+export const selectIsSniperShotNeeded = createSelector(
+  selectIsRoleInPlay,
+  selectGameEndgameState,
+  (isRoleInPlay, endgame) => isRoleInPlay("SNIPER_GREY") && !endgame.sniperShot
+);
+
+export const selectIsSniperShotOnDecoy = createSelector(
+  selectGameEndgameState,
+  selectFindPlayerWithRole,
+  (endgame, findPlayerWithRole) =>
+    endgame.sniperShot &&
+    endgame.sniperShot === findPlayerWithRole("DECOY_GREY")?.socketId
+);
+
+export const selectIsSniperShotOnTarget = createSelector(
+  selectGameEndgameState,
+  selectFindPlayerWithRole,
+  (endgame, findPlayerWithRole) =>
+    endgame.sniperShot &&
+    endgame.sniperShot === findPlayerWithRole("TARGET_GREY")?.socketId
+);
+
 export const selectIsGameEndgameComplete = createSelector(
   selectIsPrivateEyeIdentificationNeeded,
   selectIsGamblerPredictionNeeded,
-  (isPrivateEyeIdentificationNeeded, isGamblerPredictionNeeded) =>
-    [isPrivateEyeIdentificationNeeded, isGamblerPredictionNeeded].some(
-      (bool) => bool
-    )
+  selectIsSniperShotNeeded,
+  (
+    isPrivateEyeIdentificationNeeded,
+    isGamblerPredictionNeeded,
+    isSniperShotNeeded
+  ) =>
+    [
+      isPrivateEyeIdentificationNeeded,
+      isGamblerPredictionNeeded,
+      isSniperShotNeeded,
+    ].some((bool) => bool)
 );
