@@ -14,7 +14,13 @@ import {
   PlayerActionType,
   PlayerShareRecord,
 } from "../../../client/src/types/player-action.types";
-import { RoleKey, TeamColor } from "../../../client/src/types/role.types";
+import {
+  FullyDefined,
+  PlayerRole,
+  RoleKey,
+  TeamColor,
+} from "../../../client/src/types/role.types";
+import { getRoleDefinition } from "../../../client/src/utils/role-utils";
 
 export class PlayerManager {
   constructor(
@@ -73,6 +79,12 @@ export class PlayerManager {
     } else {
       return { status: "error" };
     }
+  }
+
+  public getRoleOrFail(): FullyDefined<PlayerRole> {
+    const roleKey = this._pointer()?.role;
+    if (!roleKey) throw new Error("Couldn't find role key for players");
+    return getRoleDefinition(roleKey);
   }
 
   public pushNotification(
