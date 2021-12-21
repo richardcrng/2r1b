@@ -1,8 +1,8 @@
 import { Game, RoomName } from "../types/game.types";
-import { selectTeamWinCheckResult } from "./game-selectors";
 import { createDummyGame, createDummyPlayers } from "../utils/data-utils";
 import { GameManager } from "../../../server/src/game/model";
 import { TeamColor } from "../types/role.types";
+import { selectTeamWinCheckResult } from ".";
 
 describe("selectTeamWinCheckResult", () => {
   test("Declares win for red team when Bomber is in same endgame room as President", () => {
