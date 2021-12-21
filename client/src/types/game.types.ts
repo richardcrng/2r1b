@@ -150,9 +150,9 @@ export const createRound = (
 });
 
 export const createStartingRounds = (): Record<number, Round> => ({
-  1: createRound(10, 1),
-  2: createRound(10, 2),
-  3: createRound(10, 3),
+  1: createRound(180, 1),
+  2: createRound(120, 2),
+  3: createRound(60, 3),
 });
 
 export type PlayerRoomAllocation = Record<string, RoomName>;
