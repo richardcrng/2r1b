@@ -113,10 +113,12 @@ export class PlayerManager {
               ? `${this.getNameOrFail()} has declined your ${shareType} share offer to share with someone else`
               : `${this.getNameOrFail()} has withdrawn their ${shareType} share offer to share with someone else`;
 
-          this.gameManager.pushPlayerNotificationById(otherPlayerId, {
-            type: NotificationType.GENERAL,
-            message: messageToOtherPlayer,
-          });
+          this.gameManager
+            .managePlayer(otherPlayerId)
+            .resolvePendingAction(shareOffer, {
+              type: NotificationType.GENERAL,
+              message: messageToOtherPlayer,
+            });
         }
       });
     });
