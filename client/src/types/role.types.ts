@@ -1,4 +1,4 @@
-import { Optional } from "./util.typs";
+import { Optional } from "./util.types";
 import { WinCondition } from "./role-responsibilities";
 
 export enum TeamColor {
