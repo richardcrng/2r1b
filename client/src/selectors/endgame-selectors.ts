@@ -232,16 +232,38 @@ export const selectIsSniperShotOnDecoy = createSelector(
   selectGameEndgameState,
   selectFindPlayerWithRole,
   (endgame, findPlayerWithRole) =>
-    endgame.sniperShot &&
-    endgame.sniperShot === findPlayerWithRole("DECOY_GREY")?.socketId
+    !!(
+      endgame.sniperShot &&
+      endgame.sniperShot === findPlayerWithRole("DECOY_GREY")?.socketId
+    )
 );
 
 export const selectIsSniperShotOnTarget = createSelector(
   selectGameEndgameState,
   selectFindPlayerWithRole,
   (endgame, findPlayerWithRole) =>
-    endgame.sniperShot &&
-    endgame.sniperShot === findPlayerWithRole("TARGET_GREY")?.socketId
+    !!(
+      endgame.sniperShot &&
+      endgame.sniperShot === findPlayerWithRole("TARGET_GREY")?.socketId
+    )
+);
+
+export const selectGreyResultHelpers = createSelector(
+  selectIsPrivateEyeIdentificationCorrect,
+  selectIsGamblerPredictionCorrect,
+  selectIsSniperShotOnTarget,
+  selectIsSniperShotOnDecoy,
+  (
+    isPrivateEyeWin,
+    isGamblerWin,
+    isSniperShotOnTarget,
+    isSniperShotOnDecoy
+  ) => ({
+    isPrivateEyeWin,
+    isGamblerWin,
+    isSniperShotOnTarget,
+    isSniperShotOnDecoy,
+  })
 );
 
 export const selectIsGameEndgameComplete = createSelector(

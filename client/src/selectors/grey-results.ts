@@ -12,8 +12,7 @@ export const selectGreyPlayerResults = createSelector(
   SELECTORS.selectGame,
   SELECTORS.selectIsRoleInPlay,
   SELECTORS.selectGameEndgameState,
-  SELECTORS.selectIsPrivateEyeIdentificationCorrect,
-  SELECTORS.selectIsGamblerPredictionCorrect,
+  SELECTORS.selectGreyResultHelpers,
   SELECTORS.selectFindPlayerWithRole,
   SELECTORS.selectOfficeHolder,
   SELECTORS.selectDescribeOfficeHolder,
@@ -24,8 +23,12 @@ export const selectGreyPlayerResults = createSelector(
     game,
     isRoleInPlay,
     endgame,
-    isPrivateEyeWin,
-    isGamblerWin,
+    {
+      isGamblerWin,
+      isPrivateEyeWin,
+      isSniperShotOnTarget,
+      isSniperShotOnDecoy,
+    },
     findPlayerWithRole,
     officeHolder,
     describeOfficeHolder,
@@ -85,6 +88,40 @@ export const selectGreyPlayerResults = createSelector(
             : didShareWithExplosivesHolder
             ? `Card shared with ${describeExplosivesHolder} but not ${describeOfficeHolder}`
             : `Card shared with neither ${describeOfficeHolder} nor ${describeExplosivesHolder}`
+        }`,
+      });
+    }
+
+    if (
+      isRoleInPlay("SNIPER_GREY") &&
+      isRoleInPlay("TARGET_GREY") &&
+      isRoleInPlay("DECOY_GREY")
+    ) {
+      results.push({
+        role: "SNIPER_GREY",
+        isWin: isSniperShotOnTarget,
+        reason: `${
+          isSniperShotOnTarget ? `Shot the Target` : "Did not shoot the Target"
+        }`,
+      });
+
+      results.push({
+        role: "TARGET_GREY",
+        isWin: !isSniperShotOnTarget,
+        reason: `${
+          isSniperShotOnTarget
+            ? "Was shot by the Sniper"
+            : "Was not shot by the Sniper"
+        }`,
+      });
+
+      results.push({
+        role: "DECOY_GREY",
+        isWin: isSniperShotOnDecoy,
+        reason: `${
+          isSniperShotOnDecoy
+            ? "Was shot by the Sniper"
+            : "Was not shot by the Sniper"
         }`,
       });
     }
