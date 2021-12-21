@@ -194,7 +194,7 @@ export const selectTeamWinCheckResult = createSelector(
     } else {
       return {
         winningColor: TeamColor.BLUE,
-        reason: `The ${officeHolder.description} was survived! They were kept apart from the ${explosivesHolder.description}.`,
+        reason: `The ${officeHolder.description} survived! They were kept apart from the ${explosivesHolder.description}.`,
       };
     }
   }
