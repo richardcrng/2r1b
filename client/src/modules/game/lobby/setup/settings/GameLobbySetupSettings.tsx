@@ -18,7 +18,7 @@ function GameLobbySetupSettings({
       <Checkbox
         checked={settings.colorSharing}
         label={{
-          children: (
+          children: () => (
             <>
               <strong>Color sharing:</strong>{" "}
               {settings.colorSharing ? "ON" : "OFF"}
