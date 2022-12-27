@@ -83,8 +83,7 @@ function GameOngoingHostageSelection({
   roomName,
   round,
 }: Props): JSX.Element {
-  const currentHostages: string[] =
-    selectCurrentRoundRoomHostages(game)[roomName];
+  const currentHostages = selectCurrentRoundRoomHostages(game)[roomName];
   const hostageTotal = selectCurrentRoundHostageTotal(game);
   const isRightHostageCount = hostageTotal === currentHostages.length;
 
